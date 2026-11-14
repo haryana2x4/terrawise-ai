@@ -1,0 +1,427 @@
+{
+  "generatedAt": "2026-11-15T01:10:00+05:30",
+  "totalScenes": 8,
+  "scenes": [
+    {
+      "id": "dawn_onion_mist",
+      "title": "Misty Dawn over Onion Rows, Rahuri",
+      "timeOfDay": [
+        "dawn"
+      ],
+      "season": [
+        "rabi",
+        "summer"
+      ],
+      "focalPoint": {
+        "x": 0.45,
+        "y": 0.55
+      },
+      "alt": {
+        "mr": "\u0930\u093e\u0939\u0941\u0930\u0940 \u092f\u0947\u0925\u0940\u0932 \u0915\u093e\u0902\u0926\u094d\u092f\u093e\u091a\u094d\u092f\u093e \u0936\u0947\u0924\u093e\u0935\u0930 \u092a\u0939\u093e\u091f\u0947\u091a\u0947 \u0927\u0941\u0915\u0947 \u0906\u0923\u093f \u0938\u0942\u0930\u094d\u092f\u094b\u0926\u092f",
+        "hi": "\u0930\u093e\u0939\u0941\u0930\u0940 \u0915\u0947 \u092a\u094d\u092f\u093e\u091c \u0915\u0947 \u0916\u0947\u0924\u094b\u0902 \u092a\u0930 \u0938\u0941\u092c\u0939 \u0915\u093e \u0915\u094b\u0939\u0930\u093e \u0914\u0930 \u0938\u0942\u0930\u094d\u092f\u094b\u0926\u092f",
+        "en": "Misty dawn sunrise over cultivated onion rows in Rahuri, Ahilya Nagar"
+      },
+      "palette": [
+        "#fad6a5",
+        "#da9166",
+        "#5c764d",
+        "#233d26"
+      ],
+      "files": {
+        "desktop_2400": {
+          "webp": "/img/hero/dawn_onion_mist_desktop_2400.webp",
+          "jpg": "/img/hero/dawn_onion_mist_desktop_2400.jpg",
+          "size_kb": 215.5
+        },
+        "desktop_1600": {
+          "webp": "/img/hero/dawn_onion_mist_desktop_1600.webp",
+          "jpg": "/img/hero/dawn_onion_mist_desktop_1600.jpg",
+          "size_kb": 118.3
+        },
+        "tablet_1024": {
+          "webp": "/img/hero/dawn_onion_mist_tablet_1024.webp",
+          "jpg": "/img/hero/dawn_onion_mist_tablet_1024.jpg",
+          "size_kb": 78.4
+        },
+        "mobile_640": {
+          "webp": "/img/hero/dawn_onion_mist_mobile_640.webp",
+          "jpg": "/img/hero/dawn_onion_mist_mobile_640.jpg",
+          "size_kb": 58.2
+        }
+      },
+      "thumb": "/img/hero/dawn_onion_mist_thumb.webp",
+      "licence": "CC0 Public Domain / Terrawise Pilot Production",
+      "author": "TERRAWISE Agro-Visual Lab",
+      "sourceUrl": "https://terrawise.internal/hero/dawn_onion_mist"
+    },
+    {
+      "id": "morning_vineyard_niphad",
+      "title": "Morning Sun in Niphad Vineyards, Nashik",
+      "timeOfDay": [
+        "morning"
+      ],
+      "season": [
+        "rabi",
+        "post_monsoon"
+      ],
+      "focalPoint": {
+        "x": 0.5,
+        "y": 0.5
+      },
+      "alt": {
+        "mr": "\u0928\u093f\u092b\u093e\u0921 \u0928\u093e\u0936\u093f\u0915 \u092f\u0947\u0925\u0940\u0932 \u0926\u094d\u0930\u093e\u0915\u094d\u0937 \u092c\u093e\u0917\u0947\u0935\u0930 \u0938\u0915\u093e\u0933\u091a\u0947 \u0915\u094b\u0935\u0933\u0947 \u090a\u0928",
+        "hi": "\u0928\u093f\u092b\u093e\u0921 \u0928\u093e\u0938\u093f\u0915 \u0915\u0947 \u0905\u0902\u0917\u0942\u0930 \u0915\u0947 \u092c\u093e\u0917\u094b\u0902 \u092e\u0947\u0902 \u0938\u0941\u092c\u0939 \u0915\u0940 \u0938\u0941\u0928\u0939\u0930\u0940 \u0927\u0942\u092a",
+        "en": "Morning sunlight washing across table grape vineyard rows in Niphad, Nashik"
+      },
+      "palette": [
+        "#c3e6b4",
+        "#78b464",
+        "#2d6a4f",
+        "#1b4332"
+      ],
+      "files": {
+        "desktop_2400": {
+          "webp": "/img/hero/morning_vineyard_niphad_desktop_2400.webp",
+          "jpg": "/img/hero/morning_vineyard_niphad_desktop_2400.jpg",
+          "size_kb": 180.9
+        },
+        "desktop_1600": {
+          "webp": "/img/hero/morning_vineyard_niphad_desktop_1600.webp",
+          "jpg": "/img/hero/morning_vineyard_niphad_desktop_1600.jpg",
+          "size_kb": 99.3
+        },
+        "tablet_1024": {
+          "webp": "/img/hero/morning_vineyard_niphad_tablet_1024.webp",
+          "jpg": "/img/hero/morning_vineyard_niphad_tablet_1024.jpg",
+          "size_kb": 66.6
+        },
+        "mobile_640": {
+          "webp": "/img/hero/morning_vineyard_niphad_mobile_640.webp",
+          "jpg": "/img/hero/morning_vineyard_niphad_mobile_640.jpg",
+          "size_kb": 49.5
+        }
+      },
+      "thumb": "/img/hero/morning_vineyard_niphad_thumb.webp",
+      "licence": "CC0 Public Domain / Terrawise Pilot Production",
+      "author": "TERRAWISE Agro-Visual Lab",
+      "sourceUrl": "https://terrawise.internal/hero/morning_vineyard_niphad"
+    },
+    {
+      "id": "noon_lush_crops",
+      "title": "Vibrant Soybean and Sugarcane under Bright Sky",
+      "timeOfDay": [
+        "noon"
+      ],
+      "season": [
+        "kharif",
+        "rabi"
+      ],
+      "focalPoint": {
+        "x": 0.5,
+        "y": 0.4
+      },
+      "alt": {
+        "mr": "\u0926\u0941\u092a\u093e\u0930\u091a\u094d\u092f\u093e \u0938\u094d\u0935\u091a\u094d\u091b \u0906\u0915\u093e\u0936\u093e\u0916\u093e\u0932\u0940 \u0939\u093f\u0930\u0935\u0940\u0917\u093e\u0930 \u0938\u094b\u092f\u093e\u092c\u0940\u0928 \u0935 \u090a\u0938\u093e\u091a\u0940 \u0936\u0947\u0924\u0940",
+        "hi": "\u0926\u094b\u092a\u0939\u0930 \u0915\u0947 \u0938\u093e\u092b \u0906\u0938\u092e\u093e\u0928 \u0915\u0947 \u0928\u0940\u091a\u0947 \u0939\u0930\u0940-\u092d\u0930\u0940 \u0938\u094b\u092f\u093e\u092c\u0940\u0928 \u0914\u0930 \u0917\u0928\u094d\u0928\u0947 \u0915\u0940 \u092b\u0938\u0932",
+        "en": "Lush vibrant green crops under clear midday sun in western Maharashtra"
+      },
+      "palette": [
+        "#8cc8e6",
+        "#4c8b3f",
+        "#1f4d2b",
+        "#7a4e2d"
+      ],
+      "files": {
+        "desktop_2400": {
+          "webp": "/img/hero/noon_lush_crops_desktop_2400.webp",
+          "jpg": "/img/hero/noon_lush_crops_desktop_2400.jpg",
+          "size_kb": 127.6
+        },
+        "desktop_1600": {
+          "webp": "/img/hero/noon_lush_crops_desktop_1600.webp",
+          "jpg": "/img/hero/noon_lush_crops_desktop_1600.jpg",
+          "size_kb": 69.0
+        },
+        "tablet_1024": {
+          "webp": "/img/hero/noon_lush_crops_tablet_1024.webp",
+          "jpg": "/img/hero/noon_lush_crops_tablet_1024.jpg",
+          "size_kb": 45.7
+        },
+        "mobile_640": {
+          "webp": "/img/hero/noon_lush_crops_mobile_640.webp",
+          "jpg": "/img/hero/noon_lush_crops_mobile_640.jpg",
+          "size_kb": 34.2
+        }
+      },
+      "thumb": "/img/hero/noon_lush_crops_thumb.webp",
+      "licence": "CC0 Public Domain / Terrawise Pilot Production",
+      "author": "TERRAWISE Agro-Visual Lab",
+      "sourceUrl": "https://terrawise.internal/hero/noon_lush_crops"
+    },
+    {
+      "id": "golden_hour_fields",
+      "title": "Golden Hour over Bajra and Jowar Harvest",
+      "timeOfDay": [
+        "golden_hour"
+      ],
+      "season": [
+        "kharif",
+        "rabi",
+        "summer"
+      ],
+      "focalPoint": {
+        "x": 0.55,
+        "y": 0.45
+      },
+      "alt": {
+        "mr": "\u0905\u0939\u093f\u0932\u094d\u092f\u093e\u0928\u0917\u0930\u092e\u0927\u0940\u0932 \u092c\u093e\u091c\u0930\u0940\u091a\u094d\u092f\u093e \u0936\u0947\u0924\u093e\u0935\u0930 \u0938\u094b\u0928\u0947\u0930\u0940 \u0938\u0902\u0927\u094d\u092f\u093e\u0915\u093e\u0933\u091a\u0947 \u0905\u092a\u094d\u0930\u0924\u093f\u092e \u0926\u0943\u0936\u094d\u092f",
+        "hi": "\u0905\u0939\u093f\u0932\u094d\u092f\u093e\u0928\u0917\u0930 \u092e\u0947\u0902 \u092c\u093e\u091c\u0930\u0947 \u0915\u0947 \u0916\u0947\u0924 \u092a\u0930 \u0938\u0941\u0928\u0939\u0930\u0940 \u0936\u093e\u092e \u0915\u093e \u0916\u0942\u092c\u0938\u0942\u0930\u0924 \u0926\u0943\u0936\u094d\u092f",
+        "en": "Golden hour sunlight backlighting mature bajra stalks in Ahilya Nagar"
+      },
+      "palette": [
+        "#f2a93b",
+        "#d4822b",
+        "#964b19",
+        "#2a1e14"
+      ],
+      "files": {
+        "desktop_2400": {
+          "webp": "/img/hero/golden_hour_fields_desktop_2400.webp",
+          "jpg": "/img/hero/golden_hour_fields_desktop_2400.jpg",
+          "size_kb": 172.8
+        },
+        "desktop_1600": {
+          "webp": "/img/hero/golden_hour_fields_desktop_1600.webp",
+          "jpg": "/img/hero/golden_hour_fields_desktop_1600.jpg",
+          "size_kb": 95.3
+        },
+        "tablet_1024": {
+          "webp": "/img/hero/golden_hour_fields_tablet_1024.webp",
+          "jpg": "/img/hero/golden_hour_fields_tablet_1024.jpg",
+          "size_kb": 64.9
+        },
+        "mobile_640": {
+          "webp": "/img/hero/golden_hour_fields_mobile_640.webp",
+          "jpg": "/img/hero/golden_hour_fields_mobile_640.jpg",
+          "size_kb": 47.9
+        }
+      },
+      "thumb": "/img/hero/golden_hour_fields_thumb.webp",
+      "licence": "CC0 Public Domain / Terrawise Pilot Production",
+      "author": "TERRAWISE Agro-Visual Lab",
+      "sourceUrl": "https://terrawise.internal/hero/golden_hour_fields"
+    },
+    {
+      "id": "monsoon_ghats_clouds",
+      "title": "Monsoon Rain Clouds Rolling over Western Ghats",
+      "timeOfDay": [
+        "morning",
+        "noon",
+        "golden_hour"
+      ],
+      "season": [
+        "monsoon",
+        "kharif"
+      ],
+      "focalPoint": {
+        "x": 0.4,
+        "y": 0.6
+      },
+      "alt": {
+        "mr": "\u092a\u0936\u094d\u091a\u093f\u092e \u0918\u093e\u091f\u093e\u0924\u0940\u0932 \u0905\u0915\u094b\u0932\u0947 \u0921\u094b\u0902\u0917\u0930\u0930\u093e\u0902\u0917\u093e\u0902\u0935\u0930 \u0906\u0932\u0947\u0932\u0947 \u092a\u093e\u0935\u0938\u093e\u0933\u0940 \u0922\u0917 \u0906\u0923\u093f \u0936\u0947\u0924\u0940",
+        "hi": "\u092a\u0936\u094d\u091a\u093f\u092e\u0940 \u0918\u093e\u091f \u0915\u0940 \u092a\u0939\u093e\u0921\u093c\u093f\u092f\u094b\u0902 \u092a\u0930 \u0909\u092e\u0921\u093c\u0924\u0947 \u092e\u093e\u0928\u0938\u0942\u0928\u0940 \u092c\u093e\u0926\u0932 \u0914\u0930 \u0939\u0930\u0947 \u0916\u0947\u0924",
+        "en": "Dramatic monsoon rain clouds crowning verdant terrace fields near Western Ghats"
+      },
+      "palette": [
+        "#647d8c",
+        "#3c5f50",
+        "#234b37",
+        "#142d23"
+      ],
+      "files": {
+        "desktop_2400": {
+          "webp": "/img/hero/monsoon_ghats_clouds_desktop_2400.webp",
+          "jpg": "/img/hero/monsoon_ghats_clouds_desktop_2400.jpg",
+          "size_kb": 76.0
+        },
+        "desktop_1600": {
+          "webp": "/img/hero/monsoon_ghats_clouds_desktop_1600.webp",
+          "jpg": "/img/hero/monsoon_ghats_clouds_desktop_1600.jpg",
+          "size_kb": 41.9
+        },
+        "tablet_1024": {
+          "webp": "/img/hero/monsoon_ghats_clouds_tablet_1024.webp",
+          "jpg": "/img/hero/monsoon_ghats_clouds_tablet_1024.jpg",
+          "size_kb": 28.5
+        },
+        "mobile_640": {
+          "webp": "/img/hero/monsoon_ghats_clouds_mobile_640.webp",
+          "jpg": "/img/hero/monsoon_ghats_clouds_mobile_640.jpg",
+          "size_kb": 20.6
+        }
+      },
+      "thumb": "/img/hero/monsoon_ghats_clouds_thumb.webp",
+      "licence": "CC0 Public Domain / Terrawise Pilot Production",
+      "author": "TERRAWISE Agro-Visual Lab",
+      "sourceUrl": "https://terrawise.internal/hero/monsoon_ghats_clouds"
+    },
+    {
+      "id": "dusk_horizon_glow",
+      "title": "Dusk Silhouette over Pomegranate Orchard, Sangamner",
+      "timeOfDay": [
+        "dusk"
+      ],
+      "season": [
+        "rabi",
+        "summer"
+      ],
+      "focalPoint": {
+        "x": 0.5,
+        "y": 0.5
+      },
+      "alt": {
+        "mr": "\u0938\u0902\u0917\u092e\u0928\u0947\u0930 \u092f\u0947\u0925\u0940\u0932 \u0921\u093e\u0933\u093f\u0902\u092c\u093e\u091a\u094d\u092f\u093e \u092c\u093e\u0917\u0947\u0935\u0930 \u0938\u093e\u092f\u0902\u0915\u093e\u0933\u091a\u0940 \u0936\u093e\u0902\u0924 \u0915\u093f\u0930\u0923\u0947",
+        "hi": "\u0938\u0902\u0917\u092e\u0928\u0947\u0930 \u092e\u0947\u0902 \u0905\u0928\u093e\u0930 \u0915\u0947 \u092c\u093e\u0917\u094b\u0902 \u092a\u0930 \u0922\u0932\u0924\u0940 \u0936\u093e\u092e \u0915\u0940 \u0936\u093e\u0902\u0924 \u0930\u094b\u0936\u0928\u0940",
+        "en": "Dusk horizon with deep purple and crimson glow over pomegranate orchard in Sangamner"
+      },
+      "palette": [
+        "#b45a6e",
+        "#783c5f",
+        "#412341",
+        "#191423"
+      ],
+      "files": {
+        "desktop_2400": {
+          "webp": "/img/hero/dusk_horizon_glow_desktop_2400.webp",
+          "jpg": "/img/hero/dusk_horizon_glow_desktop_2400.jpg",
+          "size_kb": 128.5
+        },
+        "desktop_1600": {
+          "webp": "/img/hero/dusk_horizon_glow_desktop_1600.webp",
+          "jpg": "/img/hero/dusk_horizon_glow_desktop_1600.jpg",
+          "size_kb": 70.1
+        },
+        "tablet_1024": {
+          "webp": "/img/hero/dusk_horizon_glow_tablet_1024.webp",
+          "jpg": "/img/hero/dusk_horizon_glow_tablet_1024.jpg",
+          "size_kb": 47.9
+        },
+        "mobile_640": {
+          "webp": "/img/hero/dusk_horizon_glow_mobile_640.webp",
+          "jpg": "/img/hero/dusk_horizon_glow_mobile_640.jpg",
+          "size_kb": 35.7
+        }
+      },
+      "thumb": "/img/hero/dusk_horizon_glow_thumb.webp",
+      "licence": "CC0 Public Domain / Terrawise Pilot Production",
+      "author": "TERRAWISE Agro-Visual Lab",
+      "sourceUrl": "https://terrawise.internal/hero/dusk_horizon_glow"
+    },
+    {
+      "id": "night_sky_field",
+      "title": "Quiet Starry Night over Resting Maharashtra Farmland",
+      "timeOfDay": [
+        "night"
+      ],
+      "season": [
+        "rabi",
+        "summer",
+        "monsoon"
+      ],
+      "focalPoint": {
+        "x": 0.5,
+        "y": 0.4
+      },
+      "alt": {
+        "mr": "\u0930\u093e\u0924\u094d\u0930\u0940\u091a\u094d\u092f\u093e \u0936\u093e\u0902\u0924 \u0906\u0915\u093e\u0936\u093e\u0916\u093e\u0932\u0940 \u091a\u093e\u0902\u0926\u0923\u094d\u092f\u093e\u0924 \u0928\u094d\u0939\u093e\u0932\u0947\u0932\u0947 \u0936\u0947\u0924",
+        "hi": "\u0924\u093e\u0930\u094b\u0902 \u092d\u0930\u0947 \u0936\u093e\u0902\u0924 \u0906\u0938\u092e\u093e\u0928 \u0915\u0947 \u0928\u0940\u091a\u0947 \u0930\u093e\u0924 \u0915\u093e \u0936\u093e\u0902\u0924 \u0916\u0947\u0924",
+        "en": "Starry indigo night sky arched peacefully over resting Maharashtra fields"
+      },
+      "palette": [
+        "#141b34",
+        "#0f1628",
+        "#2a3c50",
+        "#0a0e19"
+      ],
+      "files": {
+        "desktop_2400": {
+          "webp": "/img/hero/night_sky_field_desktop_2400.webp",
+          "jpg": "/img/hero/night_sky_field_desktop_2400.jpg",
+          "size_kb": 26.6
+        },
+        "desktop_1600": {
+          "webp": "/img/hero/night_sky_field_desktop_1600.webp",
+          "jpg": "/img/hero/night_sky_field_desktop_1600.jpg",
+          "size_kb": 13.4
+        },
+        "tablet_1024": {
+          "webp": "/img/hero/night_sky_field_tablet_1024.webp",
+          "jpg": "/img/hero/night_sky_field_tablet_1024.jpg",
+          "size_kb": 7.1
+        },
+        "mobile_640": {
+          "webp": "/img/hero/night_sky_field_mobile_640.webp",
+          "jpg": "/img/hero/night_sky_field_mobile_640.jpg",
+          "size_kb": 4.5
+        }
+      },
+      "thumb": "/img/hero/night_sky_field_thumb.webp",
+      "licence": "CC0 Public Domain / Terrawise Pilot Production",
+      "author": "TERRAWISE Agro-Visual Lab",
+      "sourceUrl": "https://terrawise.internal/hero/night_sky_field"
+    },
+    {
+      "id": "aerial_patchwork_fields",
+      "title": "Satellite Aerial View of Cadastral Crop Patchwork",
+      "timeOfDay": [
+        "morning",
+        "noon"
+      ],
+      "season": [
+        "rabi",
+        "kharif"
+      ],
+      "focalPoint": {
+        "x": 0.5,
+        "y": 0.5
+      },
+      "alt": {
+        "mr": "\u0909\u092a\u0917\u094d\u0930\u0939\u093e\u0935\u0930\u0942\u0928 \u0926\u093f\u0938\u0923\u093e\u0930\u093e \u0935\u093f\u0935\u093f\u0927 \u092a\u093f\u0915\u093e\u0902\u091a\u094d\u092f\u093e \u0936\u0947\u0924\u093e\u0902\u091a\u093e \u0935\u093f\u0939\u0902\u0917\u092e \u0928\u0915\u093e\u0936\u093e",
+        "hi": "\u0909\u092a\u0917\u094d\u0930\u0939 \u0938\u0947 \u0926\u093f\u0916\u0928\u0947 \u0935\u093e\u0932\u093e \u0935\u093f\u092d\u093f\u0928\u094d\u0928 \u092b\u0938\u0932\u094b\u0902 \u0915\u0947 \u0916\u0947\u0924\u094b\u0902 \u0915\u093e \u0935\u093f\u0939\u0902\u0917\u092e \u0926\u0943\u0936\u094d\u092f",
+        "en": "Geometric satellite patchwork of crop fields, canals and farm ponds across Godavari basin"
+      },
+      "palette": [
+        "#508255",
+        "#91a06e",
+        "#c3af82",
+        "#32553c"
+      ],
+      "files": {
+        "desktop_2400": {
+          "webp": "/img/hero/aerial_patchwork_fields_desktop_2400.webp",
+          "jpg": "/img/hero/aerial_patchwork_fields_desktop_2400.jpg",
+          "size_kb": 96.8
+        },
+        "desktop_1600": {
+          "webp": "/img/hero/aerial_patchwork_fields_desktop_1600.webp",
+          "jpg": "/img/hero/aerial_patchwork_fields_desktop_1600.jpg",
+          "size_kb": 54.2
+        },
+        "tablet_1024": {
+          "webp": "/img/hero/aerial_patchwork_fields_tablet_1024.webp",
+          "jpg": "/img/hero/aerial_patchwork_fields_tablet_1024.jpg",
+          "size_kb": 37.6
+        },
+        "mobile_640": {
+          "webp": "/img/hero/aerial_patchwork_fields_mobile_640.webp",
+          "jpg": "/img/hero/aerial_patchwork_fields_mobile_640.jpg",
+          "size_kb": 28.9
+        }
+      },
+      "thumb": "/img/hero/aerial_patchwork_fields_thumb.webp",
+      "licence": "CC0 Public Domain / Terrawise Pilot Production",
+      "author": "TERRAWISE Agro-Visual Lab",
+      "sourceUrl": "https://terrawise.internal/hero/aerial_patchwork_fields"
+    }
+  ]
+}
