@@ -17,7 +17,6 @@ export default {
         }
       },
       fontSize: {
-        // Enforcing Rule R5: body text 18px or larger
         'base': ['1.125rem', { lineHeight: '1.65rem' }], // 18px
         'lg': ['1.25rem', { lineHeight: '1.75rem' }],   // 20px
         'xl': ['1.5rem', { lineHeight: '2rem' }],       // 24px

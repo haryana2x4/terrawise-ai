@@ -65,7 +65,7 @@ export const Login: React.FC<LoginProps> = ({
   const [simulatedHour, setSimulatedHour] = useState<number | null>(null);
   const [sunTheme, setSunTheme] = useState(() => computeSunTheme());
 
-  // Evaluator / Demo Drawer (opened via ?demo=1, 'D' key, or subtle badge)
+  // Demo helper drawer (opened via ?demo=1, 'D' key, or footer button)
   const [showDemoDrawer, setShowDemoDrawer] = useState(() => {
     return new URLSearchParams(window.location.search).get("demo") === "1";
   });
@@ -86,7 +86,7 @@ export const Login: React.FC<LoginProps> = ({
     return () => clearInterval(interval);
   }, [simulatedHour]);
 
-  // Keyboard shortcut: Press 'D' to toggle evaluator drawer
+  // Keyboard shortcut: Press 'D' to toggle demo drawer
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.target instanceof HTMLInputElement || e.target instanceof HTMLTextAreaElement) return;
@@ -454,7 +454,7 @@ export const Login: React.FC<LoginProps> = ({
                 )}
               </p>
 
-              {/* Discreet Evaluator / Demo trigger */}
+              {/* Demo account quick-fill trigger */}
               <div className="mt-2 flex items-center justify-center space-x-2">
                 <button
                   type="button"
@@ -463,7 +463,7 @@ export const Login: React.FC<LoginProps> = ({
                 >
                   <Sparkles className="w-3 h-3 text-amber-600" />
                   <span>
-                    {lang === "mr" ? "प्रात्यक्षिक चाचणी व माहिती (Demo Helper)" : "Evaluator / Demo Inspector"}
+                    {lang === "mr" ? "प्रात्यक्षिक चाचणी खाती (Demo Accounts)" : "Quick Demo Accounts"}
                   </span>
                 </button>
               </div>
@@ -525,7 +525,7 @@ export const Login: React.FC<LoginProps> = ({
               </div>
               <div className="mt-4 pt-3 border-t border-stone-700 text-xs text-stone-400 flex items-center gap-1.5">
                 <ShieldCheck className="w-4 h-4 text-emerald-400" />
-                <span>नियम R6: संपूर्ण गोपनीयता व सुरक्षितता</span>
+                <span>संपूर्ण गोपनीयता व सुरक्षितता</span>
               </div>
             </div>
 
@@ -546,7 +546,7 @@ export const Login: React.FC<LoginProps> = ({
               </div>
               <div className="mt-4 pt-3 border-t border-stone-700 text-xs text-stone-400 flex items-center gap-1.5">
                 <Satellite className="w-4 h-4 text-sky-400" />
-                <span>नियम R1: प्रत्यक्ष उपग्रह डेटा</span>
+                <span>प्रत्यक्ष उपग्रह डेटा</span>
               </div>
             </div>
 
@@ -557,17 +557,17 @@ export const Login: React.FC<LoginProps> = ({
                   ३
                 </div>
                 <h3 className="text-lg font-black text-white mb-2">
-                  {lang === "mr" ? "अचूक व सोपा पीक सल्ला" : "Grade-4 Actionable Advice"}
+                  {lang === "mr" ? "अचूक व सोपा पीक सल्ला" : "Clear Actionable Advice"}
                 </h3>
                 <p className="text-sm text-stone-300 leading-relaxed">
                   {lang === "mr"
                     ? "महात्मा फुले कृषी विद्यापीठ (राहुरी) नियमावलीनुसार १२ शब्दांपेक्षा लहान वाक्यांत समजणारा सोपा सल्ला."
-                    : "Crop recommendations and IPM schedules formulated in plain language under 12 words."}
+                    : "Crop recommendations and IPM schedules formulated in plain, straightforward language."}
                 </p>
               </div>
               <div className="mt-4 pt-3 border-t border-stone-700 text-xs text-stone-400 flex items-center gap-1.5">
                 <Sprout className="w-4 h-4 text-amber-400" />
-                <span>नियम R5: सोपे व थेट मार्गदर्शन</span>
+                <span>सोपे व थेट मार्गदर्शन</span>
               </div>
             </div>
           </div>
@@ -614,7 +614,7 @@ export const Login: React.FC<LoginProps> = ({
         </div>
       </footer>
 
-      {/* 8. EVALUATOR / DEMO SLIDE-OVER DRAWER (Toggled via 'D' or Footer link) */}
+      {/* 8. DEMO SLIDE-OVER DRAWER (Toggled via 'D' or Footer link) */}
       {showDemoDrawer && (
         <div className="fixed inset-0 z-50 flex items-center justify-end bg-black/60 backdrop-blur-sm transition-all p-2 sm:p-4 animate-fade-in">
           <div className="w-full max-w-md bg-stone-900 border border-stone-700 text-white rounded-3xl p-6 shadow-2xl flex flex-col max-h-[95vh] overflow-y-auto">

@@ -10,8 +10,8 @@ from typing import Dict, Any, List, Optional
 from utils import safe_value
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
-CROPS_FILE = os.path.normpath(os.path.join(BASE_DIR, "..", "docs", "research", "crops.json"))
-RULES_FILE = os.path.normpath(os.path.join(BASE_DIR, "..", "docs", "research", "risk-rules.json"))
+CROPS_FILE = os.path.normpath(os.path.join(BASE_DIR, "..", "data", "crops.json"))
+RULES_FILE = os.path.normpath(os.path.join(BASE_DIR, "..", "data", "risk-rules.json"))
 
 def load_crops_db() -> List[Dict[str, Any]]:
     if os.path.exists(CROPS_FILE):

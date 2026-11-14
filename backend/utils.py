@@ -97,7 +97,7 @@ def generate_farmer_id(district: str, serial_num: int) -> str:
 
 def safe_value(val: Any, source: str = "Unknown", observed_at: Optional[str] = None) -> Dict[str, Any]:
     """
-    Core Rule R2: Missing is not zero.
+    Null-safe telemetry value wrapper:
     - null/None renders 'No data' / 'माहिती नाही'
     - recorded 0 renders '0'
     """
@@ -128,7 +128,7 @@ def safe_value(val: Any, source: str = "Unknown", observed_at: Optional[str] = N
     }
 
 def format_provenance(source_label: str, observed_at_str: str, is_stale: bool = False) -> str:
-    """Core Rule R3: Every number shows source and date."""
+    """Formats data source and observation timestamp."""
     if is_stale:
         return f"Old data from {observed_at_str} (Source: {source_label})"
     return f"Source: {source_label}, updated {observed_at_str}"

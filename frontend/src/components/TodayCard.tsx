@@ -22,7 +22,7 @@ export const TodayCard: React.FC<TodayCardProps> = ({ todayData, lang }) => {
 
   const trafficLevel = todayData?.traffic_light || "green";
 
-  // Visual cues: Icon + Word + Color (Rule R5: never color alone)
+  // Status badge: Icon + Word + Color
   let statusBadge = {
     bg: "bg-emerald-100",
     border: "border-emerald-500",

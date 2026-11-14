@@ -22,7 +22,7 @@ from credential_cards import build_single_card_a6, build_batch_cards_a4
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 DATA_DIR = os.path.join(BASE_DIR, "data")
 GEO_DIR = os.path.normpath(os.path.join(BASE_DIR, "..", "data", "geo"))
-DOCS_RESEARCH_DIR = os.path.normpath(os.path.join(BASE_DIR, "..", "docs", "research"))
+ROOT_DATA_DIR = os.path.normpath(os.path.join(BASE_DIR, "..", "data"))
 
 app = Flask(__name__)
 app.secret_key = os.environ.get("FLASK_SECRET_KEY", "terrawise_secret_pilot_ahilyanagar_nashik_2026")
@@ -358,7 +358,7 @@ def get_farmer_dashboard():
         priority=request.args.get("priority", "balanced")
     )
 
-    # Simplified Today card summary per Grade-4 UX rules
+    # Today card summary
     today_summary = {
         "greeting_mr": f"नमस्कार, {farmer.full_name}!",
         "greeting_en": f"Welcome, {farmer.full_name}!",
@@ -541,7 +541,7 @@ def get_crops_list():
 
 @app.route("/api/geo/glossary", methods=["GET"])
 def get_glossary_list():
-    path = os.path.join(DOCS_RESEARCH_DIR, "glossary.json")
+    path = os.path.join(ROOT_DATA_DIR, "glossary.json")
     if os.path.exists(path):
         with open(path, "r", encoding="utf-8") as f:
             return jsonify(json.load(f))
