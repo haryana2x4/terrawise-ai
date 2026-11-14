@@ -1,0 +1,49 @@
+# Environment and secrets
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+*.p12
+*.pfx
+
+# Dependencies and virtual environments
+node_modules/
+.venv/
+venv/
+env/
+
+# Python bytecode and caches
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+*.egg-info/
+
+# Build output and logs
+dist/
+build/
+coverage/
+*.tsbuildinfo
+*.log
+logs/
+
+# Databases, runtime caches, and private farmer data
+*.db
+*.sqlite
+*.sqlite3
+backend/data/cache/
+data/imported/
+data/geo/fields.geojson
+services/ai-bot/data/memory.json
+uploads/
+credential-cards/
+**/credential*.pdf
+
+# Editor and OS files
+.vscode/*
+!.vscode/extensions.json
+.idea/
+.DS_Store
+Thumbs.db

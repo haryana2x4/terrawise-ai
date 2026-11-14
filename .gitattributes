@@ -1,0 +1,17 @@
+* text=auto
+
+# Binary assets
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.webp binary
+*.avif binary
+*.ttf binary
+*.woff binary
+*.woff2 binary
+*.pdf binary
+*.ico binary
+
+# Shell and batch scripts keep native line endings
+*.sh text eol=lf
+*.bat text eol=crlf
