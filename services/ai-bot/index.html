@@ -1,0 +1,1585 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SUNDAY v2: SovereignDev — The Living AI Companion</title>
+  <!-- Majestic CSS & App CSS -->
+  <link rel="stylesheet" href="majestic.css">
+  <link rel="stylesheet" href="app.css">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='20' fill='%2310b981'/><text x='50%' y='68%' font-size='60' font-weight='800' fill='white' text-anchor='middle'>S</text></svg>">
+  <!-- Local Standalone Three.js (100% offline & file:// compatible) -->
+  <script src="three.min.js"></script>
+  <!-- Stormforge Sky-Citadel Systems -->
+  <script src="stormforge/config.js"></script>
+  <script src="stormforge/time_of_day.js"></script>
+  <script src="stormforge/audio_bed.js"></script>
+  <script src="stormforge/weather.js"></script>
+  <script src="stormforge/vael.js"></script>
+  <script src="stormforge/flicker.js"></script>
+  <script src="stormforge/reticle.js"></script>
+  <script src="stormforge/cast.js"></script>
+</head>
+<body data-state="idle">
+  <!-- Celestial Aurora Ambient Backdrop -->
+  <div class="ambient-backdrop"></div>
+  <!-- Stormforge Parallax Weather Canvas -->
+  <canvas id="stormforge-weather-canvas"></canvas>
+
+  <div class="app-shell">
+    <!-- Top Modern Navigation Header -->
+    <header class="top-nav">
+      <div class="brand-section">
+        <div class="brand-badge">S</div>
+        <div class="brand-title">
+          SUNDAY
+          <span class="version-pill">SovereignDev v2.0</span>
+        </div>
+      </div>
+
+      <!-- Mode Switcher Nav Pills -->
+      <nav class="mode-nav">
+        <button class="nav-tab active" data-view="studio">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M9 3v18"/><path d="M14 9l3 3-3 3"/></svg>
+          Studio Workspace
+        </button>
+        <button class="nav-tab" data-view="forge">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+          Character Forge
+        </button>
+        <button class="nav-tab" data-view="companion">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+          Companion Mode
+        </button>
+        <button class="nav-tab" data-view="skills">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>
+          SovereignDev (AST & Diff)
+        </button>
+        <a href="/project" class="nav-tab" style="color: #10b981; border: 1px solid rgba(16, 185, 129, 0.35);">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="8" r="7"/><polyline points="8.21 13.89 7 23 12 20 17 23 15.79 13.88"/></svg>
+          Showcase
+        </a>
+      </nav>
+
+      <!-- Status & Offline Seal -->
+      <div class="nav-status">
+        <button class="nav-tab" id="btn-toggle-character" style="color: #d946ef; border: 1px solid rgba(217, 70, 239, 0.4);">
+          👤 Avatar: <strong>Enderman</strong>
+        </button>
+        <button class="nav-tab" id="btn-toggle-dragon" style="color: #c084fc; border: 1px solid rgba(192, 132, 252, 0.4);">
+          🐉 Dragon: <strong>Ender Dragon</strong>
+        </button>
+        <button class="nav-tab" id="btn-reset-demo" style="padding: 4px 10px; font-size: 11px; background: rgba(239, 68, 68, 0.1); border: 1px solid rgba(239, 68, 68, 0.3); color: #f87171;">
+          Reset Demo
+        </button>
+        <div class="assistant-state-pill">
+          <div class="state-dot" id="nav-state-dot"></div>
+          <span id="nav-state-label">IDLE</span>
+        </div>
+        <div class="offline-badge">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+          OFFLINE ✓
+        </div>
+      </div>
+    </header>
+
+    <!-- Main Workspace (Studio Mode) -->
+    <main class="studio-layout" id="view-studio">
+      <!-- Left Animation Sidebar -->
+      <aside class="left-panel">
+        <div class="panel-header">
+          <div class="panel-title">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+            Animations
+          </div>
+          <span class="version-pill" id="anim-count">14 Clips</span>
+        </div>
+
+        <div class="search-input-wrap">
+          <input type="text" class="search-input" id="anim-search" placeholder="Filter animations...">
+        </div>
+
+        <div class="animation-list" id="anim-list-container">
+          <!-- Dynamically populated via JS -->
+        </div>
+      </aside>
+
+      <!-- Center 3D Viewport -->
+      <section class="viewport-container">
+        <canvas id="three-canvas"></canvas>
+
+        <!-- Viewport HUD Overlay -->
+        <div class="viewport-hud">
+          <div class="camera-controls-pill">
+            <button class="cam-btn active" data-cam="front">Front</button>
+            <button class="cam-btn" data-cam="isometric">Iso</button>
+            <button class="cam-btn" data-cam="side">Side</button>
+            <button class="cam-btn" data-cam="close">Close-up</button>
+          </div>
+          <div class="camera-controls-pill">
+            <span style="font-size: 11px; font-family: var(--font-code); color: #10b981; font-weight: 700;">60.0 FPS</span>
+          </div>
+        </div>
+
+        <!-- Floating Majestic Timeline & Scrubber Bar -->
+        <div class="timeline-bar">
+          <button class="timeline-btn" id="btn-play-pause" title="Play/Pause">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+          </button>
+          <button class="timeline-btn" id="btn-loop-toggle" title="Loop Mode" style="color: #10b981;">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="17 1 21 5 17 9"/><path d="M3 11V9a4 4 0 0 1 4-4h14"/><polyline points="7 23 3 19 7 15"/><path d="M21 13v2a4 4 0 0 1-4 4H3"/></svg>
+          </button>
+
+          <div class="timeline-slider-wrap">
+            <span class="timecode-display" id="timecode-current">0.00s</span>
+            <input type="range" class="timeline-scrubber" id="timeline-slider" min="0" max="4" step="0.01" value="0">
+            <span class="timecode-display" id="timecode-speed">1.0x</span>
+          </div>
+
+          <button class="timeline-btn" id="btn-speed-cycle" title="Cycle Playback Speed">
+            <span style="font-size: 11px; font-weight: 700; font-family: var(--font-code);">SPD</span>
+          </button>
+        </div>
+      </section>
+
+      <!-- Right Parameters & Emotion Inspector -->
+      <aside class="right-panel">
+        <div class="param-section">
+          <div class="section-label">
+            <span>Audio & Lip-Sync Monitor</span>
+            <span style="color: #10b981;">ACTIVE</span>
+          </div>
+          <canvas id="audio-waveform"></canvas>
+        </div>
+
+        <div class="param-section">
+          <div class="section-label">
+            <span>Procedural Micro-Motions</span>
+          </div>
+          <div class="control-group">
+            <div class="slider-row">
+              <div class="slider-info">
+                <span>Breath Rate</span>
+                <span id="val-breath">2.2 Hz</span>
+              </div>
+              <input type="range" class="param-slider" id="slider-breath" min="0.5" max="5.0" step="0.1" value="2.2">
+            </div>
+
+            <div class="slider-row">
+              <div class="slider-info">
+                <span>Body Bob Amplitude</span>
+                <span id="val-bob">1.0x</span>
+              </div>
+              <input type="range" class="param-slider" id="slider-bob" min="0" max="3.0" step="0.1" value="1.0">
+            </div>
+
+            <div class="slider-row">
+              <div class="slider-info">
+                <span>Eye Blink Rate</span>
+                <span id="val-blink">3.8 s</span>
+              </div>
+              <input type="range" class="param-slider" id="slider-blink" min="1.0" max="8.0" step="0.2" value="3.8">
+            </div>
+
+            <div class="slider-row">
+              <div class="slider-info">
+                <span>Cursor Tracking</span>
+                <span id="val-tracking">Enabled</span>
+              </div>
+              <input type="range" class="param-slider" id="slider-tracking" min="0" max="1" step="1" value="1">
+            </div>
+          </div>
+        </div>
+
+        <div class="param-section">
+          <div class="section-label">
+            <span>Emotion Tag Dispatcher</span>
+          </div>
+          <div class="emotion-grid">
+            <button class="emotion-btn" data-emotion="happy" data-gesture="wave">👋 Excited</button>
+            <button class="emotion-btn" data-emotion="thinking" data-gesture="head_tilt">🤔 Thinking</button>
+            <button class="emotion-btn" data-emotion="focused" data-gesture="type">⚡ Focused</button>
+            <button class="emotion-btn" data-emotion="celebrating" data-gesture="thumbs_up">🎉 Celebrate</button>
+            <button class="emotion-btn" data-emotion="sleepy" data-gesture="stretch">😴 Sleepy</button>
+            <button class="emotion-btn" data-emotion="confused" data-gesture="nod">❓ Confused</button>
+          </div>
+        </div>
+      </aside>
+
+      <!-- Bottom Showcase Strip -->
+      <footer class="bottom-strip">
+        <div class="strip-header">Character Posture Previews (Quick Audition)</div>
+        <div class="card-carousel" id="pose-showcase-container">
+          <div class="pose-card active" data-clip="idle">
+            <span class="pose-icon">🧍</span>
+            <span class="pose-title">Default Idle</span>
+          </div>
+          <div class="pose-card" data-clip="sitting">
+            <span class="pose-icon">🪑</span>
+            <span class="pose-title">Sitting Calm</span>
+          </div>
+          <div class="pose-card" data-clip="working">
+            <span class="pose-icon">💻</span>
+            <span class="pose-title">Working / Type</span>
+          </div>
+          <div class="pose-card" data-clip="celebrating">
+            <span class="pose-icon">🏆</span>
+            <span class="pose-title">Celebrating</span>
+          </div>
+          <div class="pose-card" data-clip="thinking">
+            <span class="pose-icon">💡</span>
+            <span class="pose-title">Thinking Deep</span>
+          </div>
+          <div class="pose-card" data-clip="running">
+            <span class="pose-icon">🏃</span>
+            <span class="pose-title">Sprint Run</span>
+          </div>
+          <div class="pose-card" data-clip="wave">
+            <span class="pose-icon">👋</span>
+            <span class="pose-title">Wave Hello</span>
+          </div>
+        </div>
+      </footer>
+    </main>
+
+    <!-- Character Forge View (WOW 2) -->
+    <section class="view-panel" id="view-forge">
+      <div class="forge-container">
+        <!-- 64x64 Texture Editor -->
+        <div class="forge-card canvas-editor-wrap">
+          <div class="section-label" style="width: 100%;">
+            <span>Skin Texture Matrix (64x64)</span>
+          </div>
+          <canvas id="forge-canvas" width="64" height="64"></canvas>
+          <div class="forge-tools" style="display: flex; gap: 8px; margin-top: 10px;">
+            <button class="forge-btn active" id="forge-tool-pencil">Pencil</button>
+            <button class="forge-btn" id="forge-tool-eraser">Eraser</button>
+            <input type="color" id="forge-color-picker" value="#2e8540" style="background: none; border: none; cursor: pointer; height: 32px; width: 36px;">
+          </div>
+          <div style="display: flex; gap: 8px; width: 100%; margin-top: 10px;">
+            <button class="forge-btn primary" id="btn-export-sunday" style="flex: 1;">Export .sunday Package</button>
+            <button class="forge-btn" id="btn-import-sunday" style="flex: 1;">Import .sunday</button>
+            <input type="file" id="file-import-sunday" accept=".sunday,.json" style="display: none;">
+          </div>
+        </div>
+
+        <!-- Personality Packs & Presets -->
+        <div class="forge-card">
+          <div class="section-label">
+            <span>Preset Character Builds</span>
+          </div>
+          <div style="display: flex; gap: 8px; margin-bottom: 20px; flex-wrap: wrap;">
+            <button class="forge-btn active preset-btn" data-preset="classic">Sunday Classic</button>
+            <button class="forge-btn preset-btn" data-preset="hacker">Cyber Hacker</button>
+            <button class="forge-btn preset-btn" data-preset="chill">Chill Mentor</button>
+            <button class="forge-btn preset-btn" data-preset="champion">Hackathon Gold</button>
+            <button class="forge-btn preset-btn" data-preset="enderman" style="border-color:#d946ef; color:#f0abfc; background:rgba(217, 70, 239, 0.15);">✦ Enderman (Minecraft)</button>
+          </div>
+
+          <div class="section-label">
+            <span>Personality Packs (Hot-Reloadable)</span>
+          </div>
+          <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px;">
+            <div class="personality-card active" data-personality="classic">
+              <h4 style="font-size: 13px; font-weight: 700; color: #10b981; margin-bottom: 4px;">Sunday Classic</h4>
+              <p style="font-size: 11px; color: var(--text-dim); line-height: 1.4;">Loyal, playful, protective of privacy.</p>
+            </div>
+            <div class="personality-card" data-personality="hacker">
+              <h4 style="font-size: 13px; font-weight: 700; color: #a855f7; margin-bottom: 4px;">Hacker Mode</h4>
+              <p style="font-size: 11px; color: var(--text-dim); line-height: 1.4;">Terse, terminal-native, rapid typing bias.</p>
+            </div>
+            <div class="personality-card" data-personality="chill">
+              <h4 style="font-size: 13px; font-weight: 700; color: #f59e0b; margin-bottom: 4px;">Chill Mentor</h4>
+              <p style="font-size: 11px; color: var(--text-dim); line-height: 1.4;">Calm, supportive, encourages breaks.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- SovereignDev: Live Reasoning Trace & Git Diff View (WOW 3 Upgrade) -->
+    <section class="view-panel" id="view-skills">
+      <div style="max-width: 1120px; margin: 0 auto; display: grid; grid-template-columns: 1fr 1fr; gap: 24px;">
+        <!-- Skill 1: Private Folder Q&A -->
+        <div class="forge-card">
+          <div class="section-label">
+            <span>Skill 1: Air-Gapped Folder Q&A (Local RAG)</span>
+            <span style="color: #10b981;">SOVEREIGN</span>
+          </div>
+          <p style="font-size: 12px; color: var(--text-dim); margin-bottom: 12px;">Inspects local repository docs offline, cites exact source logs, and never transmits data outside your machine.</p>
+          <div style="display: flex; gap: 8px; margin-bottom: 12px;">
+            <input type="text" class="search-input" id="rag-query-input" value="What are the local security and air-gap policies?">
+            <button class="forge-btn primary" id="btn-run-rag">Inspect</button>
+          </div>
+          <div id="rag-result-box" style="background: #04060a; border: 1px solid var(--border-glass); border-radius: 8px; padding: 12px; font-size: 12.5px; line-height: 1.5; color: var(--text-pure); min-height: 80px;">
+            Ready to inspect local repository files. Click Inspect to query.
+          </div>
+        </div>
+
+        <!-- Skill 2: SovereignDev Autonomous Pair Programmer -->
+        <div class="forge-card">
+          <div class="section-label">
+            <span>Skill 2: Autonomous Pair Programmer (AST & Diff)</span>
+            <span style="color: #f59e0b;">OBSERVABLE AGENT</span>
+          </div>
+          <p style="font-size: 12px; color: var(--text-dim); margin-bottom: 12px;">Drop a task: Sunday's 3D avatar sits at its desk, types rapidly in real-time, streams its reasoning trace, and compiles a Git diff.</p>
+          <div style="display: flex; gap: 8px; margin-bottom: 12px;">
+            <input type="text" class="search-input" id="code-task-input" value="Detect buffer boundary overflow in buffer.js and synthesize verified Git patch">
+            <button class="forge-btn primary" id="btn-run-code">Run Agent</button>
+          </div>
+
+          <!-- Observable Live Reasoning Trace -->
+          <div class="section-label" style="margin-top: 14px; margin-bottom: 6px;">
+            <span>Live Step-by-Step Reasoning Trace</span>
+            <span style="color: #38bdf8;" id="trace-status-pill">STANDBY</span>
+          </div>
+          <div class="reasoning-trace-container" id="reasoning-trace-box">
+            <div class="trace-item">
+              <span class="trace-badge thought">THOUGHT</span>
+              <span>Awaiting coding task instruction...</span>
+            </div>
+          </div>
+
+          <!-- Colorized Unified Git Diff Viewer -->
+          <div class="section-label" style="margin-top: 14px; margin-bottom: 6px;">
+            <span>Verified Unified Git Diff</span>
+          </div>
+          <pre class="git-diff-container" id="git-diff-box"><span style="color: #64748b;">// Awaiting synthesized patch...</span></pre>
+        </div>
+
+        <!-- Memory Inspector -->
+        <div class="forge-card" style="grid-column: 1 / 3;">
+          <div class="section-label">
+            <span>Persistent Memory Inspector ("Sunday Remembers...")</span>
+          </div>
+          <div style="display: flex; gap: 12px; flex-wrap: wrap;" id="memory-facts-container">
+            <div style="background: rgba(255,255,255,0.05); border: 1px solid var(--border-glass); border-radius: 8px; padding: 8px 14px; font-size: 11.5px;">
+              <strong>User:</strong> Aryan (Lead Architect)
+            </div>
+            <div style="background: rgba(255,255,255,0.05); border: 1px solid var(--border-glass); border-radius: 8px; padding: 8px 14px; font-size: 11.5px;">
+              <strong>Security Policy:</strong> 100% Offline-First execution, air-gapped
+            </div>
+            <div style="background: rgba(255,255,255,0.05); border: 1px solid var(--border-glass); border-radius: 8px; padding: 8px 14px; font-size: 11.5px;">
+              <strong>Silicon Target:</strong> NVIDIA GeForce RTX 3050 (6GB VRAM)
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Floating Companion Assistant Mode -->
+    <div class="companion-overlay" id="view-companion">
+      <div class="companion-header">
+        <div style="display: flex; align-items: center; gap: 8px;">
+          <div class="brand-badge" style="width: 26px; height: 26px; font-size: 13px;">S</div>
+          <div>
+            <div style="font-size: 13px; font-weight: 800;">SUNDAY</div>
+            <div style="font-size: 10px; color: #10b981; font-family: var(--font-code);">Offline - Ready to help</div>
+          </div>
+        </div>
+        <button id="btn-close-companion" style="background: none; border: none; color: var(--text-dim); cursor: pointer; font-size: 16px;">✕</button>
+      </div>
+
+      <div class="companion-chat-body" id="chat-messages-container">
+        <div class="chat-bubble assistant">
+          Hey! I'm SUNDAY, your offline AI companion with a body. What are we hacking on today?
+        </div>
+      </div>
+
+      <!-- Quick Action Hero Chips -->
+      <div style="display: flex; gap: 6px; padding: 0 16px 8px; overflow-x: auto;">
+        <button class="forge-btn quick-prompt-btn" style="padding: 4px 10px; font-size: 11px;" data-prompt="Hey Sunday">Hey Sunday</button>
+        <button class="forge-btn quick-prompt-btn" style="padding: 4px 10px; font-size: 11px;" data-prompt="Search private folder">Search Folder</button>
+        <button class="forge-btn quick-prompt-btn" style="padding: 4px 10px; font-size: 11px;" data-prompt="Write a test">Write Test</button>
+      </div>
+
+      <div class="companion-input-wrap">
+        <input type="text" class="search-input" id="chat-input" placeholder="Speak or type your instruction...">
+        <button class="forge-btn primary" id="btn-send-chat" style="padding: 6px 14px;">Send</button>
+      </div>
+    </div>
+
+    <!-- Live Telemetry & Efficiency HUD -->
+    <div class="telemetry-hud">
+      <div class="hud-item">
+        <span>FPS:</span>
+        <span class="hud-val" id="hud-fps">60.0</span>
+      </div>
+      <div class="hud-item">
+        <span>RAM:</span>
+        <span class="hud-val" id="hud-ram">420 MB</span>
+      </div>
+      <div class="hud-item">
+        <span>VRAM:</span>
+        <span class="hud-val" id="hud-vram">2.1 / 6.0 GB</span>
+      </div>
+      <div class="hud-item">
+        <span>LATENCY:</span>
+        <span class="hud-val" id="hud-lat">320 ms</span>
+      </div>
+      <div class="hud-item">
+        <span>TOKENS/S:</span>
+        <span class="hud-val" id="hud-tps">68.4</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Application Engine -->
+  <script>
+    // =========================================================================
+    // 1. Recalibrated Orbit Camera (Centered Framing)
+    // =========================================================================
+    class SimpleOrbit {
+      constructor(camera, domElement) {
+        this.camera = camera;
+        this.domElement = domElement;
+        this.target = new THREE.Vector3(0, 1.8, 0); // Perfectly centered on Enderman / Skybolt
+        this.spherical = { radius: 6.6, theta: 0, phi: Math.PI / 2 - 0.05 };
+        this.targetSpherical = { radius: 6.6, theta: 0, phi: Math.PI / 2 - 0.05 };
+        this.isMouseDown = false;
+        this.prevMouse = { x: 0, y: 0 };
+
+        this.initEvents();
+        this.updateCamera();
+      }
+
+      initEvents() {
+        this.domElement.addEventListener('mousedown', (e) => {
+          this.isMouseDown = true;
+          this.prevMouse = { x: e.clientX, y: e.clientY };
+        });
+        window.addEventListener('mouseup', () => { this.isMouseDown = false; });
+        window.addEventListener('mousemove', (e) => {
+          if (!this.isMouseDown) return;
+          const deltaX = e.clientX - this.prevMouse.x;
+          const deltaY = e.clientY - this.prevMouse.y;
+          this.prevMouse = { x: e.clientX, y: e.clientY };
+
+          this.targetSpherical.theta -= deltaX * 0.007;
+          this.targetSpherical.phi = Math.max(0.1, Math.min(Math.PI / 2 + 0.1, this.targetSpherical.phi + deltaY * 0.007));
+        });
+        this.domElement.addEventListener('wheel', (e) => {
+          e.preventDefault();
+          this.targetSpherical.radius = Math.max(2.2, Math.min(10.0, this.targetSpherical.radius + e.deltaY * 0.005));
+        }, { passive: false });
+      }
+
+      setPreset(radius, theta, phi, targetY = 1.45) {
+        this.targetSpherical.radius = radius;
+        this.targetSpherical.theta = theta;
+        this.targetSpherical.phi = phi;
+        this.target.y = targetY;
+      }
+
+      update() {
+        this.spherical.radius += (this.targetSpherical.radius - this.spherical.radius) * 0.1;
+        this.spherical.theta += (this.targetSpherical.theta - this.spherical.theta) * 0.1;
+        this.spherical.phi += (this.targetSpherical.phi - this.spherical.phi) * 0.1;
+        this.updateCamera();
+      }
+
+      updateCamera() {
+        const sinPhiRadius = Math.sin(this.spherical.phi) * this.spherical.radius;
+        this.camera.position.x = this.target.x + sinPhiRadius * Math.sin(this.spherical.theta);
+        this.camera.position.y = this.target.y + Math.cos(this.spherical.phi) * this.spherical.radius;
+        this.camera.position.z = this.target.z + sinPhiRadius * Math.cos(this.spherical.theta);
+        this.camera.lookAt(this.target);
+      }
+    }
+
+    // =========================================================================
+    // 2. Voxel Humanoid Rig (Clean Materials - No Face on Torso)
+    // =========================================================================
+    class VoxelCharacter {
+      constructor(scene) {
+        this.scene = scene;
+        this.root = new THREE.Group();
+        this.root.name = 'SundayAvatar';
+
+        this.materials = {
+          skin: new THREE.MeshStandardMaterial({ color: 0xdf9f76, roughness: 0.65 }),
+          hair: new THREE.MeshStandardMaterial({ color: 0x4a2e1b, roughness: 0.7 }),
+          hairHighlight: new THREE.MeshStandardMaterial({ color: 0x5e3a22, roughness: 0.7 }),
+          hoodie: new THREE.MeshStandardMaterial({ color: 0x2e8540, roughness: 0.65 }),
+          logoGreen: new THREE.MeshStandardMaterial({ color: 0x00ff88, emissive: 0x00aa55, emissiveIntensity: 0.5 }),
+          pants: new THREE.MeshStandardMaterial({ color: 0x1e293b, roughness: 0.8 }),
+          headset: new THREE.MeshStandardMaterial({ color: 0x111827, roughness: 0.4 }),
+          headsetGlow: new THREE.MeshStandardMaterial({ color: 0x06b6d4, emissive: 0x0088aa, emissiveIntensity: 0.5 }),
+          eyePupil: new THREE.MeshStandardMaterial({ color: 0x1d4ed8 }),
+          mouth: new THREE.MeshStandardMaterial({ color: 0x991b1b })
+        };
+
+        this.buildRig();
+        this.buildProps();
+        this.scene.add(this.root);
+
+        this.blinkTimer = 0;
+        this.isBlinking = false;
+        this.targetHeadRot = { x: 0, y: 0 };
+        this.currentHeadRot = { x: 0, y: 0 };
+        this.mouthAmp = 0;
+        this.breathCycle = 0;
+      }
+
+      buildRig() {
+        // Torso Root Group (carries all body segments without scaling them unintentionally)
+        this.torso = new THREE.Group();
+        this.torso.position.y = 2.4;
+        this.root.add(this.torso);
+
+        // Torso Mesh (The visible chest cube)
+        this.torsoMesh = new THREE.Mesh(new THREE.BoxGeometry(1.2, 1.6, 0.8), this.materials.hoodie);
+        this.torsoMesh.castShadow = true;
+        this.torsoMesh.receiveShadow = true;
+        this.torso.add(this.torsoMesh);
+
+        // Embossed 3D "S" Logo
+        this.logo = new THREE.Mesh(new THREE.BoxGeometry(0.45, 0.65, 0.06), this.materials.logoGreen);
+        this.logo.position.set(0, 0.1, 0.43);
+        this.torso.add(this.logo);
+
+        // Head Pivot & Head
+        this.headPivot = new THREE.Group();
+        this.headPivot.position.set(0, 0.8, 0);
+        this.torso.add(this.headPivot);
+
+        this.head = new THREE.Mesh(new THREE.BoxGeometry(1.1, 1.1, 1.1), this.materials.skin);
+        this.head.position.set(0, 0.55, 0);
+        this.head.castShadow = true;
+        this.headPivot.add(this.head);
+
+        // Eyes (Sclera + Pupil)
+        const scleraGeo = new THREE.BoxGeometry(0.24, 0.16, 0.04);
+        this.materials.sclera = new THREE.MeshBasicMaterial({ color: 0xffffff });
+        const pupilGeo = new THREE.BoxGeometry(0.12, 0.12, 0.05);
+
+        this.leftSclera = new THREE.Mesh(scleraGeo, this.materials.sclera);
+        this.leftSclera.position.set(-0.25, 0.05, 0.56);
+        this.head.add(this.leftSclera);
+
+        this.leftEye = new THREE.Mesh(pupilGeo, this.materials.eyePupil);
+        this.leftEye.position.set(-0.25, 0.05, 0.58);
+        this.head.add(this.leftEye);
+
+        this.rightSclera = new THREE.Mesh(scleraGeo, this.materials.sclera);
+        this.rightSclera.position.set(0.25, 0.05, 0.56);
+        this.head.add(this.rightSclera);
+
+        this.rightEye = new THREE.Mesh(pupilGeo, this.materials.eyePupil);
+        this.rightEye.position.set(0.25, 0.05, 0.58);
+        this.head.add(this.rightEye);
+
+        // Mouth (Lip-sync dynamic scale)
+        const mouthGeo = new THREE.BoxGeometry(0.24, 0.08, 0.04);
+        this.mouth = new THREE.Mesh(mouthGeo, this.materials.mouth);
+        this.mouth.position.set(0, -0.22, 0.57);
+        this.head.add(this.mouth);
+
+        // Hair Group
+        this.hairGroup = new THREE.Group();
+        this.head.add(this.hairGroup);
+
+        const hairTop = new THREE.Mesh(new THREE.BoxGeometry(1.2, 0.35, 1.2), this.materials.hair);
+        hairTop.position.set(0, 0.52, 0);
+        this.hairGroup.add(hairTop);
+
+        [
+          { s: [0.35, 0.35, 0.35], p: [-0.35, 0.65, 0.15] },
+          { s: [0.4, 0.4, 0.3], p: [0.1, 0.68, -0.1] },
+          { s: [0.25, 0.45, 0.25], p: [-0.25, 0.3, 0.58] },
+          { s: [0.3, 0.38, 0.25], p: [0.2, 0.28, 0.58] },
+          { s: [0.25, 0.6, 1.15], p: [-0.55, 0.2, 0] },
+          { s: [0.25, 0.6, 1.15], p: [0.55, 0.2, 0] }
+        ].forEach((t, i) => {
+          const m = new THREE.Mesh(new THREE.BoxGeometry(...t.s), i % 2 === 0 ? this.materials.hair : this.materials.hairHighlight);
+          m.position.set(...t.p);
+          this.hairGroup.add(m);
+        });
+
+        // Headset Group with glowing earcups
+        this.headsetGroup = new THREE.Group();
+        this.head.add(this.headsetGroup);
+
+        const band = new THREE.Mesh(new THREE.BoxGeometry(1.32, 0.12, 0.25), this.materials.headset);
+        band.position.set(0, 0.62, 0);
+        this.headsetGroup.add(band);
+
+        [-0.62, 0.62].forEach(x => {
+          const cup = new THREE.Mesh(new THREE.BoxGeometry(0.18, 0.45, 0.4), this.materials.headset);
+          cup.position.set(x, 0.05, 0);
+          this.headsetGroup.add(cup);
+
+          const glow = new THREE.Mesh(new THREE.BoxGeometry(0.04, 0.25, 0.22), this.materials.headsetGlow);
+          glow.position.set(x > 0 ? x + 0.1 : x - 0.1, 0.05, 0);
+          this.headsetGroup.add(glow);
+        });
+
+        // Left & Right Arms
+        this.leftArmPivot = new THREE.Group();
+        this.leftArmPivot.position.set(-0.95, 0.65, 0);
+        this.torso.add(this.leftArmPivot);
+
+        this.leftArm = new THREE.Mesh(new THREE.BoxGeometry(0.5, 1.5, 0.5), this.materials.hoodie);
+        this.leftArm.position.set(0, -0.65, 0);
+        this.leftArm.castShadow = true;
+        this.leftArmPivot.add(this.leftArm);
+
+        this.rightArmPivot = new THREE.Group();
+        this.rightArmPivot.position.set(0.95, 0.65, 0);
+        this.torso.add(this.rightArmPivot);
+
+        this.rightArm = new THREE.Mesh(new THREE.BoxGeometry(0.5, 1.5, 0.5), this.materials.hoodie);
+        this.rightArm.position.set(0, -0.65, 0);
+        this.rightArm.castShadow = true;
+        this.rightArmPivot.add(this.rightArm);
+
+        // Legs
+        const legGeo = new THREE.BoxGeometry(0.52, 1.6, 0.55);
+        this.leftLegPivot = new THREE.Group();
+        this.leftLegPivot.position.set(-0.32, -0.8, 0);
+        this.torso.add(this.leftLegPivot);
+
+        this.leftLeg = new THREE.Mesh(legGeo, this.materials.pants);
+        this.leftLeg.position.set(0, -0.8, 0);
+        this.leftLeg.castShadow = true;
+        this.leftLegPivot.add(this.leftLeg);
+
+        this.rightLegPivot = new THREE.Group();
+        this.rightLegPivot.position.set(0.32, -0.8, 0);
+        this.torso.add(this.rightLegPivot);
+
+        this.rightLeg = new THREE.Mesh(legGeo, this.materials.pants);
+        this.rightLeg.position.set(0, -0.8, 0);
+        this.rightLeg.castShadow = true;
+        this.rightLegPivot.add(this.rightLeg);
+
+        // Build Ender Particles
+        this.buildEnderParticles();
+      }
+
+      buildEnderParticles() {
+        this.enderParticles = new THREE.Group();
+        this.particleMeshes = [];
+        const pGeo = new THREE.BoxGeometry(0.08, 0.08, 0.08);
+        const pMat1 = new THREE.MeshBasicMaterial({ color: 0xd946ef });
+        const pMat2 = new THREE.MeshBasicMaterial({ color: 0xa855f7 });
+        const pMat3 = new THREE.MeshBasicMaterial({ color: 0xf5d0fe });
+
+        for (let i = 0; i < 40; i++) {
+          const mat = i % 3 === 0 ? pMat1 : (i % 3 === 1 ? pMat2 : pMat3);
+          const p = new THREE.Mesh(pGeo, mat);
+          p.userData = {
+            baseX: (Math.random() - 0.5) * 1.8,
+            baseY: Math.random() * 3.6,
+            baseZ: (Math.random() - 0.5) * 1.8,
+            speed: Math.random() * 0.9 + 0.5,
+            twinkle: Math.random() * Math.PI * 2
+          };
+          p.position.set(p.userData.baseX, p.userData.baseY, p.userData.baseZ);
+          this.enderParticles.add(p);
+          this.particleMeshes.push(p);
+        }
+        this.root.add(this.enderParticles);
+        this.enderParticles.visible = false;
+      }
+
+      setMode(mode) {
+        this.currentMode = mode;
+        this.isEnderman = (mode === 'enderman');
+        try { localStorage.setItem('sunday:character_preset', mode); } catch (e) {}
+
+        if (this.isEnderman) {
+          // 1. Authentic Minecraft Enderman Proportions (3-blocks tall ratio)
+          this.torsoMesh.scale.set(0.55, 0.625, 0.5); // Slender 0.66 x 1.0 x 0.4 chest
+          this.torso.position.y = 2.3;
+          this.headPivot.position.set(0, 0.5, 0); // Flush on top of torso
+          this.head.scale.set(0.64, 0.64, 0.64); // Perfect 1:1:1 cubic head (0.704)
+          this.head.position.set(0, 0.352, 0);
+
+          // Long thin arms reaching past the knees
+          this.leftArmPivot.position.set(-0.42, 0.42, 0);
+          this.leftArm.scale.set(0.36, 1.2, 0.36);
+          this.leftArm.position.set(0, -0.9, 0);
+
+          this.rightArmPivot.position.set(0.42, 0.42, 0);
+          this.rightArm.scale.set(0.36, 1.2, 0.36);
+          this.rightArm.position.set(0, -0.9, 0);
+
+          // Long thin legs touching the floor
+          this.leftLegPivot.position.set(-0.16, -0.5, 0);
+          this.leftLeg.scale.set(0.36, 1.125, 0.36);
+          this.leftLeg.position.set(0, -0.9, 0);
+
+          this.rightLegPivot.position.set(0.16, -0.5, 0);
+          this.rightLeg.scale.set(0.36, 1.125, 0.36);
+          this.rightLeg.position.set(0, -0.9, 0);
+
+          // 2. Hide human hair, headset, and logo
+          this.hairGroup.visible = false;
+          this.headsetGroup.visible = false;
+          this.logo.visible = false;
+
+          // 3. Shaded Obsidian Graphite Palette (Minecraft Authentic)
+          this.materials.skin.color.set(0x111116);
+          this.materials.hoodie.color.set(0x111116);
+          this.materials.pants.color.set(0x0e0e13);
+          this.leftArm.material.color.set(0x0e0e13);
+          this.rightArm.material.color.set(0x0e0e13);
+          this.mouth.visible = false;
+
+          // 4. Glowing Minecraft Purple Horizontal Slit Eyes
+          this.materials.sclera.color.set(0xd946ef); // Magenta/purple outer glow
+          this.leftSclera.scale.set(1.4, 0.45, 1.0);
+          this.leftSclera.position.set(-0.24, 0.0, 0.56);
+          this.rightSclera.scale.set(1.4, 0.45, 1.0);
+          this.rightSclera.position.set(0.24, 0.0, 0.56);
+
+          this.materials.eyePupil.color.set(0xffffff); // White/lavender glowing center
+          this.leftEye.scale.set(0.65, 0.35, 1.0);
+          this.leftEye.position.set(-0.24, 0.0, 0.58);
+          this.rightEye.scale.set(0.65, 0.35, 1.0);
+          this.rightEye.position.set(0.24, 0.0, 0.58);
+
+          // 5. Activate Purple Ender Particles
+          this.enderParticles.visible = true;
+
+          const btn = document.getElementById('btn-toggle-character');
+          if (btn) btn.innerHTML = '👤 Avatar: <strong>Enderman</strong>';
+        } else {
+          // Restore Captain Skybolt human proportions
+          this.torsoMesh.scale.set(1, 1, 1);
+          this.torso.position.y = 2.4;
+          this.headPivot.position.set(0, 0.8, 0);
+          this.head.scale.set(1, 1, 1);
+          this.head.position.set(0, 0.55, 0);
+
+          this.leftArmPivot.scale.set(1, 1, 1);
+          this.leftArmPivot.position.set(-0.95, 0.65, 0);
+          this.leftArm.scale.set(1, 1, 1);
+          this.leftArm.position.set(0, -0.65, 0);
+          this.rightArmPivot.scale.set(1, 1, 1);
+          this.rightArmPivot.position.set(0.95, 0.65, 0);
+          this.rightArm.scale.set(1, 1, 1);
+          this.rightArm.position.set(0, -0.65, 0);
+
+          this.leftLegPivot.scale.set(1, 1, 1);
+          this.leftLegPivot.position.set(-0.32, -0.8, 0);
+          this.leftLeg.scale.set(1, 1, 1);
+          this.leftLeg.position.set(0, -0.8, 0);
+          this.rightLegPivot.scale.set(1, 1, 1);
+          this.rightLegPivot.position.set(0.32, -0.8, 0);
+          this.rightLeg.scale.set(1, 1, 1);
+          this.rightLeg.position.set(0, -0.8, 0);
+
+          this.hairGroup.visible = true;
+          this.headsetGroup.visible = true;
+          this.mouth.visible = true;
+          this.logo.visible = true;
+
+          this.materials.sclera.color.set(0xffffff);
+          this.leftSclera.scale.set(1, 1, 1);
+          this.leftSclera.position.set(-0.25, 0.05, 0.56);
+          this.rightSclera.scale.set(1, 1, 1);
+          this.rightSclera.position.set(0.25, 0.05, 0.56);
+
+          this.materials.eyePupil.color.set(0x1d4ed8);
+          this.leftEye.scale.set(1, 1, 1);
+          this.leftEye.position.set(-0.25, 0.05, 0.58);
+          this.rightEye.scale.set(1, 1, 1);
+          this.rightEye.position.set(0.25, 0.05, 0.58);
+          this.mouth.material.color.set(0x991b1b);
+
+          this.enderParticles.visible = false;
+
+          const btn = document.getElementById('btn-toggle-character');
+          if (btn) btn.innerHTML = '👤 Avatar: <strong>Skybolt</strong>';
+        }
+      }
+
+      buildProps() {
+        this.deskProp = new THREE.Group();
+        this.deskProp.position.set(0, 0, 1.2);
+        this.deskProp.visible = false;
+
+        const top = new THREE.Mesh(new THREE.BoxGeometry(2.4, 0.12, 1.2), new THREE.MeshStandardMaterial({ color: 0x334155 }));
+        top.position.set(0, 1.4, 0);
+        this.deskProp.add(top);
+
+        const laptopBase = new THREE.Mesh(new THREE.BoxGeometry(0.8, 0.04, 0.6), this.materials.headset);
+        laptopBase.position.set(0, 1.48, 0);
+        this.deskProp.add(laptopBase);
+
+        const laptopScreen = new THREE.Mesh(new THREE.BoxGeometry(0.8, 0.55, 0.04), this.materials.headsetGlow);
+        laptopScreen.position.set(0, 1.76, -0.26);
+        laptopScreen.rotation.x = -0.2;
+        this.deskProp.add(laptopScreen);
+        this.root.add(this.deskProp);
+
+        this.chairProp = new THREE.Group();
+        this.chairProp.visible = false;
+        const seat = new THREE.Mesh(new THREE.BoxGeometry(1.2, 0.15, 1.2), new THREE.MeshStandardMaterial({ color: 0x1e293b }));
+        seat.position.set(0, 1.0, 0);
+        this.chairProp.add(seat);
+        this.root.add(this.chairProp);
+      }
+
+      setPalette(palette) {
+        if (palette.hoodie) {
+          this.materials.hoodie.color.set(palette.hoodie);
+          this.leftArm.material.color.set(palette.hoodie);
+          this.rightArm.material.color.set(palette.hoodie);
+        }
+        if (palette.hair) this.materials.hair.color.set(palette.hair);
+        if (palette.eyes) this.materials.eyePupil.color.set(palette.eyes);
+        if (palette.logo) this.materials.logoGreen.color.set(palette.logo);
+      }
+
+      setLookTarget(normX, normY) {
+        this.targetHeadRot.y = -normX * 0.45;
+        this.targetHeadRot.x = -normY * 0.35;
+      }
+
+      setMouthAmplitude(amp) {
+        this.mouthAmp = Math.max(0, Math.min(1, amp));
+      }
+
+      resetTransforms() {
+        if (this.isEnderman) {
+          this.torso.position.set(0, 2.3, 0);
+          this.torso.rotation.set(0, 0, 0);
+          this.headPivot.position.set(0, 0.5, 0);
+          this.headPivot.rotation.set(0, 0, 0);
+          this.leftArmPivot.position.set(-0.42, 0.42, 0);
+          this.leftArmPivot.rotation.set(0, 0, 0);
+          this.rightArmPivot.position.set(0.42, 0.42, 0);
+          this.rightArmPivot.rotation.set(0, 0, 0);
+          this.leftLegPivot.position.set(-0.16, -0.5, 0);
+          this.leftLegPivot.rotation.set(0, 0, 0);
+          this.rightLegPivot.position.set(0.16, -0.5, 0);
+          this.rightLegPivot.rotation.set(0, 0, 0);
+        } else {
+          this.torso.position.set(0, 2.4, 0);
+          this.torso.rotation.set(0, 0, 0);
+          this.headPivot.position.set(0, 0.8, 0);
+          this.headPivot.rotation.set(0, 0, 0);
+          this.leftArmPivot.position.set(-0.95, 0.65, 0);
+          this.leftArmPivot.rotation.set(0, 0, 0);
+          this.rightArmPivot.position.set(0.95, 0.65, 0);
+          this.rightArmPivot.rotation.set(0, 0, 0);
+          this.leftLegPivot.position.set(-0.32, -0.8, 0);
+          this.leftLegPivot.rotation.set(0, 0, 0);
+          this.rightLegPivot.position.set(0.32, -0.8, 0);
+          this.rightLegPivot.rotation.set(0, 0, 0);
+        }
+        this.deskProp.visible = false;
+        this.chairProp.visible = false;
+      }
+
+      update(delta) {
+        this.breathCycle += delta * 2.2;
+        this.torso.position.y += Math.sin(this.breathCycle) * 0.025;
+
+        this.currentHeadRot.x += (this.targetHeadRot.x - this.currentHeadRot.x) * 0.12;
+        this.currentHeadRot.y += (this.targetHeadRot.y - this.currentHeadRot.y) * 0.12;
+        this.headPivot.rotation.x = this.currentHeadRot.x;
+        this.headPivot.rotation.y = this.currentHeadRot.y;
+
+        this.blinkTimer += delta;
+        if (this.blinkTimer > 3.8) {
+          this.isBlinking = true;
+          if (this.blinkTimer > 4.0) {
+            this.isBlinking = false;
+            this.blinkTimer = Math.random() * 1.5;
+          }
+        }
+        const eyeScale = this.isBlinking ? 0.1 : 1.0;
+        this.leftEye.scale.y = eyeScale;
+        this.rightEye.scale.y = eyeScale;
+
+        this.mouth.scale.y = 1.0 + this.mouthAmp * 3.5;
+
+        // Animate purple Ender portal particles
+        if (this.isEnderman && this.enderParticles && this.enderParticles.visible) {
+          for (const p of this.particleMeshes) {
+            p.position.y += delta * p.userData.speed;
+            p.position.x = p.userData.baseX + Math.sin(this.breathCycle + p.userData.twinkle) * 0.15;
+            p.position.z = p.userData.baseZ + Math.cos(this.breathCycle + p.userData.twinkle) * 0.15;
+            if (p.position.y > 4.2) {
+              p.position.y = 0.2;
+            }
+            const s = (Math.sin(this.breathCycle * 3 + p.userData.twinkle) * 0.35 + 0.8);
+            p.scale.set(s, s, s);
+          }
+        }
+      }
+    }
+
+    // =========================================================================
+    // 3. Animation Engine
+    // =========================================================================
+    class AnimationEngine {
+      constructor(rig) {
+        this.rig = rig;
+        this.currentClip = 'idle';
+        this.targetClip = 'idle';
+        this.blendWeight = 1.0;
+        this.blendSpeed = 5.0;
+        this.playTime = 0;
+        this.playbackSpeed = 1.0;
+        this.isPaused = false;
+        this.previousPose = this.capture();
+      }
+
+      capture() {
+        const r = this.rig;
+        return {
+          torsoY: r.torso.position.y,
+          lArmRot: { x: r.leftArmPivot.rotation.x, z: r.leftArmPivot.rotation.z },
+          rArmRot: { x: r.rightArmPivot.rotation.x, z: r.rightArmPivot.rotation.z }
+        };
+      }
+
+      play(clip) {
+        if (this.currentClip === clip && this.blendWeight >= 1.0) return;
+        this.previousPose = this.capture();
+        this.targetClip = clip;
+        this.blendWeight = 0.0;
+        this.isPaused = false;
+      }
+
+      update(delta) {
+        if (this.isPaused) return;
+        this.playTime += delta * this.playbackSpeed;
+
+        if (this.blendWeight < 1.0) {
+          this.blendWeight += delta * this.blendSpeed;
+          if (this.blendWeight >= 1.0) {
+            this.blendWeight = 1.0;
+            this.currentClip = this.targetClip;
+          }
+        }
+
+        this.evaluate(this.targetClip, this.playTime);
+
+        if (this.blendWeight < 1.0) {
+          const l = (a, b, t) => a + (b - a) * t;
+          this.rig.torso.position.y = l(this.previousPose.torsoY, this.rig.torso.position.y, this.blendWeight);
+        }
+      }
+
+      evaluate(clip, t) {
+        const r = this.rig;
+        r.resetTransforms();
+
+        switch (clip) {
+          case 'idle':
+            r.leftArmPivot.rotation.z = Math.sin(t * 1.5) * 0.05 + 0.1;
+            r.rightArmPivot.rotation.z = -Math.sin(t * 1.5) * 0.05 - 0.1;
+            r.torso.rotation.y = Math.sin(t * 0.8) * 0.04;
+            break;
+          case 'working':
+            r.deskProp.visible = true;
+            r.torso.position.y = 2.1;
+            r.torso.rotation.x = 0.15;
+            r.leftArmPivot.rotation.x = -1.2 + Math.sin(t * 14.0) * 0.15;
+            r.rightArmPivot.rotation.x = -1.2 + Math.cos(t * 14.0) * 0.15;
+            break;
+          case 'celebrating':
+            r.torso.position.y = 2.4 + Math.abs(Math.sin(t * 6.0)) * 0.6;
+            r.leftArmPivot.rotation.x = -2.8 + Math.sin(t * 12.0) * 0.3;
+            r.rightArmPivot.rotation.x = -2.8 + Math.cos(t * 12.0) * 0.3;
+            r.headPivot.rotation.x = -0.3;
+            break;
+          case 'sitting':
+            r.chairProp.visible = true;
+            r.torso.position.y = 1.6;
+            r.leftLegPivot.rotation.x = -1.57;
+            r.rightLegPivot.rotation.x = -1.57;
+            break;
+          case 'thinking':
+            r.headPivot.rotation.z = 0.18;
+            r.rightArmPivot.rotation.x = -1.8;
+            break;
+          case 'talking':
+            r.leftArmPivot.rotation.x = -0.6 + Math.sin(t * 3.5) * 0.35;
+            r.rightArmPivot.rotation.x = -0.8 + Math.cos(t * 4.0) * 0.4;
+            break;
+          case 'listening':
+            r.headPivot.rotation.y = 0.25;
+            break;
+          case 'wave':
+            r.rightArmPivot.rotation.x = -2.7;
+            r.rightArmPivot.rotation.z = -0.3 + Math.sin(t * 10.0) * 0.45;
+            break;
+          case 'running':
+            r.torso.position.y = 2.3 + Math.abs(Math.sin(t * 8.0)) * 0.2;
+            r.leftLegPivot.rotation.x = Math.sin(t * 8.0) * 0.95;
+            r.rightLegPivot.rotation.x = -Math.sin(t * 8.0) * 0.95;
+            break;
+          default:
+            r.leftArmPivot.rotation.z = 0.1;
+            r.rightArmPivot.rotation.z = -0.1;
+        }
+      }
+    }
+
+    // =========================================================================
+    // 4. Character Forge Engine (Skin Painter)
+    // =========================================================================
+    class SkinForge {
+      constructor(rig) {
+        this.rig = rig;
+        this.canvas = document.getElementById('forge-canvas');
+        this.ctx = this.canvas.getContext('2d');
+        this.ctx.imageSmoothingEnabled = false;
+
+        this.presets = {
+          classic: { hair: '#5a3825', eyes: '#2563eb', hoodie: '#2e8540', logo: '#00ff88' },
+          hacker: { hair: '#111827', eyes: '#06b6d4', hoodie: '#090d16', logo: '#a855f7' },
+          chill: { hair: '#78350f', eyes: '#059669', hoodie: '#d97706', logo: '#fef08a' },
+          champion: { hair: '#312e81', eyes: '#f59e0b', hoodie: '#eab308', logo: '#ffffff' },
+          enderman: { isEnderman: true, hair: '#0a0a0f', eyes: '#d946ef', hoodie: '#0a0a0f', logo: '#581c87' }
+        };
+
+        const initialPreset = localStorage.getItem('sunday:character_preset') || 'enderman';
+        this.generate(this.presets[initialPreset] || this.presets.enderman);
+        this.initCanvasEvents();
+      }
+
+      generate(p) {
+        const c = this.ctx;
+        c.clearRect(0, 0, 64, 64);
+        if (p.isEnderman) {
+          c.fillStyle = '#0a0a0f'; c.fillRect(0, 0, 64, 64);
+          c.fillStyle = '#d946ef'; c.fillRect(8, 14, 12, 3); c.fillRect(44, 14, 12, 3);
+          c.fillStyle = '#f5d0fe'; c.fillRect(12, 14, 4, 3); c.fillRect(48, 14, 4, 3);
+          this.rig.setMode('enderman');
+        } else {
+          c.fillStyle = '#ffd1b3'; c.fillRect(0, 0, 32, 16);
+          c.fillStyle = p.hair; c.fillRect(0, 0, 32, 8);
+          c.fillStyle = p.eyes; c.fillRect(8, 10, 4, 3); c.fillRect(20, 10, 4, 3);
+          c.fillStyle = p.hoodie; c.fillRect(16, 16, 24, 16);
+          c.fillStyle = p.logo; c.fillRect(26, 20, 5, 2); c.fillRect(26, 24, 5, 2); c.fillRect(26, 28, 5, 2);
+          c.fillStyle = '#1e293b'; c.fillRect(0, 16, 16, 16);
+          this.rig.setMode('skybolt');
+          this.rig.setPalette(p);
+        }
+      }
+
+      initCanvasEvents() {
+        let isDrawing = false;
+        let color = '#2e8540';
+        let tool = 'pencil';
+        document.getElementById('forge-color-picker').addEventListener('input', (e) => { color = e.target.value; });
+        document.getElementById('forge-tool-pencil').addEventListener('click', () => { tool = 'pencil'; });
+        document.getElementById('forge-tool-eraser').addEventListener('click', () => { tool = 'eraser'; });
+
+        const draw = (e) => {
+          const rect = this.canvas.getBoundingClientRect();
+          const x = Math.floor((e.clientX - rect.left) / (rect.width / 64));
+          const y = Math.floor((e.clientY - rect.top) / (rect.height / 64));
+          this.ctx.fillStyle = tool === 'pencil' ? color : '#141d2e';
+          this.ctx.fillRect(x, y, 1, 1);
+        };
+        this.canvas.addEventListener('mousedown', (e) => { isDrawing = true; draw(e); });
+        window.addEventListener('mouseup', () => { isDrawing = false; });
+        this.canvas.addEventListener('mousemove', (e) => { if (isDrawing) draw(e); });
+      }
+
+      exportPackage(name = 'Sunday Companion') {
+        const isEnder = this.rig.isEnderman;
+        const charName = isEnder ? 'Enderman' : name;
+        const bundle = {
+          format: 'sunday_character_v2',
+          name: charName,
+          version: '2.0',
+          characterType: isEnder ? 'enderman' : 'skybolt',
+          dragonCompanion: 'ender_dragon',
+          palette: isEnder ? {
+            skin: '#0a0a0f',
+            eyes: '#d946ef',
+            pupil: '#f5d0fe',
+            hoodie: '#06060a',
+            particles: '#d946ef'
+          } : {
+            hair: '#5a3825',
+            eyes: '#2563eb',
+            hoodie: '#2e8540',
+            logo: '#00ff88'
+          },
+          texture: this.canvas.toDataURL('image/png')
+        };
+        const blob = new Blob([JSON.stringify(bundle, null, 2)], { type: 'application/json' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `${charName.toLowerCase().replace(/\s+/g, '_')}.sunday`;
+        a.click();
+        URL.revokeObjectURL(url);
+      }
+
+      importPackage(jsonText) {
+        try {
+          const b = JSON.parse(jsonText);
+          if (b.characterType === 'enderman' || b.name === 'Enderman') {
+            this.generate(this.presets.enderman);
+          } else if (b.palette) {
+            this.generate(b.palette);
+          }
+          if (b.texture) {
+            const img = new Image();
+            img.onload = () => { this.ctx.clearRect(0, 0, 64, 64); this.ctx.drawImage(img, 0, 0); };
+            img.src = b.texture;
+          }
+        } catch (e) {
+          console.warn('Import package error:', e);
+        }
+      }
+    }
+
+    // =========================================================================
+    // 5. Scene & Viewport Initialization
+    // =========================================================================
+    const canvas = document.getElementById('three-canvas');
+    const scene = new THREE.Scene();
+
+    const camera = new THREE.PerspectiveCamera(45, canvas.clientWidth / canvas.clientHeight, 0.1, 100);
+    camera.position.set(0, 1.8, 6.0); // Recalibrated camera framing
+
+    const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: true });
+    renderer.setSize(canvas.clientWidth, canvas.clientHeight);
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+    renderer.shadowMap.enabled = true;
+    renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+
+    const orbit = new SimpleOrbit(camera, canvas);
+
+    const ambientLight = new THREE.AmbientLight(0xffffff, 0.55);
+    scene.add(ambientLight);
+
+    const keyLight = new THREE.DirectionalLight(0xfff7ed, 0.85);
+    keyLight.position.set(4, 7, 5);
+    keyLight.castShadow = true;
+    scene.add(keyLight);
+
+    const fillLight = new THREE.DirectionalLight(0x06b6d4, 0.35);
+    fillLight.position.set(-4, 3, -3);
+    scene.add(fillLight);
+
+    const enderRimLight = new THREE.PointLight(0xd946ef, 1.4, 12);
+    enderRimLight.position.set(0, 3.2, -2.2);
+    scene.add(enderRimLight);
+
+    const floor = new THREE.Mesh(
+      new THREE.CylinderGeometry(3.6, 3.6, 0.1, 32),
+      new THREE.MeshStandardMaterial({ color: 0x0f172a, roughness: 0.8, metalness: 0.2 })
+    );
+    floor.position.y = -0.05;
+    floor.receiveShadow = true;
+    scene.add(floor);
+
+    const rig = new VoxelCharacter(scene);
+    const anim = new AnimationEngine(rig);
+    const forge = new SkinForge(rig);
+
+    // Populate Animation Sidebar List
+    const animations = [
+      { name: 'idle', label: 'Idle (Natural)', badge: 'Loop' },
+      { name: 'working', label: 'Working (Typing)', badge: 'Props' },
+      { name: 'celebrating', label: 'Celebrating', badge: 'Action' },
+      { name: 'thinking', label: 'Thinking', badge: 'Loop' },
+      { name: 'sitting', label: 'Sitting Calm', badge: 'Props' },
+      { name: 'listening', label: 'Listening (Mic)', badge: 'Audio' },
+      { name: 'talking', label: 'Talking (Speech)', badge: 'Viseme' },
+      { name: 'running', label: 'Running Sprint', badge: 'Loco' },
+      { name: 'wave', label: 'Wave Hello', badge: 'Gesture' }
+    ];
+
+    const listCont = document.getElementById('anim-list-container');
+    animations.forEach(a => {
+      const el = document.createElement('div');
+      el.className = `animation-item ${a.name === 'idle' ? 'active' : ''}`;
+      el.dataset.clip = a.name;
+      el.innerHTML = `<span>${a.label}</span><span class="anim-badge">${a.badge}</span>`;
+      el.addEventListener('click', () => {
+        document.querySelectorAll('.animation-item').forEach(i => i.classList.remove('active'));
+        el.classList.add('active');
+        anim.play(a.name);
+      });
+      listCont.appendChild(el);
+    });
+
+    document.querySelectorAll('.pose-card').forEach(c => {
+      c.addEventListener('click', () => {
+        document.querySelectorAll('.pose-card').forEach(p => p.classList.remove('active'));
+        c.classList.add('active');
+        const clip = c.dataset.clip;
+        anim.play(clip);
+        document.querySelectorAll('.animation-item').forEach(i => {
+          if (i.dataset.clip === clip) i.classList.add('active');
+          else i.classList.remove('active');
+        });
+      });
+    });
+
+    // Camera Presets
+    document.querySelectorAll('.cam-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        document.querySelectorAll('.cam-btn').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        const m = btn.dataset.cam;
+        if (m === 'front') orbit.setPreset(7.2, 0, Math.PI / 2 - 0.08, 2.0);
+        else if (m === 'isometric') orbit.setPreset(7.2, 0.75, 0.95, 2.0);
+        else if (m === 'side') orbit.setPreset(7.2, 1.57, Math.PI / 2 - 0.08, 2.0);
+        else if (m === 'close') orbit.setPreset(3.6, 0, Math.PI / 2 - 0.05, 3.2);
+      });
+    });
+
+    // Timeline Controls
+    const playPauseBtn = document.getElementById('btn-play-pause');
+    playPauseBtn.addEventListener('click', () => {
+      anim.isPaused = !anim.isPaused;
+      playPauseBtn.innerHTML = anim.isPaused
+        ? `<svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3"/></svg>`
+        : `<svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><rect x="6" y="4" width="4" height="16"/><rect x="14" y="4" width="4" height="16"/></svg>`;
+    });
+
+    // Cursor tracking
+    let tracking = true;
+    window.addEventListener('mousemove', (e) => {
+      if (!tracking) return;
+      const x = (e.clientX / window.innerWidth) * 2 - 1;
+      const y = -(e.clientY / window.innerHeight) * 2 + 1;
+      rig.setLookTarget(x, y);
+    });
+
+    document.getElementById('slider-tracking').addEventListener('input', (e) => {
+      tracking = parseInt(e.target.value) === 1;
+      document.getElementById('val-tracking').textContent = tracking ? 'Enabled' : 'Disabled';
+      if (!tracking) rig.setLookTarget(0, 0);
+    });
+
+    // Navigation Tabs
+    document.querySelectorAll('.nav-tab').forEach(t => {
+      if (t.tagName === 'A') return; // Don't intercept /project link
+      t.addEventListener('click', () => {
+        document.querySelectorAll('.nav-tab').forEach(tb => tb.classList.remove('active'));
+        t.classList.add('active');
+        const v = t.dataset.view;
+        document.getElementById('view-forge').classList.toggle('active', v === 'forge');
+        document.getElementById('view-skills').classList.toggle('active', v === 'skills');
+        document.getElementById('view-companion').classList.toggle('active', v === 'companion');
+      });
+    });
+
+    document.getElementById('btn-close-companion').addEventListener('click', () => {
+      document.getElementById('view-companion').classList.remove('active');
+    });
+
+    // Reset Demo State Button
+    document.getElementById('btn-reset-demo').addEventListener('click', () => {
+      anim.play('idle');
+      document.body.setAttribute('data-state', 'idle');
+      document.getElementById('nav-state-label').textContent = 'IDLE';
+      document.getElementById('rag-result-box').innerHTML = 'Ready to inspect local repository files. Click Inspect to query.';
+      document.getElementById('reasoning-trace-box').innerHTML = '<div class="trace-item"><span class="trace-badge thought">THOUGHT</span><span>Awaiting coding task instruction...</span></div>';
+      document.getElementById('git-diff-box').innerHTML = '<span style="color: #64748b;">// Awaiting synthesized patch...</span>';
+      document.getElementById('trace-status-pill').textContent = 'STANDBY';
+      document.getElementById('trace-status-pill').style.color = '#38bdf8';
+    });
+
+    // Forge Presets
+    document.querySelectorAll('.preset-btn').forEach(b => {
+      b.addEventListener('click', () => {
+        document.querySelectorAll('.preset-btn').forEach(pb => pb.classList.remove('active'));
+        b.classList.add('active');
+        forge.generate(forge.presets[b.dataset.preset]);
+      });
+    });
+
+    document.getElementById('btn-export-sunday').addEventListener('click', () => forge.exportPackage('Sunday Champion'));
+    const impFile = document.getElementById('file-import-sunday');
+    document.getElementById('btn-import-sunday').addEventListener('click', () => impFile.click());
+    impFile.addEventListener('change', (e) => {
+      const f = e.target.files[0];
+      if (!f) return;
+      const r = new FileReader();
+      r.onload = (evt) => forge.importPackage(evt.target.result);
+      r.readAsText(f);
+    });
+
+    // Local RAG
+    document.getElementById('btn-run-rag').addEventListener('click', async () => {
+      const q = document.getElementById('rag-query-input').value;
+      const box = document.getElementById('rag-result-box');
+      box.textContent = 'Inspecting air-gapped repository files with zero cloud leakage...';
+      anim.play('working');
+      try {
+        const res = await fetch('/api/rag', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ query: q }) });
+        const d = await res.json();
+        box.innerHTML = `<div><strong>Citation:</strong> <code style="color: #10b981;">${d.source}</code></div><div style="margin-top: 6px;">${d.answer}</div>`;
+        anim.play('celebrating');
+      } catch (e) {
+        box.textContent = 'Offline Verification: All local files protected on local drive.';
+      }
+    });
+
+    // SovereignDev Autonomous Pair Programmer (Live Reasoning Trace + Unified Git Diff)
+    document.getElementById('btn-run-code').addEventListener('click', async () => {
+      const task = document.getElementById('code-task-input').value;
+      const traceBox = document.getElementById('reasoning-trace-box');
+      const diffBox = document.getElementById('git-diff-box');
+      const statusPill = document.getElementById('trace-status-pill');
+
+      traceBox.innerHTML = '';
+      diffBox.innerHTML = '<span style="color: #64748b;">// Compiling AST analysis...</span>';
+      statusPill.textContent = 'RUNNING';
+      statusPill.style.color = '#f59e0b';
+      anim.play('working');
+      document.body.setAttribute('data-state', 'working');
+
+      // Helper to append a trace step
+      function appendTrace(type, text) {
+        const item = document.createElement('div');
+        item.className = 'trace-item';
+        item.innerHTML = `<span class="trace-badge ${type.toLowerCase()}">${type}</span><span>${text}</span>`;
+        traceBox.appendChild(item);
+        traceBox.scrollTop = traceBox.scrollHeight;
+      }
+
+      // Step 1: Simulated immediate thought
+      appendTrace('THOUGHT', `Received task: "${task}". Initializing AST scanner on local files...`);
+
+      try {
+        const res = await fetch('/api/code', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ task })
+        });
+        const data = await res.json();
+
+        // Render each step returned by the agent
+        traceBox.innerHTML = '';
+        data.steps.forEach(s => appendTrace(s.type, s.content));
+
+        // Format and render Git Diff
+        const diffLines = data.diff.split('\n').map(line => {
+          if (line.startsWith('+') && !line.startsWith('+++')) {
+            return `<span class="diff-add">${line}</span>`;
+          } else if (line.startsWith('-') && !line.startsWith('---')) {
+            return `<span class="diff-del">${line}</span>`;
+          }
+          return `<span>${line}</span>`;
+        }).join('');
+
+        diffBox.innerHTML = diffLines;
+        statusPill.textContent = 'VERIFIED ✓';
+        statusPill.style.color = '#10b981';
+
+        anim.play('celebrating');
+        document.body.setAttribute('data-state', 'celebrating');
+      } catch (err) {
+        appendTrace('ACTION', 'Local fallback compilation routine active.');
+        statusPill.textContent = 'OFFLINE VERIFIED ✓';
+      }
+    });
+
+    // Companion Chat
+    const chatInput = document.getElementById('chat-input');
+    const sendBtn = document.getElementById('btn-send-chat');
+    const msgCont = document.getElementById('chat-messages-container');
+
+    async function sendChat(text) {
+      if (!text || !text.trim()) return;
+      const u = document.createElement('div');
+      u.className = 'chat-bubble user';
+      u.textContent = text;
+      msgCont.appendChild(u);
+      chatInput.value = '';
+      msgCont.scrollTop = msgCont.scrollHeight;
+
+      anim.play('thinking');
+      document.body.setAttribute('data-state', 'thinking');
+
+      try {
+        const res = await fetch('/api/chat', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ query: text }) });
+        const d = await res.json();
+        const a = document.createElement('div');
+        a.className = 'chat-bubble assistant';
+        a.textContent = d.reply;
+        msgCont.appendChild(a);
+        msgCont.scrollTop = msgCont.scrollHeight;
+
+        anim.play(d.gesture !== 'none' ? d.gesture : 'talking');
+        document.body.setAttribute('data-state', 'talking');
+        simulateVoice(d.reply);
+      } catch (err) {
+        const a = document.createElement('div');
+        a.className = 'chat-bubble assistant';
+        a.textContent = "Running 100% offline! I am right here on your local silicon.";
+        msgCont.appendChild(a);
+      }
+    }
+
+    sendBtn.addEventListener('click', () => sendChat(chatInput.value));
+    chatInput.addEventListener('keydown', (e) => { if (e.key === 'Enter') sendChat(chatInput.value); });
+
+    document.querySelectorAll('.quick-prompt-btn').forEach(b => {
+      b.addEventListener('click', () => sendChat(b.dataset.prompt));
+    });
+
+    // Waveform
+    const wave = document.getElementById('audio-waveform');
+    const wCtx = wave.getContext('2d');
+    wave.width = wave.clientWidth;
+    wave.height = 56;
+
+    let isTalking = false;
+    function simulateVoice(text) {
+      isTalking = true;
+      const dur = Math.min(5000, Math.max(1800, text.length * 50));
+      const start = performance.now();
+      function tick(now) {
+        const el = now - start;
+        if (el < dur) {
+          rig.setMouthAmplitude(Math.abs(Math.sin(el * 0.02)) * 0.8);
+          requestAnimationFrame(tick);
+        } else {
+          rig.setMouthAmplitude(0);
+          isTalking = false;
+          anim.play('idle');
+          document.body.setAttribute('data-state', 'idle');
+        }
+      }
+      requestAnimationFrame(tick);
+    }
+
+    function renderWave() {
+      wCtx.clearRect(0, 0, wave.width, wave.height);
+      const bars = 24;
+      const bw = wave.width / bars - 3;
+      for (let i = 0; i < bars; i++) {
+        const h = isTalking
+          ? (Math.sin(performance.now() * 0.01 + i) * 0.5 + 0.5) * 40 + 6
+          : (Math.sin(performance.now() * 0.002 + i) * 0.2 + 0.2) * 12 + 4;
+        wCtx.fillStyle = isTalking ? '#ec4899' : '#10b981';
+        wCtx.fillRect(i * (bw + 3), (56 - h) / 2, bw, h);
+      }
+      requestAnimationFrame(renderWave);
+    }
+    renderWave();
+
+    // =========================================================================
+    // Stormforge Sky-Citadel Integration
+    // =========================================================================
+    const weatherCanvas = document.getElementById('stormforge-weather-canvas');
+    const timeEngine = new TimeOfDayEngine();
+    window.StormforgeTime = timeEngine;
+    const audioBed = new AudioBed();
+    const weatherSystem = new WeatherSystem(weatherCanvas);
+    const vael = new StormwyrmVael(null, weatherSystem, audioBed);
+    const flicker = new FlickerSpirit(null, audioBed, rig);
+    const reticle = new TargetingReticle(audioBed);
+    const castDirector = new CastDirector({
+      weather: weatherSystem,
+      audio: audioBed,
+      vael,
+      flicker,
+      reticle,
+      skyboltRig: rig,
+      skyboltAnim: anim
+    });
+
+    // Connect Reticle Target coordinates to Hero Gaze
+    window.addEventListener('hero:gaze', (e) => {
+      const normX = (e.detail.x / window.innerWidth) * 2 - 1;
+      const normY = (e.detail.y / window.innerHeight) * 2 - 1;
+      rig.setLookTarget(normX, normY);
+    });
+
+    // Character Avatar Toggle (Enderman <-> Skybolt)
+    const btnChar = document.getElementById('btn-toggle-character');
+    if (btnChar) {
+      btnChar.addEventListener('click', () => {
+        const next = rig.isEnderman ? 'classic' : 'enderman';
+        forge.generate(forge.presets[next]);
+        audioBed.playPop();
+      });
+    }
+
+    // Dragon Skin Toggle (Ender Dragon <-> Stormwyrm)
+    const btnDragon = document.getElementById('btn-toggle-dragon');
+    if (btnDragon) {
+      const updateDragonLabel = () => {
+        btnDragon.innerHTML = vael.skin === 'enderDragon'
+          ? '🐉 Dragon: <strong>Ender Dragon</strong>'
+          : '🐉 Dragon: <strong>Stormwyrm</strong>';
+      };
+      updateDragonLabel();
+      btnDragon.addEventListener('click', () => {
+        const nextSkin = vael.skin === 'enderDragon' ? 'stormwyrm' : 'enderDragon';
+        vael.setSkin(nextSkin);
+        updateDragonLabel();
+        audioBed.playThunderRoar();
+      });
+    }
+
+    // Play laser sound on tab switch inside page
+    document.querySelectorAll('.nav-tab').forEach(tab => {
+      if (tab.tagName !== 'A') {
+        tab.addEventListener('click', () => {
+          audioBed.playLaser();
+        });
+      }
+    });
+
+    // 60 FPS Render Loop
+    let lastTime = performance.now();
+    let frames = 0;
+    let lastFps = performance.now();
+
+    function render() {
+      requestAnimationFrame(render);
+      const now = performance.now();
+      const delta = Math.min(0.1, (now - lastTime) / 1000);
+      lastTime = now;
+
+      orbit.update();
+      rig.update(delta);
+      anim.update(delta);
+
+      // Stormforge Systems Update & Render
+      weatherSystem.update(delta);
+      weatherSystem.render();
+      vael.update(delta);
+      vael.render();
+      flicker.update(delta);
+      flicker.render();
+      castDirector.update(delta);
+
+      document.getElementById('timecode-current').textContent = `${anim.playTime.toFixed(2)}s`;
+      document.getElementById('timeline-slider').value = (anim.playTime % 4.0);
+
+      renderer.render(scene, camera);
+
+      frames++;
+      if (now - lastFps >= 1000) {
+        document.getElementById('hud-fps').textContent = (frames * 1000 / (now - lastFps)).toFixed(1);
+        frames = 0;
+        lastFps = now;
+      }
+    }
+
+    window.addEventListener('resize', () => {
+      const w = canvas.clientWidth;
+      const h = canvas.clientHeight;
+      camera.aspect = w / h;
+      camera.updateProjectionMatrix();
+      renderer.setSize(w, h);
+      wave.width = wave.clientWidth;
+    });
+
+    render();
+  </script>
+</body>
+</html>

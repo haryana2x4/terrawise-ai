@@ -1,0 +1,98 @@
+[
+  {
+    "id": "dry_spell_kharif",
+    "name": "Kharif Dry Spell Duration",
+    "parameter": "consecutive_dry_days_rain_under_2.5mm",
+    "low_threshold": "< 7 days",
+    "medium_threshold": "7 - 14 days",
+    "high_threshold": "> 14 days",
+    "unit": "days",
+    "source": "ICAR-CRIDA District Agriculture Contingency Plan for Ahmednagar & Nashik",
+    "rationale": "In Vertisols and medium black soils, moisture starts depleting rapidly after 7 rainless days during peak vegetative and flowering stages of soybean and bajra; beyond 14 days causes permanent wilting point stress in rainfed crops.",
+    "needs_expert_review": false
+  },
+  {
+    "id": "terminal_heat_wheat",
+    "name": "Rabi Terminal Heat Stress",
+    "parameter": "daily_maximum_temperature_feb_mar",
+    "low_threshold": "< 32.0 °C",
+    "medium_threshold": "32.0 - 35.0 °C",
+    "high_threshold": "> 35.0 °C",
+    "unit": "°C",
+    "source": "MPKV Rahuri Wheat Research Scheme & IMD Agromet Advisory",
+    "rationale": "Temperatures above 32°C during anthesis and grain filling drastically shorten duration of grain development, causing shriveled wheat kernels and up to 25% yield loss.",
+    "needs_expert_review": false
+  },
+  {
+    "id": "grape_frost_risk",
+    "name": "Vineyard Frost & Cold Injury",
+    "parameter": "daily_minimum_temperature_dec_jan",
+    "low_threshold": "> 10.0 °C",
+    "medium_threshold": "6.0 - 10.0 °C",
+    "high_threshold": "< 6.0 °C",
+    "unit": "°C",
+    "source": "ICAR-NRC Grapes Pune & Maharashtra Rajya Draksha Bagaitdar Sangh Nashik",
+    "rationale": "Night temperatures dropping below 6°C in Niphad/Dindori grape basins inhibit cell division, crack maturing table grape berries, and halt sugar accumulation.",
+    "needs_expert_review": false
+  },
+  {
+    "id": "extreme_precipitation_waterlogging",
+    "name": "24-Hour Excessive Precipitation",
+    "parameter": "single_day_rainfall_mm",
+    "low_threshold": "< 40 mm",
+    "medium_threshold": "40 - 75 mm",
+    "high_threshold": "> 75 mm",
+    "unit": "mm/day",
+    "source": "IMD District Agro-meteorological Warning Criteria",
+    "rationale": "Daily rainfall exceeding 75 mm leads to prolonged water stagnation in low-lying Vertisols, suffocating root systems of cotton, onion, and pulses, and inducing collar rot.",
+    "needs_expert_review": false
+  },
+  {
+    "id": "downy_mildew_grape_window",
+    "name": "Grape Downy Mildew Weather Window",
+    "parameter": "rh_above_85_and_temp_20_26_with_rain",
+    "low_threshold": "Dry canopy, RH < 70%",
+    "medium_threshold": "RH 70-85%, leaf wetness 2-4 hours",
+    "high_threshold": "RH > 85%, temp 20-26°C, continuous leaf wetness > 4 hours",
+    "unit": "microclimate index",
+    "source": "ICAR-NRC Grapes Disease Forewarning Model",
+    "rationale": "Plasmopara viticola requires continuous free moisture on grape leaves for at least 4 hours at moderate temperatures for zoospore encystment and stomatal infection.",
+    "needs_expert_review": false
+  },
+  {
+    "id": "soil_root_zone_moisture",
+    "name": "Root-Zone Hydration Deficit",
+    "parameter": "nasa_gwetroot_fraction",
+    "low_threshold": "> 0.50 (Hydrated)",
+    "medium_threshold": "0.30 - 0.50 (Moderate Deficit)",
+    "high_threshold": "< 0.30 (Severe Water Stress)",
+    "unit": "fraction (0.0 to 1.0)",
+    "source": "NASA POWER & SMAP Root Zone Soil Moisture Integration",
+    "rationale": "Root zone wetness below 0.30 triggers stomatal closure, spike in VPD, flower drop in soybean and cotton, and requires immediate supplementary protective irrigation.",
+    "needs_expert_review": false
+  },
+  {
+    "id": "groundwater_aquifer_stress",
+    "name": "Taluka Groundwater Exploitation Level",
+    "parameter": "cgwb_stage_of_groundwater_extraction_pct",
+    "low_threshold": "< 70% (Safe)",
+    "medium_threshold": "70% - 100% (Critical / Semi-critical)",
+    "high_threshold": "> 100% (Over-exploited)",
+    "unit": "% extraction vs recharge",
+    "source": "Central Ground Water Board (CGWB) Dynamic Ground Water Resources of Maharashtra 2023",
+    "rationale": "Over-exploited talukas (e.g., Sangamner, Sinnar, Kopargaon) experience borewell discharge dropping by 60% in summer, making high-water crops like sugarcane unsustainable.",
+    "needs_expert_review": false
+  },
+  {
+    "id": "onion_price_volatility",
+    "name": "Onion Mandi Price Crash Alert",
+    "parameter": "lasalgaon_modal_price_vs_production_cost",
+    "low_threshold": "> ₹1800 / quintal (Profitable)",
+    "medium_threshold": "₹1200 - ₹1800 / quintal (Near Cost-of-Cultivation)",
+    "high_threshold": "< ₹1200 / quintal (Distress / Loss)",
+    "unit": "₹ / quintal",
+    "source": "Agmarknet Historical Mandi Data & Commission for Agricultural Costs and Prices (CACP)",
+    "rationale": "Estimated cost of cultivation for rabi/summer onion in Nashik and Ahilya Nagar is approximately ₹1200-1400 per quintal. Mandi prices below ₹1200 cause direct capital erosion to growers.",
+    "needs_expert_review": false
+  }
+]

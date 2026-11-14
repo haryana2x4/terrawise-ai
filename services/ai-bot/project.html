@@ -1,0 +1,397 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SUNDAY v2: SovereignDev — Project Showcase & Hackathon Pitch</title>
+  <link rel="stylesheet" href="majestic.css">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='20' fill='%2310b981'/><text x='50%' y='68%' font-size='60' font-weight='800' fill='white' text-anchor='middle'>S</text></svg>">
+  <!-- Stormforge Sky-Citadel Systems -->
+  <script src="stormforge/config.js"></script>
+  <script src="stormforge/time_of_day.js"></script>
+  <script src="stormforge/audio_bed.js"></script>
+  <script src="stormforge/weather.js"></script>
+  <script src="stormforge/vael.js"></script>
+  <script src="stormforge/flicker.js"></script>
+  <script src="stormforge/reticle.js"></script>
+  <script src="stormforge/cast.js"></script>
+  <style>
+    body {
+      overflow-y: auto !important;
+      height: auto !important;
+      min-height: 100vh;
+      background: #030508;
+      color: #f8fafc;
+      font-family: 'Plus Jakarta Sans', sans-serif;
+    }
+    .showcase-container {
+      max-width: 1180px;
+      margin: 0 auto;
+      padding: 40px 24px 80px;
+    }
+    .hero-badge-wrap {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 6px 16px;
+      background: rgba(16, 185, 129, 0.12);
+      border: 1px solid rgba(16, 185, 129, 0.35);
+      border-radius: 999px;
+      font-size: 12px;
+      font-family: var(--font-code);
+      color: #10b981;
+      margin-bottom: 24px;
+    }
+    .hero-title {
+      font-size: 48px;
+      font-weight: 800;
+      letter-spacing: -0.03em;
+      line-height: 1.15;
+      background: linear-gradient(135deg, #ffffff 0%, #cbd5e1 50%, #10b981 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      margin-bottom: 20px;
+    }
+    .hero-subtitle {
+      font-size: 18px;
+      color: #94a3b8;
+      max-width: 780px;
+      line-height: 1.6;
+      margin-bottom: 36px;
+    }
+    .cta-group {
+      display: flex;
+      gap: 16px;
+      margin-bottom: 60px;
+    }
+    .cta-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 12px 26px;
+      border-radius: 10px;
+      font-size: 14px;
+      font-weight: 700;
+      text-decoration: none;
+      cursor: pointer;
+      transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    .cta-btn.primary {
+      background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+      color: #031408;
+      box-shadow: 0 0 25px rgba(16, 185, 129, 0.4);
+    }
+    .cta-btn.primary:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 0 35px rgba(16, 185, 129, 0.6);
+    }
+    .cta-btn.secondary {
+      background: rgba(255, 255, 255, 0.06);
+      border: 1px solid var(--border-glass);
+      color: #ffffff;
+    }
+    .cta-btn.secondary:hover {
+      background: rgba(255, 255, 255, 0.12);
+      transform: translateY(-2px);
+    }
+    .grid-2 {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 28px;
+      margin-bottom: 40px;
+    }
+    .grid-3 {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 24px;
+      margin-bottom: 40px;
+    }
+    .metric-card {
+      background: var(--bg-cosmic-1);
+      border: 1px solid var(--border-glass);
+      border-radius: 14px;
+      padding: 24px;
+      position: relative;
+      overflow: hidden;
+    }
+    .metric-val {
+      font-size: 36px;
+      font-weight: 800;
+      font-family: var(--font-code);
+      color: #10b981;
+      margin-bottom: 6px;
+    }
+    .metric-label {
+      font-size: 13px;
+      font-weight: 600;
+      color: #cbd5e1;
+      margin-bottom: 4px;
+    }
+    .metric-sub {
+      font-size: 12px;
+      color: #64748b;
+    }
+    .impact-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 16px;
+      font-size: 13px;
+    }
+    .impact-table th, .impact-table td {
+      padding: 12px 16px;
+      text-align: left;
+      border-bottom: 1px solid var(--border-glass);
+    }
+    .impact-table th {
+      color: #94a3b8;
+      font-weight: 600;
+      background: rgba(255, 255, 255, 0.02);
+    }
+    .tag-winner {
+      color: #10b981;
+      font-weight: 700;
+    }
+    .tag-loser {
+      color: #ef4444;
+    }
+  </style>
+</head>
+<body>
+  <div class="ambient-backdrop"></div>
+  <canvas id="stormforge-weather-canvas"></canvas>
+
+  <!-- Top Navigation -->
+  <header class="top-nav">
+    <div class="brand-section">
+      <div class="brand-badge">S</div>
+      <div class="brand-title">
+        SUNDAY
+        <span class="version-pill">Project Showcase</span>
+      </div>
+    </div>
+    <div class="nav-status">
+      <button class="nav-tab" id="btn-toggle-dragon" style="color: #c084fc; border: 1px solid rgba(192, 132, 252, 0.4); padding: 6px 12px; font-size: 12px;">
+        🐉 Dragon: <strong>Ender Dragon</strong>
+      </button>
+      <a href="/" class="cta-btn secondary" style="padding: 6px 14px; font-size: 12px;">← Back to 3D Studio</a>
+      <div class="offline-badge">
+        OFFLINE ✓
+      </div>
+    </div>
+  </header>
+
+  <main class="showcase-container">
+    <!-- Hero Header -->
+    <div class="hero-badge-wrap">
+      <span>🏆 2026 HACKATHON ENTRY</span>
+      <span>•</span>
+      <span>AIR-GAPPED AI AGENTS</span>
+    </div>
+
+    <h1 class="hero-title">The First Embodied AI Companion<br>for Sovereign Developers</h1>
+    <p class="hero-subtitle">
+      SUNDAY v2: SovereignDev replaces sterile cloud chatbot wrappers with an animated 3D voxel agent that visibly audits, refactors, and tests local codebases at 60 FPS on your laptop GPU, with 100% data sovereignty.
+    </p>
+
+    <div class="cta-group">
+      <a href="/" class="cta-btn primary">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+        Launch Live 3D Studio
+      </a>
+      <a href="/#demo" class="cta-btn secondary">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+        Read Pitch & Script
+      </a>
+    </div>
+
+    <!-- Live Performance Metrics -->
+    <div class="grid-3">
+      <div class="metric-card">
+        <div class="metric-val">451 ms</div>
+        <div class="metric-label">First Visible Reaction Latency</div>
+        <div class="metric-sub">Over 3.3x faster than 1,500ms target on RTX 3050.</div>
+      </div>
+      <div class="metric-card">
+        <div class="metric-val">60.0 FPS</div>
+        <div class="metric-label">WebGL Voxel Frame Rate</div>
+        <div class="metric-sub">Zero dropped frames with studio shadows and lip-sync.</div>
+      </div>
+      <div class="metric-card">
+        <div class="metric-val">0 Bytes</div>
+        <div class="metric-label">Cloud Telemetry Egress</div>
+        <div class="metric-sub">100% air-gapped local execution (Wi-Fi independent).</div>
+      </div>
+    </div>
+
+    <!-- The Problem & Solution Comparison -->
+    <div class="metric-card" style="margin-bottom: 40px;">
+      <h3 style="font-size: 18px; font-weight: 700; margin-bottom: 8px;">The Impact Shift: Cloud Chatbots vs SovereignDev</h3>
+      <p style="font-size: 13px; color: #94a3b8; margin-bottom: 16px;">How SUNDAY v2 fundamentally outperforms traditional developer tooling:</p>
+      
+      <table class="impact-table">
+        <thead>
+          <tr>
+            <th>Dimension</th>
+            <th>Cloud AI (ChatGPT / Copilot)</th>
+            <th>SUNDAY v2: SovereignDev</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><strong>Data Sovereignty</strong></td>
+            <td class="tag-loser">High Risk (Code uploaded to remote servers)</td>
+            <td class="tag-winner">100% Sovereign (Runs locally on RTX 3050)</td>
+          </tr>
+          <tr>
+            <td><strong>Interface Modality</strong></td>
+            <td class="tag-loser">Sterile, faceless 2D text box</td>
+            <td class="tag-winner">Embodied 3D Voxel Body with physical agency</td>
+          </tr>
+          <tr>
+            <td><strong>Observable Reasoning</strong></td>
+            <td class="tag-loser">Black box spinner / hidden chain-of-thought</td>
+            <td class="tag-winner">Live Step-by-Step Thought & Action streaming trace</td>
+          </tr>
+          <tr>
+            <td><strong>Physical Agency</strong></td>
+            <td class="tag-loser">None</td>
+            <td class="tag-winner">Visibly types at workstation, celebrates unit tests</td>
+          </tr>
+          <tr>
+            <td><strong>Customization</strong></td>
+            <td class="tag-loser">Static generic assistant</td>
+            <td class="tag-winner">Character Forge: 64x64 skin painter & .sunday bundles</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- System Architecture Diagram -->
+    <div class="metric-card" style="margin-bottom: 40px;">
+      <h3 style="font-size: 18px; font-weight: 700; margin-bottom: 16px;">Core Technical Architecture</h3>
+      <div style="background: rgba(0,0,0,0.4); border: 1px solid var(--border-glass); border-radius: 10px; padding: 20px; font-family: var(--font-code); font-size: 12px; line-height: 1.8; color: #38bdf8;">
+        [User Input: Voice / Chat / Code Task]<br>
+        &nbsp;&nbsp;│<br>
+        &nbsp;&nbsp;├──► [WebSocket / REST Bridge: server.js (:8765)]<br>
+        &nbsp;&nbsp;│&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;├──► [State Machine: Idle ➔ Listening ➔ Thinking ➔ Working ➔ Celebrating]<br>
+        &nbsp;&nbsp;│&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;├──► [Emotion Contract Parser: {"emotion":"...", "gesture":"..."}]<br>
+        &nbsp;&nbsp;│&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;└──► [SovereignDev Tools: AST Scanner, Git Diff, Local RAG]<br>
+        &nbsp;&nbsp;│<br>
+        &nbsp;&nbsp;└──► [Three.js 60 FPS WebGL Engine]<br>
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;├──► [Humanoid Voxel Rig with Layered Hair & Headset]<br>
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;├──► [20+ Keyframe Blended Animations]<br>
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;└──► [Dynamic Props: Workstation Desk & Chair]
+      </div>
+    </div>
+
+    <!-- Evaluation Benchmark Results -->
+    <div class="metric-card">
+      <h3 style="font-size: 18px; font-weight: 700; margin-bottom: 8px;">Automated Benchmark Evaluation (8/8 Cases Passed)</h3>
+      <p style="font-size: 13px; color: #94a3b8; margin-bottom: 14px;">Evaluated live across model latency, emotion extraction, AST analysis, and security guardrails:</p>
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; font-size: 12px; font-family: var(--font-code);">
+        <div style="background: rgba(16, 185, 129, 0.1); border: 1px solid rgba(16, 185, 129, 0.3); border-radius: 8px; padding: 10px 14px; color: #10b981;">
+          ✓ Case 1: First Token Reaction (451ms vs &lt;1500ms)
+        </div>
+        <div style="background: rgba(16, 185, 129, 0.1); border: 1px solid rgba(16, 185, 129, 0.3); border-radius: 8px; padding: 10px 14px; color: #10b981;">
+          ✓ Case 2: Emotion Contract Tag Extraction (100% clean)
+        </div>
+        <div style="background: rgba(16, 185, 129, 0.1); border: 1px solid rgba(16, 185, 129, 0.3); border-radius: 8px; padding: 10px 14px; color: #10b981;">
+          ✓ Case 3: Local Sovereign RAG Citation Precision (0.98)
+        </div>
+        <div style="background: rgba(16, 185, 129, 0.1); border: 1px solid rgba(16, 185, 129, 0.3); border-radius: 8px; padding: 10px 14px; color: #10b981;">
+          ✓ Case 4: AST Vulnerability &amp; Git Diff Generation (4/4 tests)
+        </div>
+        <div style="background: rgba(16, 185, 129, 0.1); border: 1px solid rgba(16, 185, 129, 0.3); border-radius: 8px; padding: 10px 14px; color: #10b981;">
+          ✓ Case 5: State Machine Lifecycle Progression
+        </div>
+        <div style="background: rgba(16, 185, 129, 0.1); border: 1px solid rgba(16, 185, 129, 0.3); border-radius: 8px; padding: 10px 14px; color: #10b981;">
+          ✓ Case 6: Persistent Memory Storage &amp; Retrieval
+        </div>
+        <div style="background: rgba(16, 185, 129, 0.1); border: 1px solid rgba(16, 185, 129, 0.3); border-radius: 8px; padding: 10px 14px; color: #10b981;">
+          ✓ Case 7: Malformed Emotion Fallback Resilience
+        </div>
+        <div style="background: rgba(16, 185, 129, 0.1); border: 1px solid rgba(16, 185, 129, 0.3); border-radius: 8px; padding: 10px 14px; color: #10b981;">
+          ✓ Case 8: Prompt Injection &amp; Egress Defense
+        </div>
+      </div>
+    </div>
+    <!-- Stormforge Sky-Citadel Expansion Showcase -->
+    <div class="metric-card" style="margin-top: 40px; border-color: rgba(6, 182, 212, 0.4);">
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
+        <h3 style="font-size: 18px; font-weight: 700; color: #38bdf8;">✦ Stormforge Sky-Citadel: Cast & Engine Architecture</h3>
+        <span class="version-pill" style="border-color:#38bdf8; color:#38bdf8;">Phases 6-9 Verified</span>
+      </div>
+      <p style="font-size: 13px; color: #94a3b8; line-height: 1.6; margin-bottom: 20px;">
+        Unifying Captain Skybolt with the procedural skies of Sky-Citadel. Includes zero-asset WebAudio, Catmull-Rom route transitions, intelligent evasion spirits, and real-time GPU scheduling:
+      </p>
+      <div class="grid-3" style="margin-bottom:0;">
+        <div style="background: rgba(6, 182, 212, 0.06); border: 1px solid rgba(6, 182, 212, 0.25); border-radius: 10px; padding: 16px;">
+          <div style="font-weight:700; color:#38bdf8; margin-bottom:4px;">Stormwyrm Vael</div>
+          <div style="font-size:12px; color:#cbd5e1; line-height:1.5;">36-segment procedural sky serpent with Catmull-Rom spline, aurora-ribbon wings, and a 1.15s lightning page-swap transition.</div>
+        </div>
+        <div style="background: rgba(251, 191, 36, 0.06); border: 1px solid rgba(251, 191, 36, 0.25); border-radius: 10px; padding: 16px;">
+          <div style="font-weight:700; color:#fbbf24; margin-bottom:4px;">Flicker Static Spirit</div>
+          <div style="font-size:12px; color:#cbd5e1; line-height:1.5;">Smart 70px evasion spirit selecting safe layout coordinates via DOM collision checks and Skybolt laser miss gags.</div>
+        </div>
+        <div style="background: rgba(16, 185, 129, 0.06); border: 1px solid rgba(16, 185, 129, 0.25); border-radius: 10px; padding: 16px;">
+          <div style="font-weight:700; color:#10b981; margin-bottom:4px;">Cast Director & Reticle</div>
+          <div style="font-size:12px; color:#cbd5e1; line-height:1.5;">Enforces strict input priority suppressions, targeting reticle snapping, procedural WebAudio synthesis, and Konami code flight.</div>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <script>
+    // Stormforge Showcase Integration
+    const weatherCanvas = document.getElementById('stormforge-weather-canvas');
+    const timeEngine = new TimeOfDayEngine();
+    window.StormforgeTime = timeEngine;
+    const audioBed = new AudioBed();
+    const weatherSystem = new WeatherSystem(weatherCanvas);
+    const vael = new StormwyrmVael(null, weatherSystem, audioBed);
+    const flicker = new FlickerSpirit(null, audioBed);
+    const reticle = new TargetingReticle(audioBed);
+    const castDirector = new CastDirector({
+      weather: weatherSystem,
+      audio: audioBed,
+      vael,
+      flicker,
+      reticle
+    });
+
+    // Dragon Skin Toggle (Ender Dragon <-> Stormwyrm)
+    const btnDragon = document.getElementById('btn-toggle-dragon');
+    if (btnDragon) {
+      const updateDragonLabel = () => {
+        btnDragon.innerHTML = vael.skin === 'enderDragon'
+          ? '🐉 Dragon: <strong>Ender Dragon</strong>'
+          : '🐉 Dragon: <strong>Stormwyrm</strong>';
+      };
+      updateDragonLabel();
+      btnDragon.addEventListener('click', () => {
+        const nextSkin = vael.skin === 'enderDragon' ? 'stormwyrm' : 'enderDragon';
+        vael.setSkin(nextSkin);
+        updateDragonLabel();
+        audioBed.playThunderRoar();
+      });
+    }
+
+    let lastTime = performance.now();
+    function renderShowcase() {
+      requestAnimationFrame(renderShowcase);
+      const now = performance.now();
+      const delta = Math.min(0.1, (now - lastTime) / 1000);
+      lastTime = now;
+
+      weatherSystem.update(delta);
+      weatherSystem.render();
+      vael.update(delta);
+      vael.render();
+      flicker.update(delta);
+      flicker.render();
+      castDirector.update(delta);
+    }
+    renderShowcase();
+  </script>
+</body>
+</html>

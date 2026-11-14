@@ -1,0 +1,79 @@
+# Beyond Earth - Autonomous AI Enderman, Ender Dragon & Universal Voice AI
+========================================================================
+
+## 1. Quick Launch
+- Double-click `START_BEYOND_EARTH.bat` on your Desktop.
+- Open `http://localhost:8765/` on your browser.
+- Open `http://192.168.1.6:8765/` on your smartphone (connected to the same Wi-Fi).
+- Or share `https://beyond-earth-orion.loca.lt` with friends anywhere in the world! (Password: 223.233.87.172)
+- Or open the single-file standalone distribution: `C:\Users\Rocky\Desktop\Beyond_Earth.html`.
+
+## 2. Universal Voice & Multilingual Translation (NEW!)
+1. **20+ World Languages Supported**:
+   - English, Español (Spanish), Français (French), Deutsch (German), हिन्दी (Hindi),
+     简体中文 (Chinese), 日本語 (Japanese), العربية (Arabic), Русский (Russian),
+     Português (Portuguese), Italiano (Italian), 한국어 (Korean), Türkçe (Turkish),
+     Nederlands (Dutch), Tiếng Việt (Vietnamese), বাংলা (Bengali), Bahasa Indonesia,
+     اردو (Urdu), Polski (Polish), and Global Auto-Detect!
+
+2. **Real-time Dual Translation**:
+   - Ask questions by voice or text in ANY language (e.g. "¿Cómo ahorramos agua con NASA SMAP?", "आज खाना खाया?", "Tu as mangé aujourd'hui?", "今日はご飯食べた？").
+   - ORION automatically understands, processes the answer through Gemma 4 & NASA Earth Observation telemetry, and speaks back in the chosen language.
+   - Dual-language subtitle toggle allows viewing both native translation and original English scientific data.
+
+3. **High-Fidelity Resonant Voice Engine**:
+   - Natural Neural/Google/Microsoft timbre prioritization per language.
+   - Procedural Web Audio sub-bass resonance filter for authentic Enderman acoustic presence.
+   - Customizable Pitch & Speed sliders with 60 FPS phonetic jaw drop lip-sync.
+   - **🔊 Test Button**: Click to test the voice in any selected world language instantly!
+
+4. **Native Speech-to-Text**:
+   - Click `🎤` to speak in your chosen language — speech recognition automatically switches to the native language's BCP-47 locale.
+
+## 3. All Interactive Controls & Enderman Powers
+1. **Uncaged Newtonian Physics**:
+   - Click and drag the Enderman anywhere, release to fling him.
+   - Real gravity, floor bounce, purple dust particles, and fall damage indicators.
+
+2. **Carrying Minecraft Blocks**:
+   - Press **[B]** or click **📦 Block** to toggle and cycle through 4 block types:
+     - Grass Block
+     - TNT Block
+     - Ender Chest
+     - Cosmic Core
+
+3. **Ender Pearl Throwing**:
+   - Press **[E]** or click **🔮 Pearl**:
+   - Flings an Ender Pearl in a ballistic arc with trailing sparks.
+   - On impact, triggers a teleport boom and teleports the Enderman there!
+
+4. **Eye-Contact Stare Rage**:
+   - Hover your cursor over the Enderman's eyes for > 1.1s, or press **[S]** / click **⚠️ Stare**:
+   - Lower jaw unhinges wide, eye sclera turns blazing red, screen shakes, and Ender roar sounds.
+
+5. **Petting Reaction**:
+   - Scrub the mouse back and forth across his head, or press **[P]** / click **❤️ Pet**:
+   - Ascending pixel hearts float into the air, and he emits cute purr chirps and heals health.
+
+6. **Beatbox & Dance**:
+   - Press **[M]** or click **🎵 Beat**:
+   - Plays a procedural 8-bit beatbox beat while the Enderman grooves with articulating jaw lip-sync.
+
+7. **Aura Customization**:
+   - Click **🌈 Aura** to cycle between Void Purple, Cosmic Cyan, Solar Gold, and Rainbow Prism.
+
+8. **Rocket Jump**:
+   - Press **[Space]** or click **🚀 Fling** to launch him into zero-gravity.
+
+9. **Ender Dragon Flyby**:
+   - Press **[D]** or click **🐉 Dragon** in the top bar or dock:
+   - The Minecraft Ender Dragon swoops across the sky with articulated wings and breath particles.
+
+10. **Conversational Buddy Brain**:
+    - Ask questions about NASA SMAP, ECOSTRESS, crop rotation, climate shifts, or witty everyday topics.
+    - Full speech audio + 60 FPS phonetic lower jaw lip-sync in 20+ languages!
+
+## 4. VS Code Development
+- Open `OPEN_IN_VSCODE.bat` on Desktop or open folder `C:\Users\Rocky\Desktop\Beyond Earth`.
+- Press `F5` to start debugging.
+- Run `npm run build` to compile the production bundle.

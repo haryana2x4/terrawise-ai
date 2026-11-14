@@ -1,0 +1,491 @@
+[
+  {
+    "id": "onion",
+    "common_name": "Onion",
+    "marathi_name": "कांदा",
+    "hindi_name": "प्याज",
+    "scientific_name": "Allium cepa",
+    "season": "Kharif / Late Kharif (Rangada) / Rabi-Summer (Unnadu)",
+    "sowing_window": {
+      "kharif": "June 15 - July 15 (Nursery), Transplant July-August",
+      "late_kharif": "August 15 - September 15 (Nursery), Transplant Sept-October",
+      "rabi_summer": "October 15 - November 30 (Nursery), Transplant Dec-January"
+    },
+    "harvest_window": {
+      "kharif": "October - November",
+      "late_kharif": "January - February",
+      "rabi_summer": "April - May"
+    },
+    "water_need_mm": 450,
+    "temp_range_c": { "min": 13, "optimum": 24, "max": 34 },
+    "soil_preference": "Well-drained sandy loam to medium black clay loam; pH 6.5 - 7.8",
+    "duration_days": 120,
+    "typical_yield_kg_ha": 22000,
+    "msp_inr_qtl": null,
+    "price_range_inr_qtl": { "min": 1100, "modal": 2100, "max": 3800 },
+    "rotation_notes": "Avoid planting directly after garlic or leek. Excellent after soybean, green gram, or bajra.",
+    "key_growth_stages": [
+      { "stage": "Nursery Seedling", "days_from_sowing": 35, "description": "Seedbed germination and seedling vigour" },
+      { "stage": "Vegetative Foliage", "days_from_sowing": 65, "description": "Leaf blade expansion and root establishment" },
+      { "stage": "Bulb Initiation & Development", "days_from_sowing": 95, "description": "Neck swelling, high moisture requirement" },
+      { "stage": "Bulb Maturity & Neck Fall", "days_from_sowing": 120, "description": "50% top neck drop, irrigation withdrawal for curing" }
+    ],
+    "source": "MPKV Rahuri Package of Practices & NHRDF Chitegaon Nashik"
+  },
+  {
+    "id": "grapes",
+    "common_name": "Grapes",
+    "marathi_name": "द्राक्षे",
+    "hindi_name": "अंगूर",
+    "scientific_name": "Vitis vinifera",
+    "season": "Perennial (Two pruning cycles: April back pruning & October fruit pruning)",
+    "sowing_window": {
+      "foundation_pruning": "April 1 - April 20",
+      "fruit_pruning": "September 25 - October 25"
+    },
+    "harvest_window": {
+      "export_table": "January 15 - April 10",
+      "wine_varieties": "February - March"
+    },
+    "water_need_mm": 600,
+    "temp_range_c": { "min": 10, "optimum": 28, "max": 38 },
+    "soil_preference": "Deep well-drained loam or sandy clay loam; EC < 1.0 dS/m; pH 6.8 - 8.2",
+    "duration_days": 140,
+    "typical_yield_kg_ha": 25000,
+    "msp_inr_qtl": null,
+    "price_range_inr_qtl": { "min": 3500, "modal": 5500, "max": 9500 },
+    "rotation_notes": "Perennial vineyard; green cover cropping (sunn hemp or daincha) in inter-row spaces during monsoon.",
+    "key_growth_stages": [
+      { "stage": "Bud Break & Sprouting", "days_from_sowing": 15, "description": "Dormancy break after October pruning" },
+      { "stage": "Inflorescence & Capfall", "days_from_sowing": 45, "description": "Flowering, berry set, high susceptibility to downy mildew" },
+      { "stage": "Berry Growth & Veraison", "days_from_sowing": 85, "description": "Berry enlargement, softening, sugar accumulation" },
+      { "stage": "Harvest & Sugar Maturity", "days_from_sowing": 140, "description": "TSS 18-20° Brix, berry firmness and color maturity" }
+    ],
+    "source": "ICAR-NRC Grapes Pune & Maharashtra Rajya Draksha Bagaitdar Sangh (MRDBS) Nashik"
+  },
+  {
+    "id": "pomegranate",
+    "common_name": "Pomegranate",
+    "marathi_name": "डाळिंब",
+    "hindi_name": "अनार",
+    "scientific_name": "Punica granatum",
+    "season": "Perennial (Bahar regulation: Hasta Bahar Sept-Oct or Mrig Bahar June)",
+    "sowing_window": {
+      "mrig_bahar": "June 1 - June 20 (Flowering initiation)",
+      "hasta_bahar": "September 15 - October 15"
+    },
+    "harvest_window": {
+      "mrig_bahar": "November - January",
+      "hasta_bahar": "February - April"
+    },
+    "water_need_mm": 500,
+    "temp_range_c": { "min": 12, "optimum": 30, "max": 40 },
+    "soil_preference": "Light to medium gravelly or alluvial soil; avoids waterlogged heavy vertisols",
+    "duration_days": 160,
+    "typical_yield_kg_ha": 12000,
+    "msp_inr_qtl": null,
+    "price_range_inr_qtl": { "min": 5000, "modal": 8500, "max": 14000 },
+    "rotation_notes": "Perennial orchard; intercrop with marigold or cowpea in first 2 years to suppress nematodes.",
+    "key_growth_stages": [
+      { "stage": "Defoliation & Stress Release", "days_from_sowing": 20, "description": "Water stress release followed by new flush" },
+      { "stage": "Flowering & Fruit Set", "days_from_sowing": 50, "description": "Hermaphrodite flower pollination and young fruit setting" },
+      { "stage": "Fruit Development", "days_from_sowing": 110, "description": "Aril development and fruit skin expansion" },
+      { "stage": "Harvest Maturity", "days_from_sowing": 160, "description": "Deep red Bhagwa color, metallic ring sound on tapping" }
+    ],
+    "source": "ICAR-National Research Centre on Pomegranate (NRCP) Solapur"
+  },
+  {
+    "id": "tomato",
+    "common_name": "Tomato",
+    "marathi_name": "टोमॅटो",
+    "hindi_name": "टमाटर",
+    "scientific_name": "Solanum lycopersicum",
+    "season": "Kharif & Rabi (Nashik-Sangamner vegetable belt)",
+    "sowing_window": {
+      "kharif": "June 1 - July 10 (Transplanting July)",
+      "rabi": "September 15 - October 25 (Transplanting October-November)"
+    },
+    "harvest_window": {
+      "kharif": "September - November",
+      "rabi": "December - February"
+    },
+    "water_need_mm": 400,
+    "temp_range_c": { "min": 15, "optimum": 25, "max": 35 },
+    "soil_preference": "Fertile sandy loam to black clay loam with good drainage; pH 6.0 - 7.5",
+    "duration_days": 115,
+    "typical_yield_kg_ha": 35000,
+    "msp_inr_qtl": null,
+    "price_range_inr_qtl": { "min": 600, "modal": 1500, "max": 3200 },
+    "rotation_notes": "Rotate with pulses (gram, moong) or cereals (maize). Avoid solanaceous rotation (brinjal/potato).",
+    "key_growth_stages": [
+      { "stage": "Vegetative Establishment", "days_from_sowing": 30, "description": "Root development and staking support" },
+      { "stage": "First Flowering & Fruit Set", "days_from_sowing": 55, "description": "Active blossom cluster emergence" },
+      { "stage": "Fruit Bulking", "days_from_sowing": 85, "description": "Rapid fruit swelling and color break" },
+      { "stage": "Multiple Harvest Flushes", "days_from_sowing": 115, "description": "Breaker to red ripe harvest stages" }
+    ],
+    "source": "MPKV Rahuri Vegetable Research Scheme & Pimpalgaon APMC"
+  },
+  {
+    "id": "sugarcane",
+    "common_name": "Sugarcane",
+    "marathi_name": "ऊस",
+    "hindi_name": "गन्ना",
+    "scientific_name": "Saccharum officinarum",
+    "season": "Suru (Jan-Feb) / Adsali (July-August) / Pre-seasonal (Oct-Nov)",
+    "sowing_window": {
+      "suru": "January 15 - February 28",
+      "pre_seasonal": "October 1 - November 15",
+      "adsali": "July 15 - August 31"
+    },
+    "harvest_window": {
+      "suru": "January - March (12 months)",
+      "pre_seasonal": "November - January (14 months)",
+      "adsali": "December - February (16-18 months)"
+    },
+    "water_need_mm": 1800,
+    "temp_range_c": { "min": 18, "optimum": 32, "max": 42 },
+    "soil_preference": "Deep heavy Vertisols (>1m depth) with canal or assured lift irrigation",
+    "duration_days": 365,
+    "typical_yield_kg_ha": 95000,
+    "msp_inr_qtl": 340,
+    "price_range_inr_qtl": { "min": 315, "modal": 340, "max": 360 },
+    "rotation_notes": "Heavy feeder. Follow with green manure (daincha) or deep-rooted chickpea/soybean break crop.",
+    "key_growth_stages": [
+      { "stage": "Germination & Sett Sprouting", "days_from_sowing": 40, "description": "Eye-bud sprouting and primary root strike" },
+      { "stage": "Tillering & Canopy Coverage", "days_from_sowing": 120, "description": "Side tillering and weed canopy suppression" },
+      { "stage": "Grand Growth Period", "days_from_sowing": 270, "description": "Internode elongation and biomass accretion" },
+      { "stage": "Sucrose Ripening & Maturity", "days_from_sowing": 365, "description": "Brix reading >19%, drying of lower leaves" }
+    ],
+    "source": "Vasantdada Sugar Institute (VSI) Pune & MPKV Rahuri"
+  },
+  {
+    "id": "soybean",
+    "common_name": "Soybean",
+    "marathi_name": "सोयाबीन",
+    "hindi_name": "सोयाबीन",
+    "scientific_name": "Glycine max",
+    "season": "Kharif",
+    "sowing_window": {
+      "general": "June 20 - July 15 (after 75mm monsoon accumulation)"
+    },
+    "harvest_window": {
+      "general": "September 25 - October 20"
+    },
+    "water_need_mm": 450,
+    "temp_range_c": { "min": 18, "optimum": 28, "max": 36 },
+    "soil_preference": "Medium to deep fertile black soils (Vertisols); pH 6.5 - 7.5; avoids saline soils",
+    "duration_days": 95,
+    "typical_yield_kg_ha": 2100,
+    "msp_inr_qtl": 4892,
+    "price_range_inr_qtl": { "min": 4100, "modal": 4750, "max": 5300 },
+    "rotation_notes": "Ideal predecessor for Rabi chickpea (harbhara) or wheat. Enriches soil with 35 kg N/ha.",
+    "key_growth_stages": [
+      { "stage": "Emergence & Nodulation", "days_from_sowing": 20, "description": "Active Rhizobium nodule initiation" },
+      { "stage": "Flowering Initiation", "days_from_sowing": 45, "description": "Peak floral bloom, critical water stress stage" },
+      { "stage": "Pod Filling & Seed Expansion", "days_from_sowing": 75, "description": "Grain filling, moisture stress drops seed weight" },
+      { "stage": "Maturity & Leaf Senescence", "days_from_sowing": 95, "description": "Foliage yellowing and pod browning" }
+    ],
+    "source": "ICAR-Indian Institute of Soybean Research (IISR) Indore & MPKV Rahuri"
+  },
+  {
+    "id": "bajra",
+    "common_name": "Pearl Millet (Bajra)",
+    "marathi_name": "बाजरी",
+    "hindi_name": "बाजरा",
+    "scientific_name": "Pennisetum glaucum",
+    "season": "Kharif & Summer",
+    "sowing_window": {
+      "kharif": "June 15 - July 15",
+      "summer": "January 15 - February 15"
+    },
+    "harvest_window": {
+      "kharif": "September 15 - October 15",
+      "summer": "April 15 - May 10"
+    },
+    "water_need_mm": 300,
+    "temp_range_c": { "min": 20, "optimum": 32, "max": 42 },
+    "soil_preference": "Light to medium gravelly or shallow soils; highly drought-resilient",
+    "duration_days": 85,
+    "typical_yield_kg_ha": 2400,
+    "msp_inr_qtl": 2625,
+    "price_range_inr_qtl": { "min": 2200, "modal": 2550, "max": 2850 },
+    "rotation_notes": "Excellent drought-hardy staple for eastern talukas of Ahilya Nagar (Parner/Karjat).",
+    "key_growth_stages": [
+      { "stage": "Seedling & Tillering", "days_from_sowing": 25, "description": "Crown root formation and nodal tillering" },
+      { "stage": "Booting & Panicle Emergence", "days_from_sowing": 50, "description": "Flag leaf emergence and earhead development" },
+      { "stage": "Grain Formation (Milky & Dough)", "days_from_sowing": 70, "description": "Starch accumulation in earhead" },
+      { "stage": "Grain Maturity", "days_from_sowing": 85, "description": "Glume black spot appearance indicating physiological maturity" }
+    ],
+    "source": "All India Coordinated Research Project on Pearl Millet & MPKV Rahuri"
+  },
+  {
+    "id": "jowar",
+    "common_name": "Sorghum (Jowar)",
+    "marathi_name": "ज्वारी",
+    "hindi_name": "ज्वार",
+    "scientific_name": "Sorghum bicolor",
+    "season": "Rabi (Staple Maldandi 35-1) & Kharif",
+    "sowing_window": {
+      "rabi": "September 15 - October 15 (Critical: sow before Oct 15 for shootfly escape)"
+    },
+    "harvest_window": {
+      "rabi": "February 1 - February 28"
+    },
+    "water_need_mm": 350,
+    "temp_range_c": { "min": 15, "optimum": 28, "max": 38 },
+    "soil_preference": "Medium to deep Vertisols with good subsoil moisture retention",
+    "duration_days": 115,
+    "typical_yield_kg_ha": 2000,
+    "msp_inr_qtl": 3371,
+    "price_range_inr_qtl": { "min": 2800, "modal": 3400, "max": 4200 },
+    "rotation_notes": "Key dryland food-fodder staple. Rotates well with Kharif green gram or soybean.",
+    "key_growth_stages": [
+      { "stage": "Seedling Establishment", "days_from_sowing": 20, "description": "Shootfly vulnerable window" },
+      { "stage": "Knee-High & Panicle Initiation", "days_from_sowing": 50, "description": "Rapid vegetative growth and floral initiation" },
+      { "stage": "Flowering & Grain Filling", "days_from_sowing": 85, "description": "Anthesis and milky grain stage" },
+      { "stage": "Grain Hardening & Stover Maturity", "days_from_sowing": 115, "description": "Black layer formation at grain base" }
+    ],
+    "source": "ICAR-Indian Institute of Millets Research (IIMR) Hyderabad & MPKV Rahuri"
+  },
+  {
+    "id": "maize",
+    "common_name": "Maize (Corn)",
+    "marathi_name": "मका",
+    "hindi_name": "मक्का",
+    "scientific_name": "Zea mays",
+    "season": "Kharif & Rabi (Extensive in Nashik: Malegaon, Yeola, Niphad)",
+    "sowing_window": {
+      "kharif": "June 15 - July 15",
+      "rabi": "October 15 - November 15"
+    },
+    "harvest_window": {
+      "kharif": "September 25 - October 25",
+      "rabi": "February 15 - March 15"
+    },
+    "water_need_mm": 500,
+    "temp_range_c": { "min": 18, "optimum": 30, "max": 38 },
+    "soil_preference": "Well-drained sandy loam to clay loam; highly intolerant of waterlogging",
+    "duration_days": 105,
+    "typical_yield_kg_ha": 5500,
+    "msp_inr_qtl": 2225,
+    "price_range_inr_qtl": { "min": 1950, "modal": 2250, "max": 2550 },
+    "rotation_notes": "Follow with legumes like chickpea or lentil to restore nitrogen balance.",
+    "key_growth_stages": [
+      { "stage": "Vegetative Knee-High", "days_from_sowing": 35, "description": "Rapid leaf collar emergence and root anchor" },
+      { "stage": "Tasseling & Silking", "days_from_sowing": 60, "description": "Pollen shed and ear silking (peak moisture demand)" },
+      { "stage": "Kernel Blister & Dough", "days_from_sowing": 85, "description": "Grain starch filling, Fall Armyworm monitoring" },
+      { "stage": "Dent & Physiological Maturity", "days_from_sowing": 105, "description": "Kernel black layer development" }
+    ],
+    "source": "ICAR-Indian Institute of Maize Research (IIMR) & MPKV Rahuri"
+  },
+  {
+    "id": "wheat",
+    "common_name": "Wheat",
+    "marathi_name": "गहू",
+    "hindi_name": "गेहूं",
+    "scientific_name": "Triticum aestivum",
+    "season": "Rabi (Irrigated)",
+    "sowing_window": {
+      "timely": "November 1 - November 20 (Optimal)",
+      "late": "November 21 - December 10"
+    },
+    "harvest_window": {
+      "timely": "March 1 - March 25"
+    },
+    "water_need_mm": 450,
+    "temp_range_c": { "min": 10, "optimum": 22, "max": 30 },
+    "soil_preference": "Medium to deep fertile soils with good water-holding capacity",
+    "duration_days": 115,
+    "typical_yield_kg_ha": 3800,
+    "msp_inr_qtl": 2425,
+    "price_range_inr_qtl": { "min": 2350, "modal": 2600, "max": 3100 },
+    "rotation_notes": "Follows Kharif soybean or green gram. Highly vulnerable to late-season heat waves in March.",
+    "key_growth_stages": [
+      { "stage": "Crown Root Initiation (CRI)", "days_from_sowing": 21, "description": "Most critical irrigation stage" },
+      { "stage": "Tillering & Jointing", "days_from_sowing": 50, "description": "Stem elongation and earhead formation" },
+      { "stage": "Heading & Flowering", "days_from_sowing": 75, "description": "Spike emergence and fertilization" },
+      { "stage": "Grain Filling & Milk-Dough", "days_from_sowing": 100, "description": "Vulnerable to terminal heat stress above 32°C" },
+      { "stage": "Maturity & Desiccation", "days_from_sowing": 115, "description": "Grain hardening and straw golden browning" }
+    ],
+    "source": "ICAR-Indian Institute of Wheat and Barley Research (IIWBR) & MPKV Rahuri"
+  },
+  {
+    "id": "gram",
+    "common_name": "Bengal Gram (Chickpea / Harbhara)",
+    "marathi_name": "हरभरा",
+    "hindi_name": "चना",
+    "scientific_name": "Cicer arietinum",
+    "season": "Rabi",
+    "sowing_window": {
+      "general": "October 10 - November 10"
+    },
+    "harvest_window": {
+      "general": "January 25 - February 25"
+    },
+    "water_need_mm": 280,
+    "temp_range_c": { "min": 10, "optimum": 24, "max": 32 },
+    "soil_preference": "Medium to deep black soils with good residual moisture; avoids saline soils",
+    "duration_days": 100,
+    "typical_yield_kg_ha": 1800,
+    "msp_inr_qtl": 5650,
+    "price_range_inr_qtl": { "min": 5200, "modal": 5800, "max": 6500 },
+    "rotation_notes": "Fixes 40-50 kg atmospheric N/ha. MPKV varieties: Digvijay, Vijay, Phule Vikram.",
+    "key_growth_stages": [
+      { "stage": "Seedling Branching", "days_from_sowing": 25, "description": "Early apical shoot pinching for profuse branching" },
+      { "stage": "Flowering & Podding", "days_from_sowing": 55, "description": "Helicoverpa pod borer active window" },
+      { "stage": "Grain Filling", "days_from_sowing": 80, "description": "Green pod filling, subsoil moisture extraction" },
+      { "stage": "Pod Maturity & Drying", "days_from_sowing": 100, "description": "Foliage drying, pods turn golden-straw" }
+    ],
+    "source": "MPKV Rahuri Pulses Specialist & Directorate of Pulses Development"
+  },
+  {
+    "id": "tur",
+    "common_name": "Pigeon Pea (Tur / Arhar)",
+    "marathi_name": "तूर",
+    "hindi_name": "अरहर",
+    "scientific_name": "Cajanus cajan",
+    "season": "Kharif-Rabi Long Duration",
+    "sowing_window": {
+      "general": "June 15 - July 15"
+    },
+    "harvest_window": {
+      "general": "December 15 - January 31"
+    },
+    "water_need_mm": 450,
+    "temp_range_c": { "min": 16, "optimum": 28, "max": 38 },
+    "soil_preference": "Deep well-drained soils; deep taproot penetrates compacted soil layers",
+    "duration_days": 165,
+    "typical_yield_kg_ha": 1600,
+    "msp_inr_qtl": 7550,
+    "price_range_inr_qtl": { "min": 7100, "modal": 8200, "max": 10200 },
+    "rotation_notes": "Commonly intercropped with Soybean (1:2 or 1:4) or Bajra. Deep root bio-drills hardpan.",
+    "key_growth_stages": [
+      { "stage": "Vegetative Branching", "days_from_sowing": 45, "description": "Erect branching and root depth development" },
+      { "stage": "Budding & Profuse Flowering", "days_from_sowing": 105, "description": "Indeterminate blooming, pod borer surveillance" },
+      { "stage": "Pod Development & Grain Filling", "days_from_sowing": 140, "description": "Pod cluster maturation" },
+      { "stage": "Harvest Maturity", "days_from_sowing": 165, "description": "75% pods turn brownish-black" }
+    ],
+    "source": "ICAR-Indian Institute of Pulses Research (IIPR) & MPKV Rahuri (Phule Rajeshwari)"
+  },
+  {
+    "id": "cotton",
+    "common_name": "Cotton (Bt Hybrid)",
+    "marathi_name": "कापूस",
+    "hindi_name": "कपास",
+    "scientific_name": "Gossypium hirsutum",
+    "season": "Kharif",
+    "sowing_window": {
+      "rainfed": "June 15 - July 10",
+      "irrigated": "May 25 - June 10"
+    },
+    "harvest_window": {
+      "pickings": "November 1 - January 15 (Multiple pickings)"
+    },
+    "water_need_mm": 700,
+    "temp_range_c": { "min": 20, "optimum": 32, "max": 40 },
+    "soil_preference": "Deep black soils (Vertisols) with good water holding capacity (>90 cm depth)",
+    "duration_days": 160,
+    "typical_yield_kg_ha": 2200,
+    "msp_inr_qtl": 7521,
+    "price_range_inr_qtl": { "min": 6800, "modal": 7400, "max": 8200 },
+    "rotation_notes": "Southern Ahilya Nagar talukas (Shevgaon/Pathardi/Nevasa). Follow with summer pulses.",
+    "key_growth_stages": [
+      { "stage": "Square Formation (Bud)", "days_from_sowing": 45, "description": "Fruiting branches and square development" },
+      { "stage": "Flowering & Boll Setting", "days_from_sowing": 75, "description": "White flowers turn pink after pollination" },
+      { "stage": "Boll Development & Maturation", "days_from_sowing": 120, "description": "Pink bollworm critical scouting period" },
+      { "stage": "Boll Bursting & Picking Flushes", "days_from_sowing": 160, "description": "Fluffy white lint exposure, picking in dry weather" }
+    ],
+    "source": "ICAR-Central Institute for Cotton Research (CICR) Nagpur & MPKV Rahuri"
+  },
+  {
+    "id": "groundnut",
+    "common_name": "Groundnut (Peanut)",
+    "marathi_name": "भुईमूग",
+    "hindi_name": "मूंगफली",
+    "scientific_name": "Arachis hypogaea",
+    "season": "Kharif & Summer",
+    "sowing_window": {
+      "kharif": "June 15 - July 10",
+      "summer": "January 15 - February 15"
+    },
+    "harvest_window": {
+      "kharif": "October 1 - October 30",
+      "summer": "May 1 - May 25"
+    },
+    "water_need_mm": 450,
+    "temp_range_c": { "min": 20, "optimum": 30, "max": 36 },
+    "soil_preference": "Well-drained light sandy loam or red friable soil with calcium for peg penetration",
+    "duration_days": 105,
+    "typical_yield_kg_ha": 2600,
+    "msp_inr_qtl": 6783,
+    "price_range_inr_qtl": { "min": 6200, "modal": 6900, "max": 7600 },
+    "rotation_notes": "TAG-24 variety popular in summer irrigated tracts. Fixes nitrogen and improves soil friability.",
+    "key_growth_stages": [
+      { "stage": "Flowering Initiation", "days_from_sowing": 30, "description": "Yellow petal bloom close to soil level" },
+      { "stage": "Peg Penetration (Pegging)", "days_from_sowing": 50, "description": "Gynophore enters soil; friable topsoil critical" },
+      { "stage": "Pod Filling & Shell Hardening", "days_from_sowing": 85, "description": "Subterranean kernel development" },
+      { "stage": "Harvest Maturity", "days_from_sowing": 105, "description": "Inner pod shell shows blackish-brown reticulum" }
+    ],
+    "source": "ICAR-Directorate of Groundnut Research (DGR) Junagadh & MPKV Rahuri"
+  },
+  {
+    "id": "green_gram",
+    "common_name": "Green Gram (Moong)",
+    "marathi_name": "मूग",
+    "hindi_name": "मूंग",
+    "scientific_name": "Vigna radiata",
+    "season": "Early Kharif & Summer",
+    "sowing_window": {
+      "kharif": "June 15 - July 5 (Early monsoon onset)",
+      "summer": "February 15 - March 10"
+    },
+    "harvest_window": {
+      "kharif": "August 20 - September 10",
+      "summer": "April 25 - May 15"
+    },
+    "water_need_mm": 250,
+    "temp_range_c": { "min": 22, "optimum": 30, "max": 40 },
+    "soil_preference": "Well-drained fertile loam or light to medium black soils; avoids salinity",
+    "duration_days": 65,
+    "typical_yield_kg_ha": 1100,
+    "msp_inr_qtl": 8682,
+    "price_range_inr_qtl": { "min": 7800, "modal": 8800, "max": 9900 },
+    "rotation_notes": "Ultra-short 60-day catch crop. Fits between Rabi harvest and Kharif main crop or as green manure.",
+    "key_growth_stages": [
+      { "stage": "Vegetative & Nodule Strike", "days_from_sowing": 20, "description": "Trifoliate leaf emergence and active nitrogen fixation" },
+      { "stage": "Flower Flush", "days_from_sowing": 35, "description": "Synchronous yellow flowering" },
+      { "stage": "Pod Elongation & Filling", "days_from_sowing": 50, "description": "Green pods fill seeds" },
+      { "stage": "Pod Blackening & Harvesting", "days_from_sowing": 65, "description": "85% pods turn brownish-black" }
+    ],
+    "source": "MPKV Rahuri (BM 2002-1, BM 2003-2) & AICRP on MULLaRP"
+  },
+  {
+    "id": "black_gram",
+    "common_name": "Black Gram (Urad)",
+    "marathi_name": "उडीद",
+    "hindi_name": "उड़द",
+    "scientific_name": "Vigna mungo",
+    "season": "Kharif",
+    "sowing_window": {
+      "kharif": "June 15 - July 10"
+    },
+    "harvest_window": {
+      "kharif": "September 1 - September 25"
+    },
+    "water_need_mm": 280,
+    "temp_range_c": { "min": 22, "optimum": 30, "max": 38 },
+    "soil_preference": "Medium to deep fertile soils with moderate water holding capacity",
+    "duration_days": 70,
+    "typical_yield_kg_ha": 1200,
+    "msp_inr_qtl": 7400,
+    "price_range_inr_qtl": { "min": 7000, "modal": 7700, "max": 8800 },
+    "rotation_notes": "Dense foliage smothers weeds and prevents topsoil erosion on sloped terrains.",
+    "key_growth_stages": [
+      { "stage": "Vegetative Sprawling", "days_from_sowing": 25, "description": "Dense canopy formation" },
+      { "stage": "Flowering & Pod Initiation", "days_from_sowing": 42, "description": "Yellow racemes and hairy young pods" },
+      { "stage": "Pod Maturation", "days_from_sowing": 60, "description": "Hairy black pods develop" },
+      { "stage": "Harvesting", "days_from_sowing": 70, "description": "Pods turn dark black" }
+    ],
+    "source": "MPKV Rahuri (TAU-1, Phule Udid-15) & Directorate of Pulses Development"
+  }
+]

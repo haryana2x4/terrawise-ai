@@ -1,0 +1,33 @@
+{
+  "format": "sunday_character_v2",
+  "name": "Enderman",
+  "version": "2.0",
+  "characterType": "enderman",
+  "universe": "The End / Minecraft",
+  "dragonCompanion": "ender_dragon",
+  "proportions": {
+    "torsoScale": [0.74, 1.35, 0.7],
+    "headPosition": [0, 1.05, 0],
+    "limbScale": [0.55, 1.65, 0.55]
+  },
+  "palette": {
+    "skin": "#0a0a0f",
+    "hoodie": "#06060a",
+    "pants": "#06060a",
+    "eyes": "#d946ef",
+    "pupil": "#f5d0fe",
+    "particles": "#d946ef"
+  },
+  "particles": {
+    "enabled": true,
+    "count": 40,
+    "colors": ["#d946ef", "#a855f7", "#f5d0fe"],
+    "type": "ender_portal_drift"
+  },
+  "description": "Authentic Minecraft Enderman voxel rig with obsidian black skin, glowing purple horizontal slit eyes, tall slender proportions, and swirling purple portal particles.",
+  "instructions": {
+    "howToRun": "Run 'node server.js' in the project directory and open http://127.0.0.1:8765",
+    "howToSwitch": "Use the '👤 Avatar: Enderman' button in the top navigation bar, or select '✦ Enderman (Minecraft)' in Character Forge.",
+    "howToImport": "In Character Forge, click 'Import (.sunday)' and choose this file to restore the Enderman build anytime."
+  }
+}
