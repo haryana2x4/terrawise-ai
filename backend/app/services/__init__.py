@@ -1547,18 +1547,26 @@ class AssistantService:
                 else:
                     out = out.replace(src, tgt)
 
-        # 3. Clean up water-need level descriptors & quick-answer headers across all 3 languages
+        # 3. Clean up water-need level descriptors, double Source prefixes & headers across all 3 languages
         need_map = {
-            "mr": {"low": "कमी", "moderate": "मध्यम", "high": "जास्त"},
-            "hi": {"low": "कम", "moderate": "मध्यम", "high": "अधिक"},
-            "en": {"low": "low", "moderate": "moderate", "high": "high"},
+            "mr": {"low": "कमी", "medium": "मध्यम", "moderate": "मध्यम", "high": "जास्त"},
+            "hi": {"low": "कम", "medium": "मध्यम", "moderate": "मध्यम", "high": "अधिक"},
+            "en": {"low": "low", "medium": "medium", "moderate": "moderate", "high": "high"},
         }[target_lang]
+        norm_level = {
+            "कमी": "low",
+            "कम": "low",
+            "मध्यम": "medium",
+            "जास्त": "high",
+            "अधिक": "high",
+        }
         out = re.sub(
-            r"(पाणी गरज|पानी की आवश्यकता|water need):\s*(low|moderate|high|कमी|कम|मध्यम|जास्त|अधिक)\b",
-            lambda m: f"{m.group(1)}: {need_map.get({'कमी':'low','कम':'low','मध्यम':'moderate','जास्त':'high','अधिक':'high'}.get(m.group(2).lower(), m.group(2).lower()), m.group(2))}",
+            r"(पाणी गरज|पानी की आवश्यकता|water need):\s*(low|medium|moderate|high|कमी|कम|मध्यम|जास्त|अधिक)\b",
+            lambda m: f"{m.group(1)}: {need_map.get(norm_level.get(m.group(2).lower(), m.group(2).lower()), m.group(2))}",
             out,
             flags=re.IGNORECASE,
         )
+        out = re.sub(r"(\*?(?:स्रोत|Source)\*?:)\s*(?:स्रोत|Source):\s*", r"\1 ", out)
         if target_lang == "mr":
             out = (
                 out.replace("(High,", "(उत्तम,")
