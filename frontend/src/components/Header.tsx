@@ -1,6 +1,6 @@
 import React from "react";
 import { Language, translations } from "../i18n/translations";
-import { User, LogOut, ShieldAlert, Bot, Zap } from "lucide-react";
+import { User, LogOut, ShieldAlert, Bot, Zap, Download } from "lucide-react";
 
 interface HeaderProps {
   farmer: any;
@@ -11,6 +11,7 @@ interface HeaderProps {
   onLogout: () => void;
   onOpenAdmin?: () => void;
   onOpenAssistant?: () => void;
+  onOpenInstallModal?: () => void;
 }
 
 export const Header: React.FC<HeaderProps> = ({
@@ -21,7 +22,8 @@ export const Header: React.FC<HeaderProps> = ({
   onLanguageChange,
   onLogout,
   onOpenAdmin,
-  onOpenAssistant
+  onOpenAssistant,
+  onOpenInstallModal
 }) => {
   const t = translations[lang];
 
@@ -61,6 +63,19 @@ export const Header: React.FC<HeaderProps> = ({
             >
               <Bot className="w-4 h-4 text-amber-300" />
               <span className="hidden sm:inline">कृषी मित्र AI</span>
+            </button>
+          )}
+
+          {onOpenInstallModal && (
+            <button
+              onClick={onOpenInstallModal}
+              className="bg-emerald-900/90 hover:bg-emerald-800 text-emerald-100 px-2.5 py-1.5 rounded-xl text-xs font-bold flex items-center space-x-1 border border-emerald-500/40 shadow-xs transition-all"
+              title={lang === "mr" ? "अ‍ॅप इंस्टॉल किंवा शेअर करा" : "Install or Share App"}
+            >
+              <Download className="w-3.5 h-3.5 text-emerald-300" />
+              <span className="hidden md:inline">
+                {lang === "mr" ? "अ‍ॅप घ्या" : "Install"}
+              </span>
             </button>
           )}
 

@@ -248,7 +248,9 @@ def apply_security_headers(response: Response) -> Response:
         "script-src 'self' 'unsafe-inline' https://maps.googleapis.com; "
         "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; "
         "font-src 'self' data: https://fonts.gstatic.com; "
-        "img-src 'self' data: blob: https://*.tile.openstreetmap.org https://*.googleapis.com https://*.gstatic.com https://gibs.earthdata.nasa.gov; "
+        "img-src 'self' data: blob: https://*.tile.openstreetmap.org https://server.arcgisonline.com https://*.tile.opentopomap.org https://*.googleapis.com https://*.gstatic.com https://gibs.earthdata.nasa.gov; "
+        "worker-src 'self' blob:; "
+        "manifest-src 'self'; "
         "connect-src 'self' https://api.open-meteo.com https://power.larc.nasa.gov https://rest.isric.org;"
     )
     req_id = getattr(g, "request_id", None)

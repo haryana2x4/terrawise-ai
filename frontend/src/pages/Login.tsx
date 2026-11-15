@@ -14,7 +14,8 @@ import {
   ShieldCheck,
   ChevronDown,
   Activity,
-  X
+  X,
+  Download
 } from "lucide-react";
 import { computeSunTheme } from "../utils/sunEngine";
 import { LivingBackground } from "../components/LivingBackground";
@@ -25,6 +26,8 @@ interface LoginProps {
   onToggleTier: () => void;
   onLanguageChange: (l: Language) => void;
   onLoginSuccess: (farmerData: any, token: string) => void;
+  onOpenInstallModal?: () => void;
+  canNativeInstall?: boolean;
 }
 
 interface DistrictWeather {
@@ -41,7 +44,9 @@ export const Login: React.FC<LoginProps> = ({
   tier,
   onToggleTier,
   onLanguageChange,
-  onLoginSuccess
+  onLoginSuccess,
+  onOpenInstallModal,
+  canNativeInstall
 }) => {
   const [farmerId, setFarmerId] = useState(() => {
     return new URLSearchParams(window.location.search).get("fid")?.toUpperCase() || "";
@@ -218,6 +223,24 @@ export const Login: React.FC<LoginProps> = ({
 
           {/* Controls */}
           <div className="flex items-center space-x-1 sm:space-x-2 shrink-0">
+            {onOpenInstallModal && (
+              <button
+                type="button"
+                onClick={onOpenInstallModal}
+                title={lang === "mr" ? "अ‍ॅप इंस्टॉल किंवा शेअर करा" : "Install or Share Kshetra App"}
+                className={`px-2 py-1 rounded-xl text-[10px] sm:text-xs font-extrabold border transition-colors flex items-center space-x-1 ${
+                  canNativeInstall
+                    ? "bg-emerald-700 border-emerald-400 text-white hover:bg-emerald-600 shadow-sm"
+                    : "bg-black/45 border-white/25 text-emerald-200 hover:text-white"
+                }`}
+              >
+                <Download className="w-3 h-3 text-emerald-300" />
+                <span className="hidden sm:inline">
+                  {lang === "mr" ? "अ‍ॅप डाउनलोड" : "Get App"}
+                </span>
+              </button>
+            )}
+
             <button
               onClick={handleTierToggle}
               title={

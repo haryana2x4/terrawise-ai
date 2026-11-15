@@ -556,3 +556,33 @@ def test_parcel_patch_metadata_idor_and_dashboard_parcel_switch(client, admin_to
     assert payload["today_card"]["active_parcel"]["id"] == p2["id"]
     assert "precision_analytics" in payload
 
+
+def test_pwa_reachability_qr_and_launcher_security(client):
+    """Verify LAN/public access metadata, allowlisted QR SVG, Windows launcher, and CSP tiles."""
+    info = client.get("/api/v1/meta/access-info")
+    assert info.status_code == 200
+    data = info.get_json()
+    assert data["pwa_manifest_ready"] is True
+    assert "current_origin" in data
+    assert "recommended_share_url" in data
+    assert "https://server.arcgisonline.com" in info.headers.get("Content-Security-Policy", "")
+    assert "manifest-src 'self'" in info.headers.get("Content-Security-Policy", "")
+
+    qr_ok = client.get("/api/v1/meta/access-qr")
+    assert qr_ok.status_code == 200
+    assert "image/svg+xml" in qr_ok.content_type
+    assert b"<svg" in qr_ok.data
+
+    qr_blocked = client.get("/api/v1/meta/access-qr?target=https://untrusted.invalid/phish")
+    assert qr_blocked.status_code == 400
+    assert qr_blocked.get_json()["error"]["code"] == "UNTRUSTED_TARGET_URL"
+
+    bat_ok = client.get("/api/v1/meta/download/windows-launcher")
+    assert bat_ok.status_code == 200
+    assert "Kshetra-App.bat" in bat_ok.headers.get("Content-Disposition", "")
+    assert b"--app=%KSHETRA_URL%" in bat_ok.data
+
+    bat_blocked = client.get("/api/v1/meta/download/windows-launcher?target=https://untrusted.invalid")
+    assert bat_blocked.status_code == 400
+
+

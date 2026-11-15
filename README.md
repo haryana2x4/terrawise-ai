@@ -29,6 +29,10 @@
 5. **India DPDP Act 2023 Compliance**:
    - First-login Marathi/Hindi/English privacy consent flow, field-level PII encryption (`mobile_encrypted`, `survey_number_encrypted`), one-click **Export My Data (JSON)**, and self-service **Delete My Data**.
 
+6. **Installable PWA & Multi-Device Sharing**:
+   - Full Progressive Web App (`manifest.webmanifest`, `192/512` icons, Service Worker `sw.js`) installable on Android, iOS, Windows, and macOS.
+   - Built-in **Install & Share Modal** with live Wi-Fi/LAN SVG QR code, one-click PWA install, Windows Standalone App (`Kshetra-App.bat`), and 1-click [`share_app.bat`](file:///C:/Users/Rocky/.gemini/antigravity/scratch/terrawise-ai/share_app.bat) Waitress host mode (`start.py --share --prod`).
+
 ---
 
 ## Quick Start (Windows PowerShell)

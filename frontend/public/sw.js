@@ -1,9 +1,17 @@
-const CACHE_NAME = "kshetra-shell-v2";
-const SHELL_ASSETS = ["/", "/index.html"];
+const CACHE_NAME = "kshetra-shell-v3";
+const SHELL_ASSETS = [
+  "/",
+  "/index.html",
+  "/manifest.webmanifest",
+  "/leaf.svg",
+  "/icons/icon-192.png",
+  "/icons/icon-512.png",
+  "/icons/apple-touch-icon-180.png"
+];
 
 self.addEventListener("install", event => {
   event.waitUntil(
-    caches.open(CACHE_NAME).then(cache => cache.addAll(SHELL_ASSETS))
+    caches.open(CACHE_NAME).then(cache => cache.addAll(SHELL_ASSETS).catch(() => undefined))
   );
   self.skipWaiting();
 });
@@ -24,7 +32,11 @@ self.addEventListener("fetch", event => {
   if (request.method !== "GET") return;
 
   const url = new URL(request.url);
-  if (url.pathname.startsWith("/api/")) {
+  if (url.origin !== self.location.origin) {
+    return;
+  }
+
+  if (url.pathname.startsWith("/api/") || url.pathname === "/healthz" || url.pathname === "/readyz") {
     event.respondWith(
       fetch(request).catch(() =>
         new Response(
@@ -45,8 +57,10 @@ self.addEventListener("fetch", event => {
   event.respondWith(
     fetch(request)
       .then(resp => {
-        const clone = resp.clone();
-        caches.open(CACHE_NAME).then(cache => cache.put(request, clone));
+        if (resp && resp.status === 200 && resp.type === "basic") {
+          const clone = resp.clone();
+          caches.open(CACHE_NAME).then(cache => cache.put(request, clone));
+        }
         return resp;
       })
       .catch(() => caches.match(request).then(cached => cached || caches.match("/index.html")))

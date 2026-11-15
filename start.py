@@ -166,6 +166,19 @@ def _wait_for_http(url: str, timeout_seconds: float, proc: subprocess.Popen[str]
     return False
 
 
+def _get_lan_ips() -> List[str]:
+    ips: List[str] = []
+    try:
+        with socket.socket(socket.AF_INET, socket.SOCK_DGRAM) as s:
+            s.connect(("10.255.255.255", 1))
+            primary = s.getsockname()[0]
+            if primary and not primary.startswith("127."):
+                ips.append(primary)
+    except OSError:
+        pass
+    return ips
+
+
 def parse_args(argv: List[str]) -> argparse.Namespace:
     parser = argparse.ArgumentParser(description="Run Kshetra backend and frontend locally.")
     parser.add_argument(
@@ -178,10 +191,23 @@ def parse_args(argv: List[str]) -> argparse.Namespace:
         action="store_true",
         help="Bootstrap .env, verify dependencies and database initialization, then exit.",
     )
+    parser.add_argument(
+        "--share",
+        action="store_true",
+        help="Bind servers on 0.0.0.0 and display Wi-Fi LAN share URLs for phones and tablets.",
+    )
+    parser.add_argument(
+        "--prod",
+        action="store_true",
+        help="Build frontend bundle if needed and serve the full PWA + API on single port 5000 via Waitress.",
+    )
     parser.add_argument("--host", default="127.0.0.1", help="Bind host (default: 127.0.0.1)")
     parser.add_argument("--backend-port", type=int, default=5000, help="Backend port (default: 5000)")
     parser.add_argument("--frontend-port", type=int, default=5173, help="Frontend port (default: 5173)")
-    return parser.parse_args(argv)
+    args = parser.parse_args(argv)
+    if args.share:
+        args.host = "0.0.0.0"
+    return args
 
 
 def main(argv: List[str] | None = None) -> int:
@@ -209,19 +235,27 @@ def main(argv: List[str] | None = None) -> int:
         _log("READY", "Bootstrap check completed successfully.")
         return 0
 
-    if _is_port_in_use(args.host, args.backend_port):
+    probe_host = "127.0.0.1" if args.host in ("0.0.0.0", "::") else args.host
+
+    if _is_port_in_use(probe_host, args.backend_port):
         _log(
             "ERROR",
-            f"Port {args.backend_port} is already in use on {args.host}. Stop the existing server first.",
+            f"Port {args.backend_port} is already in use on {probe_host}. Stop the existing server first.",
         )
         return 1
 
-    if _is_port_in_use(args.host, args.frontend_port):
+    if not args.prod and _is_port_in_use(probe_host, args.frontend_port):
         _log(
             "ERROR",
-            f"Port {args.frontend_port} is already in use on {args.host}. Stop the existing server first.",
+            f"Port {args.frontend_port} is already in use on {probe_host}. Stop the existing server first.",
         )
         return 1
+
+    if args.prod:
+        dist_index = FRONTEND_DIR / "dist" / "index.html"
+        if not dist_index.exists():
+            _log("BUILD", "Building frontend production PWA bundle (frontend/dist)...")
+            subprocess.run([npm_exe, "run", "build"], cwd=str(FRONTEND_DIR), check=True)
 
     backend_env = os.environ.copy()
     backend_env.update(
@@ -231,6 +265,8 @@ def main(argv: List[str] | None = None) -> int:
             "HOST": args.host,
             "PORT": str(args.backend_port),
             "FLASK_ENV": backend_env.get("FLASK_ENV", "development"),
+            "SERVE_WAITRESS": "1" if args.prod else backend_env.get("SERVE_WAITRESS", "0"),
+            "ALLOW_LAN_ORIGINS": "1" if args.share else backend_env.get("ALLOW_LAN_ORIGINS", "1"),
             "KSHETRA_NO_RELOADER": "1",
         }
     )
@@ -251,7 +287,8 @@ def main(argv: List[str] | None = None) -> int:
         signal.signal(signal.SIGTERM, handle_signal)
 
     try:
-        _log("START", f"Launching Flask backend on http://{args.host}:{args.backend_port} ...")
+        server_kind = "Waitress PWA+API" if args.prod else "Flask backend"
+        _log("START", f"Launching {server_kind} on http://{args.host}:{args.backend_port} ...")
         backend_proc = subprocess.Popen(
             [sys.executable, str(BACKEND_DIR / "wsgi.py")],
             cwd=str(BACKEND_DIR),
@@ -267,58 +304,68 @@ def main(argv: List[str] | None = None) -> int:
             target=_stream_process_output, args=(backend_proc, "API"), daemon=True
         ).start()
 
-        health_url = f"http://{args.host}:{args.backend_port}/healthz"
+        health_url = f"http://{probe_host}:{args.backend_port}/healthz"
         if not _wait_for_http(health_url, timeout_seconds=30.0, proc=backend_proc):
             _log("ERROR", "Backend API failed to become healthy within 30 seconds.")
             return 1
 
-        _log("START", f"Launching Vite frontend on http://{args.host}:{args.frontend_port} ...")
-        frontend_proc = subprocess.Popen(
-            [
-                npm_exe,
-                "run",
-                "dev",
-                "--",
-                "--host",
-                args.host,
-                "--port",
-                str(args.frontend_port),
-                "--strictPort",
-            ],
-            cwd=str(FRONTEND_DIR),
-            env=frontend_env,
-            stdout=subprocess.PIPE,
-            stderr=subprocess.STDOUT,
-            text=True,
-            encoding="utf-8",
-            errors="replace",
-            bufsize=1,
-        )
-        threading.Thread(
-            target=_stream_process_output, args=(frontend_proc, "WEB"), daemon=True
-        ).start()
+        if args.prod:
+            app_url = f"http://{probe_host}:{args.backend_port}"
+            active_port = args.backend_port
+        else:
+            _log("START", f"Launching Vite frontend on http://{args.host}:{args.frontend_port} ...")
+            frontend_proc = subprocess.Popen(
+                [
+                    npm_exe,
+                    "run",
+                    "dev",
+                    "--",
+                    "--host",
+                    args.host,
+                    "--port",
+                    str(args.frontend_port),
+                    "--strictPort",
+                ],
+                cwd=str(FRONTEND_DIR),
+                env=frontend_env,
+                stdout=subprocess.PIPE,
+                stderr=subprocess.STDOUT,
+                text=True,
+                encoding="utf-8",
+                errors="replace",
+                bufsize=1,
+            )
+            threading.Thread(
+                target=_stream_process_output, args=(frontend_proc, "WEB"), daemon=True
+            ).start()
 
-        frontend_url = f"http://{args.host}:{args.frontend_port}"
-        if not _wait_for_http(frontend_url, timeout_seconds=30.0, proc=frontend_proc):
-            _log("ERROR", "Frontend Vite dev server failed to start within 30 seconds.")
-            return 1
+            app_url = f"http://{probe_host}:{args.frontend_port}"
+            active_port = args.frontend_port
+            if not _wait_for_http(app_url, timeout_seconds=30.0, proc=frontend_proc):
+                _log("ERROR", "Frontend Vite dev server failed to start within 30 seconds.")
+                return 1
 
+        lan_ips = _get_lan_ips() if args.share else []
         print("\n" + "=" * 64, flush=True)
-        print(f"  Kshetra App      : {frontend_url}", flush=True)
-        print(f"  Backend API      : http://{args.host}:{args.backend_port}", flush=True)
+        print(f"  Kshetra App      : {app_url}", flush=True)
+        print(f"  Backend API      : http://{probe_host}:{args.backend_port}", flush=True)
         print(f"  Health Probe     : {health_url}", flush=True)
+        for lip in lan_ips:
+            print(f"  Wi-Fi / Phone URL: http://{lip}:{active_port}", flush=True)
+        if args.share:
+            print(f"  Public HTTPS Tip : cloudflared tunnel --url http://127.0.0.1:{active_port}", flush=True)
         print("  Press Ctrl+C (or Stop in IDE) to shut down cleanly.", flush=True)
         print("=" * 64 + "\n", flush=True)
 
         no_browser = args.no_browser or os.environ.get("KSHETRA_NO_BROWSER") == "1"
         if not no_browser:
-            webbrowser.open(frontend_url)
+            webbrowser.open(app_url)
 
         while not stopping:
             if backend_proc.poll() is not None:
                 _log("ERROR", f"Backend process exited unexpectedly (code {backend_proc.returncode}).")
                 return backend_proc.returncode or 1
-            if frontend_proc.poll() is not None:
+            if frontend_proc is not None and frontend_proc.poll() is not None:
                 _log("ERROR", f"Frontend process exited unexpectedly (code {frontend_proc.returncode}).")
                 return frontend_proc.returncode or 1
             time.sleep(0.5)

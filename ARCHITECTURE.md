@@ -8,12 +8,12 @@ Kshetra (formerly TERRAWISE AI) is a production-grade agricultural decision supp
 
 ```mermaid
 flowchart TD
-    subgraph Client["Frontend PWA (React 19 + TypeScript + Leaflet + Service Worker)"]
-        LoginUI["Login & Public /status"]
-        FarmerUI["FarmerHome + TodayCard + MiniCards"]
-        MapUI["FarmMap (WGS84 / KML / GeoJSON)"]
+    subgraph Client["Frontend PWA (React 19 + TypeScript + Recharts + Leaflet + Service Worker)"]
+        LoginUI["Login, Install/QR App Modal & Public /status"]
+        FarmerUI["FarmerHome + PrecisionAnalyticsPanel (FAO-56 / 48h Spray / SoilGrids)"]
+        MapUI["FarmMap (Esri Satellite / Street / Topo / WGS84 / KML)"]
         ChatUI["AssistantChat (Krishi Mitra AI + Voice)"]
-        AdminUI["AdminPortal (N/20 Cap + 7/12 Verify + PDF/CSV)"]
+        AdminUI["AdminPortal (N/20 Cap + Officer Map + 7/12 Verify + PDF/CSV)"]
     end
 
     subgraph API["Flask API Layer (backend/app/api/v1)"]

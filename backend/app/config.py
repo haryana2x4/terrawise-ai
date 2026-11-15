@@ -94,8 +94,16 @@ class BaseConfig:
     ASSISTANT_DAILY_TOKEN_BUDGET: int = int(os.environ.get("ASSISTANT_DAILY_TOKEN_BUDGET", "25000"))
     ASSISTANT_RETENTION_DAYS: int = int(os.environ.get("ASSISTANT_RETENTION_DAYS", "90"))
 
-    # Support contact (optional; configured via environment variable only)
+    # Support & Reachability (configured via environment variable only)
     SUPPORT_CONTACT: str = os.environ.get("SUPPORT_CONTACT", "")
+    PUBLIC_URL: str = os.environ.get("KSHETRA_PUBLIC_URL", "").strip()
+    ALLOW_LAN_ORIGINS: bool = (
+        os.environ.get(
+            "ALLOW_LAN_ORIGINS",
+            "1" if os.environ.get("FLASK_ENV", "development") != "production" else "0",
+        )
+        == "1"
+    )
 
     DEBUG: bool = False
     TESTING: bool = False

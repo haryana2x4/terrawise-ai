@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 import logging
+import re
 import uuid
 from pathlib import Path
 from typing import Any, Dict, Optional
@@ -67,9 +68,16 @@ def create_app(
     app.extensions["assistant_service"] = assistant_service
 
     # Explicit CORS origins (never '*' with credentials)
+    cors_origins: list[Any] = list(app.config.get("CORS_ORIGINS", ["http://localhost:5173"]))
+    if app.config.get("ALLOW_LAN_ORIGINS"):
+        cors_origins.append(
+            re.compile(
+                r"^https?://(localhost|127\.0\.0\.1|192\.168\.\d+\.\d+|10\.\d+\.\d+\.\d+|172\.(1[6-9]|2\d|3[01])\.\d+\.\d+)(:\d+)?$"
+            )
+        )
     CORS(
         app,
-        origins=app.config.get("CORS_ORIGINS", ["http://localhost:5173"]),
+        origins=cors_origins,
         supports_credentials=True,
         expose_headers=["X-Request-Id", "ETag", "Content-Disposition"],
     )

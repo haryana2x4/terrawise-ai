@@ -5,8 +5,13 @@ import csv
 import io
 import json
 import secrets
+import socket
 from datetime import datetime, timedelta, timezone
+from pathlib import Path
 from typing import Any, Dict, List, Optional
+
+import qrcode
+import qrcode.image.svg
 
 from flask import Blueprint, Response, current_app, g, jsonify, request, send_file
 
@@ -1484,3 +1489,137 @@ def get_openapi_spec():
     if spec_path.exists():
         return Response(spec_path.read_bytes(), mimetype="application/json")
     return jsonify({"openapi": "3.1.0", "info": {"title": "Kshetra API", "version": "2.0.0"}}), 200
+
+
+def _detect_lan_ipv4_addresses() -> List[str]:
+    """Enumerate active local non-loopback IPv4 addresses safely without sending packets."""
+    ips: List[str] = []
+    try:
+        with socket.socket(socket.AF_INET, socket.SOCK_DGRAM) as s:
+            s.connect(("10.255.255.255", 1))
+            primary_ip = s.getsockname()[0]
+            if primary_ip and not primary_ip.startswith("127."):
+                ips.append(primary_ip)
+    except OSError:
+        pass
+    try:
+        for info in socket.getaddrinfo(socket.gethostname(), None, socket.AF_INET):
+            ip = str(info[4][0])
+            if ip and not ip.startswith("127.") and ip not in ips:
+                ips.append(ip)
+    except OSError:
+        pass
+    return ips
+
+
+def _collect_access_metadata() -> Dict[str, Any]:
+    """Assemble verified local, LAN, public URL, and PWA bundle readiness metadata."""
+    base_dir = Path(current_app.config["BASE_DIR"])
+    dist_dir = base_dir / "frontend" / "dist"
+    public_dir = base_dir / "frontend" / "public"
+
+    current_origin = request.host_url.rstrip("/")
+    parsed_port = request.host.split(":")[1] if ":" in request.host else ""
+    lan_ips = _detect_lan_ipv4_addresses()
+    scheme = request.scheme or "http"
+
+    lan_urls: List[str] = []
+    for ip in lan_ips:
+        port_suffix = f":{parsed_port}" if parsed_port else ""
+        lan_urls.append(f"{scheme}://{ip}{port_suffix}")
+
+    public_url = str(current_app.config.get("PUBLIC_URL") or "").strip().rstrip("/")
+    recommended_url = public_url or (lan_urls[0] if lan_urls else current_origin)
+
+    allowed_urls = [u for u in [public_url, *lan_urls, current_origin] if u]
+
+    manifest_ready = (dist_dir / "manifest.webmanifest").is_file() or (
+        public_dir / "manifest.webmanifest"
+    ).is_file()
+    dist_ready = (dist_dir / "index.html").is_file()
+
+    return {
+        "current_origin": current_origin,
+        "public_url": public_url or None,
+        "lan_ips": lan_ips,
+        "lan_urls": lan_urls,
+        "recommended_share_url": recommended_url,
+        "allowed_urls": allowed_urls,
+        "pwa_manifest_ready": manifest_ready,
+        "production_bundle_built": dist_ready,
+    }
+
+
+def _resolve_verified_access_url(requested_url: Optional[str]) -> str:
+    """Restrict QR / launcher URL targets strictly to server-verified local, LAN, or configured public URLs."""
+    meta = _collect_access_metadata()
+    if not requested_url:
+        return str(meta["recommended_share_url"])
+    clean_req = requested_url.strip().rstrip("/")
+    if clean_req in meta["allowed_urls"]:
+        return clean_req
+    raise AppError(
+        "UNTRUSTED_TARGET_URL",
+        "Requested share URL must match this server's verified origin, LAN IP, or configured KSHETRA_PUBLIC_URL.",
+        400,
+    )
+
+
+@api_v1.route("/meta/access-info", methods=["GET"])
+def meta_access_info():
+    """Return local/LAN/public URLs and PWA installability status for sharing and onboarding."""
+    meta = _collect_access_metadata()
+    return jsonify(
+        {
+            "current_origin": meta["current_origin"],
+            "public_url": meta["public_url"],
+            "lan_urls": meta["lan_urls"],
+            "recommended_share_url": meta["recommended_share_url"],
+            "pwa_manifest_ready": meta["pwa_manifest_ready"],
+            "production_bundle_built": meta["production_bundle_built"],
+            "tunnel_command_hint": "cloudflared tunnel --url http://127.0.0.1:5000",
+        }
+    ), 200
+
+
+@api_v1.route("/meta/access-qr", methods=["GET"])
+def meta_access_qr():
+    """Generate a local SVG QR code for phone/tablet access (allowlisted origins only)."""
+    target_url = _resolve_verified_access_url(request.args.get("target"))
+    img = qrcode.make(target_url, image_factory=qrcode.image.svg.SvgPathImage, box_size=12, border=2)
+    buf = io.BytesIO()
+    img.save(buf)
+    return Response(
+        buf.getvalue(),
+        mimetype="image/svg+xml",
+        headers={"Cache-Control": "no-store"},
+    )
+
+
+@api_v1.route("/meta/download/windows-launcher", methods=["GET"])
+def meta_download_windows_launcher():
+    """Serve a standalone Windows desktop app launcher targeting Edge/Chrome app mode."""
+    target_url = _resolve_verified_access_url(request.args.get("target"))
+    bat_lines = [
+        "@echo off",
+        "title Kshetra - Digital Krishi Kendra",
+        f'set "KSHETRA_URL={target_url}"',
+        'set "EDGE=%ProgramFiles(x86)%\\Microsoft\\Edge\\Application\\msedge.exe"',
+        'set "EDGE64=%ProgramFiles%\\Microsoft\\Edge\\Application\\msedge.exe"',
+        'set "CHROME=%ProgramFiles%\\Google\\Chrome\\Application\\chrome.exe"',
+        'set "CHROME86=%ProgramFiles(x86)%\\Google\\Chrome\\Application\\chrome.exe"',
+        'if exist "%EDGE%" ( start "" "%EDGE%" --app=%KSHETRA_URL% & exit /b 0 )',
+        'if exist "%EDGE64%" ( start "" "%EDGE64%" --app=%KSHETRA_URL% & exit /b 0 )',
+        'if exist "%CHROME%" ( start "" "%CHROME%" --app=%KSHETRA_URL% & exit /b 0 )',
+        'if exist "%CHROME86%" ( start "" "%CHROME86%" --app=%KSHETRA_URL% & exit /b 0 )',
+        'start "" "%KSHETRA_URL%"',
+        "",
+    ]
+    return Response(
+        "\r\n".join(bat_lines).encode("utf-8"),
+        mimetype="text/plain; charset=utf-8",
+        headers={
+            "Content-Disposition": 'attachment; filename="Kshetra-App.bat"',
+            "Cache-Control": "no-store",
+        },
+    )

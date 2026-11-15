@@ -94,6 +94,17 @@
       "problemMatcher": []
     },
     {
+      "label": "Kshetra: Share App on LAN (Single-Port Production)",
+      "type": "shell",
+      "command": "python",
+      "args": ["start.py", "--share", "--prod"],
+      "options": {
+        "cwd": "${workspaceFolder}"
+      },
+      "isBackground": true,
+      "problemMatcher": []
+    },
+    {
       "label": "Kshetra: Verify All (Guard + Pytest + Typecheck + Build)",
       "type": "shell",
       "command": "python",

@@ -20,7 +20,8 @@ import {
   FileCheck2,
   MapPin,
   LogOut,
-  Compass
+  Compass,
+  QrCode
 } from "lucide-react";
 
 interface AdminPortalProps {
@@ -29,6 +30,7 @@ interface AdminPortalProps {
   tier?: "full" | "lite";
   onBack: () => void;
   onLogout?: () => void;
+  onOpenInstallModal?: () => void;
 }
 
 export const AdminPortal: React.FC<AdminPortalProps> = ({
@@ -36,7 +38,8 @@ export const AdminPortal: React.FC<AdminPortalProps> = ({
   lang,
   tier = "full",
   onBack,
-  onLogout
+  onLogout,
+  onOpenInstallModal
 }) => {
   const [overview, setOverview] = useState<any>(null);
   const [showAddModal, setShowAddModal] = useState<boolean>(false);
@@ -378,6 +381,17 @@ export const AdminPortal: React.FC<AdminPortalProps> = ({
               <Download className="w-4 h-4" />
               <span>CSV</span>
             </button>
+
+            {onOpenInstallModal && (
+              <button
+                onClick={onOpenInstallModal}
+                className="bg-emerald-800 hover:bg-emerald-700 text-emerald-100 px-3 py-1.5 rounded-xl text-xs font-extrabold flex items-center space-x-1 shadow border border-emerald-500/40"
+                title="Install App / Share QR Code with Farmers"
+              >
+                <QrCode className="w-4 h-4 text-emerald-300" />
+                <span className="hidden md:inline">शेअर / QR अ‍ॅप</span>
+              </button>
+            )}
 
             {onLogout && (
               <button

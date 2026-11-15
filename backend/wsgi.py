@@ -16,7 +16,20 @@ app = create_app()
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", "5000"))
     host = os.environ.get("HOST", "127.0.0.1")
-    debug = os.environ.get("FLASK_ENV", "development") == "development"
+    flask_env = os.environ.get("FLASK_ENV", "development").lower()
+    use_waitress = os.environ.get("SERVE_WAITRESS", "0") == "1" or flask_env == "production"
+
+    if use_waitress:
+        try:
+            from waitress import serve
+
+            print(f"[WSGI] Serving Kshetra via Waitress on http://{host}:{port}", flush=True)
+            serve(app, host=host, port=port, threads=8)
+            raise SystemExit(0)
+        except ImportError:
+            pass
+
+    debug = flask_env == "development"
     use_reloader = (
         debug
         and ("debugpy" not in sys.modules)

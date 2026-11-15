@@ -88,3 +88,18 @@ cd ../frontend
 npx tsc --noEmit
 npm run build
 ```
+
+---
+
+## 6. Reach Kshetra From Phones & Install / Download the App
+
+1. **Share on Wi-Fi / Same Network (Single-Port Waitress Server)**:
+   - Double-click **`share_app.bat`** (or run `python start.py --share --prod`).
+   - It builds `frontend/dist`, binds Waitress WSGI on `0.0.0.0:5000`, and prints the live **Wi-Fi / Phone URL** (`http://<YOUR-LAN-IP>:5000`).
+2. **Public Internet Access (HTTPS Anywhere)**:
+   - Install Cloudflare Tunnel and run `cloudflared tunnel --url http://127.0.0.1:5000` (optionally set `KSHETRA_PUBLIC_URL=<your-https-url>` in `.env`).
+3. **Install / Download Inside the App**:
+   - Click **अ‍ॅप डाउनलोड (Get App)** on Login, **अ‍ॅप घ्या (Install)** in the top bar, or **शेअर / QR अ‍ॅप** in the Admin Header to:
+     - Install natively as a standalone **PWA** on Android Chrome/Edge or Windows/macOS Desktop (`manifest.webmanifest` + Service Worker offline shell).
+     - Scan the live SVG **QR Code** (`/api/v1/meta/access-qr`) to open Kshetra directly on nearby mobile phones.
+     - Download **`Kshetra-App.bat`** (`/api/v1/meta/download/windows-launcher`) for a standalone desktop window on Windows PCs.

@@ -13,6 +13,10 @@ All notable architectural and API changes to **Kshetra (formerly TERRAWISE AI)**
   - Fixed `crops.json` schema mapping (`marathi_name`, `hindi_name`, `common_name`, `water_need_mm`, `soil_preference`, `temp_range_c`, `typical_yield_kg_ha`, `price_range_inr_qtl`, `key_growth_stages`).
   - Added FAO-56 parcel net water volume engine (Liters/day & Liters/week), Magnus-Tetens dew point, 48-hour hourly optimal spray safety window evaluator, 7-day Recharts Rainfall/ET0/Tmax hydro-thermal chart, ISRIC SoilGrids 250m soil chemistry panel, and parcel yield/value estimate.
   - Added `PATCH /api/v1/parcels/<id>` metadata/geometry editor and `?parcel_id=` dashboard switcher.
+- **PWA App Installability, Reachability & Downloads ([`InstallAppModal.tsx`](file:///C:/Users/Rocky/.gemini/antigravity/scratch/terrawise-ai/frontend/src/components/InstallAppModal.tsx), [`manifest.webmanifest`](file:///C:/Users/Rocky/.gemini/antigravity/scratch/terrawise-ai/frontend/public/manifest.webmanifest), [`start.py`](file:///C:/Users/Rocky/.gemini/antigravity/scratch/terrawise-ai/start.py))**:
+  - Added full W3C PWA manifest (`manifest.webmanifest`), generated PNG icons (`192x192`, `512x512`, `maskable`, `180x180` Apple touch icon), upgraded offline Service Worker (`sw.js`), and registered SW in `main.tsx`.
+  - Added `/api/v1/meta/access-info`, allowlisted SVG QR endpoint `/api/v1/meta/access-qr`, downloadable `Kshetra-App.bat` standalone desktop launcher `/api/v1/meta/download/windows-launcher`, Waitress single-port production server (`start.py --share --prod` / `share_app.bat`), and dynamic LAN CORS support (`ALLOW_LAN_ORIGINS`).
+  - Added Esri World Imagery & OpenTopoMap origins + `worker-src` / `manifest-src` to `Content-Security-Policy` headers in [`security/__init__.py`](file:///C:/Users/Rocky/.gemini/antigravity/scratch/terrawise-ai/backend/app/security/__init__.py).
 
 ## [2.0.0] — 2026-11-15
 

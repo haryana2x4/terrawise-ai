@@ -1,0 +1,55 @@
+{
+  "name": "Kshetra - शेतकरी सल्लागार",
+  "short_name": "Kshetra",
+  "description": "Satellite GIS Field Mapping, FAO-56 Precision Water Balance & Krishi Mitra AI for Ahilya Nagar and Nashik Farmers",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "orientation": "portrait-primary",
+  "theme_color": "#064e3b",
+  "background_color": "#f5f5f4",
+  "lang": "mr",
+  "categories": ["productivity", "utilities", "weather"],
+  "icons": [
+    {
+      "src": "/icons/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/icons/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/icons/icon-maskable-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    },
+    {
+      "src": "/leaf.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "My Field Map",
+      "short_name": "Map",
+      "description": "Open satellite farm boundary mapper",
+      "url": "/?open=map",
+      "icons": [{ "src": "/icons/icon-192.png", "sizes": "192x192" }]
+    },
+    {
+      "name": "System Status",
+      "short_name": "Status",
+      "description": "Check live weather & soil telemetry health",
+      "url": "/status",
+      "icons": [{ "src": "/icons/icon-192.png", "sizes": "192x192" }]
+    }
+  ]
+}
