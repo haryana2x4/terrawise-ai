@@ -430,3 +430,129 @@ def test_announcements_pdf_cards_and_dpdp_compliance(client, admin_token):
         headers={"Authorization": f"Bearer {tok}"},
     )
     assert gone_resp.status_code == 404
+
+
+def test_precision_agronomy_service_and_crop_calibration():
+    """Verify real crops.json schema calibration, Marathi localization, FAO-56 liters, and dew point."""
+    from app.services import AdviceAndRiskService
+
+    data_dir = Path(__file__).resolve().parent.parent.parent / "data"
+    svc = AdviceAndRiskService(data_dir)
+    assert len(svc.crops) >= 15
+
+    synthetic_weather = {
+        "current": {
+            "temperature_c": {"value": 28.5},
+            "humidity_pct": {"value": 52.0},
+            "wind_kmh": {"value": 6.5},
+            "vpd_kpa": {"value": 1.65},
+            "soil_moisture_root": {"value": 0.24},
+        },
+        "summary": {
+            "et0_7d_total_mm": 31.5,
+            "rain_7d_forecast_mm": 2.0,
+        },
+        "forecast_7d": [
+            {"date": f"2026-11-{15+i:02d}", "rain_mm": 0.0, "et0_mm": 4.5, "rain_prob": 10}
+            for i in range(7)
+        ],
+        "hourly_48h": [
+            {
+                "time": f"2026-11-15T{h:02d}:00",
+                "temp_c": 26.0,
+                "rh_pct": 55.0,
+                "rain_mm": 0.0,
+                "wind_kmh": 7.0,
+            }
+            for h in range(12)
+        ],
+    }
+
+    suit = svc.evaluate_crop_suitability(
+        soil_type="medium_black",
+        irrigation_source="drip",
+        season="rabi",
+        weather=synthetic_weather,
+        lang="mr",
+    )
+    recs = suit["recommendations"]
+    assert len(recs) > 0
+    top = recs[0]
+    assert top["suitability_score"] > 0
+    assert top["name"] != top["scientific_name"]
+    assert top["water_need_mm"] is not None
+
+    prec = svc.compute_precision_agronomy(
+        weather=synthetic_weather,
+        suitability=suit,
+        parcel={"id": 1, "name": "Gat 42", "area_acres": 2.0, "soil_type": "medium_black", "irrigation_source": "drip"},
+        lang="mr",
+    )
+    assert prec["dew_point_c"]["available"] is True
+    assert prec["water_balance"]["parcel_liters_per_day"] is not None
+    assert prec["water_balance"]["parcel_liters_per_day"] > 0
+    assert prec["spray_outlook"]["status"] == "safe_now"
+    assert len(prec["spray_outlook"]["hourly_slots"]) > 0
+    assert prec["harvest_projection"] is not None
+
+    # Null-safety: missing telemetry must return available=False / None rather than fabricated zero
+    prec_empty = svc.compute_precision_agronomy(weather={}, suitability=suit, parcel=None, lang="en")
+    assert prec_empty["dew_point_c"]["available"] is False
+    assert prec_empty["water_balance"]["parcel_liters_per_day"] is None
+
+
+def test_parcel_patch_metadata_idor_and_dashboard_parcel_switch(client, admin_token):
+    """Verify PATCH /parcels/<id> updates metadata + enforces IDOR and dashboard switches parcel_id."""
+    r1 = client.post(
+        "/api/v1/admin/farmers",
+        headers={"Authorization": f"Bearer {admin_token}"},
+        json={"name": "Prakash Jadhav", "district": "Ahilya Nagar", "taluka": "Rahuri", "village": "Vambori"},
+    ).get_json()
+    r2 = client.post(
+        "/api/v1/admin/farmers",
+        headers={"Authorization": f"Bearer {admin_token}"},
+        json={"name": "Ramesh Kale", "district": "Ahilya Nagar", "taluka": "Rahuri", "village": "Deolali"},
+    ).get_json()
+
+    t1 = client.post("/api/v1/auth/login", json={"farmer_id": r1["farmer"]["farmer_id"], "password": r1["temporary_password"]}).get_json()["access_token"]
+    t2 = client.post("/api/v1/auth/login", json={"farmer_id": r2["farmer"]["farmer_id"], "password": r2["temporary_password"]}).get_json()["access_token"]
+
+    p1 = client.post(
+        "/api/v1/parcels",
+        headers={"Authorization": f"Bearer {t1}"},
+        json={"name": "North Plot", "soil_type": "medium_black", "irrigation_source": "drip", "geojson": VALID_PARCEL_1},
+    ).get_json()["parcel"]
+    p2 = client.post(
+        "/api/v1/parcels",
+        headers={"Authorization": f"Bearer {t1}"},
+        json={"name": "East Plot", "soil_type": "deep_black", "irrigation_source": "canal", "geojson": VALID_PARCEL_2_DISJOINT},
+    ).get_json()["parcel"]
+
+    # Farmer 1 updates North Plot metadata cleanly
+    patch_ok = client.patch(
+        f"/api/v1/parcels/{p1['id']}",
+        headers={"Authorization": f"Bearer {t1}"},
+        json={"name": "North Irrigated Plot", "soil_type": "deep_black", "irrigation_source": "sprinkler"},
+    )
+    assert patch_ok.status_code == 200
+    assert patch_ok.get_json()["parcel"]["name"] == "North Irrigated Plot"
+    assert patch_ok.get_json()["parcel"]["irrigation_source"] == "sprinkler"
+
+    # Farmer 2 IDOR block on Farmer 1's parcel
+    patch_idor = client.patch(
+        f"/api/v1/parcels/{p1['id']}",
+        headers={"Authorization": f"Bearer {t2}"},
+        json={"name": "Hijacked Plot"},
+    )
+    assert patch_idor.status_code == 403
+
+    # Dashboard parcel_id switcher focuses East Plot & includes precision_analytics
+    dash = client.get(
+        f"/api/v1/farmer/dashboard?lang=en&parcel_id={p2['id']}",
+        headers={"Authorization": f"Bearer {t1}"},
+    )
+    assert dash.status_code == 200
+    payload = dash.get_json()
+    assert payload["today_card"]["active_parcel"]["id"] == p2["id"]
+    assert "precision_analytics" in payload
+

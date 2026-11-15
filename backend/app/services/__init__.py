@@ -344,6 +344,85 @@ class AdviceAndRiskService:
             "provenance": weather.get("provenance"),
         }
 
+    @staticmethod
+    def _derive_water_tier(crop: Dict[str, Any]) -> Tuple[str, Optional[float]]:
+        """Derive crop water demand tier from catalog water_need_mm or explicit category."""
+        raw_mm = crop.get("water_need_mm")
+        if raw_mm is not None:
+            mm_val = float(raw_mm)
+            if mm_val <= 420.0:
+                return "low", mm_val
+            if mm_val <= 650.0:
+                return "medium", mm_val
+            return "high", mm_val
+        tier = str(crop.get("water_need") or crop.get("water_requirement") or "medium").lower()
+        return tier, None
+
+    @staticmethod
+    def _score_soil_preference(soil_norm: str, crop: Dict[str, Any]) -> int:
+        """Match declared Maharashtra soil classification against crop agronomic soil preference."""
+        suitable_soils = [s.lower() for s in (crop.get("suitable_soils") or crop.get("soils") or [])]
+        if suitable_soils:
+            return 24 if any(s in soil_norm or soil_norm in s for s in suitable_soils) else 14
+
+        pref = str(crop.get("soil_preference") or "").lower()
+        if not pref:
+            return 20
+
+        soil_keywords = {
+            "medium_black": ("medium black", "black", "clay loam", "loam", "vertisol"),
+            "deep_black": ("deep black", "heavy", "clay", "vertisol"),
+            "shallow_black": ("light", "shallow", "gravelly", "sandy", "murmad", "well-drained"),
+            "red_loamy": ("sandy loam", "loam", "alluvial", "red", "well-drained"),
+        }
+        if soil_norm == "deep_black" and "avoids waterlogged heavy vertisols" in pref:
+            return 12
+        keys = soil_keywords.get(soil_norm, ("loam", "black"))
+        return 24 if any(k in pref for k in keys) else 15
+
+    @staticmethod
+    def _score_season_and_temp(season: str, crop: Dict[str, Any], max_temp: Optional[float], forecast: List[Dict[str, Any]]) -> int:
+        """Evaluate seasonal sowing window fit and 7-day thermal tolerance."""
+        raw_seasons = crop.get("seasons")
+        if isinstance(raw_seasons, list) and raw_seasons:
+            season_text = " ".join(str(s).lower() for s in raw_seasons)
+        else:
+            season_text = str(crop.get("season") or "kharif").lower()
+
+        season_norm = season.lower()
+        season_aliases = {
+            "zaid": ("zaid", "summer", "unnadu", "perennial", "annual", "all"),
+            "rabi": ("rabi", "winter", "perennial", "annual", "all", "october"),
+            "kharif": ("kharif", "monsoon", "perennial", "annual", "all"),
+        }
+        matches_season = any(tok in season_text for tok in season_aliases.get(season_norm, (season_norm,)))
+        pts = 16 if matches_season else 7
+
+        temp_range = crop.get("temp_range_c") or {}
+        if forecast and temp_range:
+            avg_temps = [
+                (float(d["temp_max_c"]) + float(d["temp_min_c"])) / 2.0
+                for d in forecast
+                if d.get("temp_max_c") is not None and d.get("temp_min_c") is not None
+            ]
+            if avg_temps:
+                mean_t = sum(avg_temps) / len(avg_temps)
+                opt_t = float(temp_range.get("optimum") or 26.0)
+                max_t = float(temp_range.get("max") or 38.0)
+                min_t = float(temp_range.get("min") or 12.0)
+                if min_t <= mean_t <= max_t and abs(mean_t - opt_t) <= 6.0:
+                    pts += 4
+                elif min_t <= mean_t <= max_t:
+                    pts += 2
+                else:
+                    pts = max(4, pts - 4)
+        elif max_temp is not None:
+            pts = min(20, pts + 3)
+
+        if max_temp is not None and max_temp > 39.0 and crop.get("water_need_mm", 500) > 650:
+            pts = max(4, pts - 4)
+        return min(20, pts)
+
     def evaluate_crop_suitability(
         self,
         *,
@@ -367,6 +446,7 @@ class AdviceAndRiskService:
         summary = weather.get("summary", {})
         rain_30d = summary.get("rain_30d_total_mm")
         max_temp = summary.get("max_temp_next_7d_c")
+        forecast_7d = weather.get("forecast_7d") or []
 
         irr_norm = (irrigation_source or "rainfed").lower()
         soil_norm = (soil_type or "medium_black").lower()
@@ -374,11 +454,12 @@ class AdviceAndRiskService:
         ranked: List[Dict[str, Any]] = []
         for crop in self.crops:
             # 1. Water availability match (0-30 pts)
-            water_need = (crop.get("water_need") or crop.get("water_requirement") or "medium").lower()
-            if irr_norm in ("drip", "canal", "well", "borewell"):
-                water_pts = 28 if water_need in ("low", "medium") else 25
+            water_need, water_need_mm = self._derive_water_tier(crop)
+            if irr_norm in ("drip",):
+                water_pts = 29 if water_need in ("low", "medium") else 26
+            elif irr_norm in ("canal", "well", "borewell"):
+                water_pts = 27 if water_need in ("low", "medium") else 24
             else:
-                # Rainfed
                 if water_need == "low":
                     water_pts = 27
                 elif water_need == "medium":
@@ -387,20 +468,10 @@ class AdviceAndRiskService:
                     water_pts = 8
 
             # 2. Soil match (0-25 pts)
-            suitable_soils = [s.lower() for s in (crop.get("suitable_soils") or crop.get("soils") or [])]
-            if not suitable_soils or any(s in soil_norm or soil_norm in s for s in suitable_soils):
-                soil_pts = 24
-            else:
-                soil_pts = 14
+            soil_pts = self._score_soil_preference(soil_norm, crop)
 
             # 3. Season & temperature match (0-20 pts)
-            crop_seasons = [s.lower() for s in (crop.get("seasons") or [crop.get("season", "kharif")])]
-            if season.lower() in crop_seasons or "annual" in crop_seasons or "all" in crop_seasons:
-                season_pts = 19
-            else:
-                season_pts = 9
-            if max_temp is not None and max_temp > 39.0 and water_need == "high":
-                season_pts = max(4, season_pts - 5)
+            season_pts = self._score_season_and_temp(season, crop, max_temp, forecast_7d)
 
             # 4. Duration & input efficiency (0-15 pts)
             duration_days = crop.get("duration_days") or 110
@@ -409,7 +480,7 @@ class AdviceAndRiskService:
             duration_pts = 14 if float(duration_days) <= 120 else 11
 
             # 5. Crop rotation bonus/penalty (0-10 pts)
-            crop_id = crop.get("id") or crop.get("crop_id") or crop.get("name_en", "crop").lower()
+            crop_id = str(crop.get("id") or crop.get("crop_id") or crop.get("common_name") or "crop").lower()
             is_legume = bool(crop.get("is_legume") or crop_id in ("gram", "chickpea", "tur", "pigeonpea", "soybean", "moong", "groundnut"))
             if previous_crop_id and previous_crop_id.lower() == crop_id.lower():
                 rotation_pts = 3  # Continuous monocropping penalty
@@ -420,20 +491,34 @@ class AdviceAndRiskService:
 
             total_score = int(min(100, max(0, water_pts + soil_pts + season_pts + duration_pts + rotation_pts)))
             names = crop.get("names") or {}
-            name_en = names.get("en") or crop.get("name_en") or crop.get("name") or crop_id.title()
-            name_mr = names.get("mr") or crop.get("name_mr") or name_en
-            name_hi = names.get("hi") or crop.get("name_hi") or name_en
+            name_en = names.get("en") or crop.get("common_name") or crop.get("name_en") or crop.get("name") or crop_id.title()
+            name_mr = names.get("mr") or crop.get("marathi_name") or crop.get("name_mr") or name_en
+            name_hi = names.get("hi") or crop.get("hindi_name") or crop.get("name_hi") or name_en
+
+            typical_kg_ha = crop.get("typical_yield_kg_ha")
+            yield_qtl_acre = crop.get("yield_qtl_per_acre") or crop.get("expected_yield")
+            if yield_qtl_acre is None and typical_kg_ha is not None:
+                yield_qtl_acre = round((float(typical_kg_ha) * 0.404686) / 100.0, 1)
 
             ranked.append(
                 {
                     "crop_id": crop_id,
                     "name": {"en": name_en, "mr": name_mr, "hi": name_hi}.get(lang, name_en),
                     "names": {"en": name_en, "mr": name_mr, "hi": name_hi},
+                    "scientific_name": crop.get("scientific_name"),
                     "suitability_score": total_score,
                     "band": "High" if total_score >= 75 else ("Moderate" if total_score >= 55 else "Low"),
                     "water_need": water_need,
+                    "water_need_mm": water_need_mm,
                     "duration_days": duration_days,
-                    "expected_yield_qtl_acre": crop.get("yield_qtl_per_acre") or crop.get("expected_yield"),
+                    "expected_yield_qtl_acre": yield_qtl_acre,
+                    "typical_yield_kg_ha": typical_kg_ha,
+                    "price_range_inr_qtl": crop.get("price_range_inr_qtl"),
+                    "sowing_window": crop.get("sowing_window"),
+                    "harvest_window": crop.get("harvest_window"),
+                    "key_growth_stages": crop.get("key_growth_stages") or [],
+                    "rotation_notes": crop.get("rotation_notes"),
+                    "source": crop.get("source") or "MPKV Rahuri Package of Practices",
                     "breakdown": {
                         "water_match": water_pts,
                         "soil_match": soil_pts,
@@ -441,7 +526,7 @@ class AdviceAndRiskService:
                         "duration_efficiency": duration_pts,
                         "rotation_health": rotation_pts,
                     },
-                    "ipm_guidance": crop.get("pest_management") or crop.get("ipm_notes") or self.IPM_DISCLAIMER.get(lang, self.IPM_DISCLAIMER["en"]),
+                    "ipm_guidance": crop.get("rotation_notes") or crop.get("pest_management") or crop.get("ipm_notes") or self.IPM_DISCLAIMER.get(lang, self.IPM_DISCLAIMER["en"]),
                 }
             )
 
@@ -453,6 +538,130 @@ class AdviceAndRiskService:
             "indices": self.compute_agronomic_indices(weather, irrigation_source),
             "recommendations": ranked,
             "ipm_disclaimer": self.IPM_DISCLAIMER.get(lang, self.IPM_DISCLAIMER["en"]),
+            "provenance": weather.get("provenance"),
+        }
+
+    def compute_precision_agronomy(
+        self,
+        *,
+        weather: Dict[str, Any],
+        suitability: Dict[str, Any],
+        parcel: Optional[Dict[str, Any]] = None,
+        lang: str = "mr",
+    ) -> Dict[str, Any]:
+        """Compute FAO-56 parcel water volume, dew point, 48h spray windows, and yield valuation."""
+        cur = weather.get("current", {})
+        temp_val = (cur.get("temperature_c") or {}).get("value")
+        hum_val = (cur.get("humidity_pct") or {}).get("value")
+
+        # 1. Magnus-Tetens Dew Point & Fungal Leaf-Wetness Spread
+        dew_point_c: Optional[float] = None
+        dew_spread_c: Optional[float] = None
+        if temp_val is not None and hum_val is not None and float(hum_val) > 0:
+            a, b = 17.27, 237.3
+            gamma = ((a * float(temp_val)) / (b + float(temp_val))) + math.log(float(hum_val) / 100.0)
+            td = (b * gamma) / (a - gamma)
+            dew_point_c = round(td, 1)
+            dew_spread_c = round(float(temp_val) - td, 1)
+
+        # 2. FAO-56 7-Day Parcel Water Balance (1 mm over 1 hectare = 10,000 Liters)
+        summary = weather.get("summary", {})
+        et0_7d = summary.get("et0_7d_total_mm")
+        rain_7d = summary.get("rain_7d_forecast_mm")
+        eff_rain_7d = round(float(rain_7d) * 0.75, 1) if rain_7d is not None else None
+        net_deficit_mm: Optional[float] = None
+        liters_week: Optional[int] = None
+        liters_day: Optional[int] = None
+        area_hectares: Optional[float] = None
+        if parcel:
+            area_hectares = float(parcel.get("area_hectares") or (float(parcel.get("area_acres") or 0.0) * 0.404686))
+        if et0_7d is not None and eff_rain_7d is not None:
+            net_deficit_mm = round(max(0.0, float(et0_7d) - float(eff_rain_7d)), 1)
+            if area_hectares and area_hectares > 0:
+                liters_week = int(round(net_deficit_mm * 10000.0 * area_hectares))
+                liters_day = int(round(liters_week / 7.0))
+
+        # 3. Hourly 48h Spray Drift / Rain-Washout Safety Evaluator
+        hourly = weather.get("hourly_48h") or []
+        evaluated_hours: List[Dict[str, Any]] = []
+        safe_slots: List[Dict[str, Any]] = []
+        for slot in hourly:
+            t_c = slot.get("temp_c")
+            w_k = slot.get("wind_kmh")
+            r_m = slot.get("rain_mm")
+            rh_p = slot.get("rh_pct")
+            is_safe = False
+            reason = "no_data"
+            if None not in (t_c, w_k, r_m, rh_p):
+                if float(r_m) > 0.1:
+                    reason = "rain_washout"
+                elif float(w_k) >= 12.0:
+                    reason = "wind_drift"
+                elif float(t_c) > 33.5 or float(rh_p) < 35.0:
+                    reason = "rapid_evaporation"
+                elif float(rh_p) > 88.0:
+                    reason = "high_dew_runoff"
+                else:
+                    is_safe = True
+                    reason = "optimal"
+            entry = {**slot, "spray_ok": is_safe, "reason": reason}
+            evaluated_hours.append(entry)
+            if is_safe:
+                safe_slots.append(entry)
+
+        next_best = safe_slots[0]["time"] if safe_slots else None
+        spray_status = "no_data"
+        if evaluated_hours:
+            if evaluated_hours[0]["spray_ok"]:
+                spray_status = "safe_now"
+            elif safe_slots:
+                spray_status = "wait_for_window"
+            else:
+                spray_status = "unsafe_48h"
+
+        # 4. Top Crop Parcel-Scaled Harvest & Reference Range (MPKV/NHRDF catalog)
+        recs = suitability.get("recommendations") or []
+        top_crop = recs[0] if recs else None
+        harvest_projection: Optional[Dict[str, Any]] = None
+        if parcel and top_crop and area_hectares and area_hectares > 0:
+            kg_ha = top_crop.get("typical_yield_kg_ha")
+            price_band = top_crop.get("price_range_inr_qtl") or {}
+            est_qtl = round((float(kg_ha) * area_hectares) / 100.0, 1) if kg_ha else None
+            modal_inr = price_band.get("modal")
+            est_gross_inr = int(round(est_qtl * float(modal_inr))) if (est_qtl and modal_inr) else None
+            harvest_projection = {
+                "crop_id": top_crop.get("crop_id"),
+                "crop_name": top_crop.get("name"),
+                "area_acres": parcel.get("area_acres"),
+                "area_hectares": round(area_hectares, 2),
+                "estimated_yield_quintals": est_qtl,
+                "reference_price_inr_qtl": price_band or None,
+                "estimated_gross_modal_inr": est_gross_inr,
+                "sowing_window": top_crop.get("sowing_window"),
+                "harvest_window": top_crop.get("harvest_window"),
+                "key_growth_stages": top_crop.get("key_growth_stages") or [],
+                "source": top_crop.get("source"),
+            }
+
+        return {
+            "dew_point_c": safe_value(dew_point_c, "°C", 1),
+            "dew_spread_c": safe_value(dew_spread_c, "°C", 1),
+            "water_balance": {
+                "et0_7d_mm": safe_value(et0_7d, "mm", 1),
+                "rain_7d_mm": safe_value(rain_7d, "mm", 1),
+                "effective_rain_7d_mm": safe_value(eff_rain_7d, "mm", 1),
+                "net_irrigation_deficit_mm": safe_value(net_deficit_mm, "mm", 1),
+                "parcel_liters_per_week": liters_week,
+                "parcel_liters_per_day": liters_day,
+                "area_hectares": round(area_hectares, 2) if area_hectares else None,
+            },
+            "spray_outlook": {
+                "status": spray_status,
+                "optimal_hours_count_48h": len(safe_slots),
+                "next_optimal_hour": next_best,
+                "hourly_slots": evaluated_hours[::3][:16],
+            },
+            "harvest_projection": harvest_projection,
             "provenance": weather.get("provenance"),
         }
 

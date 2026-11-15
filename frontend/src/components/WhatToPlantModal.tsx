@@ -112,7 +112,8 @@ export const WhatToPlantModal: React.FC<WhatToPlantModalProps> = ({
                         {crop.names?.[lang] || crop.name}
                       </h3>
                       <p className="text-xs text-stone-500">
-                        {crop.names?.en} • {crop.band} Fit
+                        {crop.names?.en}
+                        {crop.scientific_name ? ` (${crop.scientific_name})` : ""} • {crop.band} Fit
                       </p>
                     </div>
                   </div>
@@ -149,11 +150,14 @@ export const WhatToPlantModal: React.FC<WhatToPlantModalProps> = ({
                 </div>
 
                 {/* Vital Stats */}
-                <div className="grid grid-cols-2 gap-2 py-2 px-3 bg-white border border-stone-200 rounded-xl text-xs font-medium mb-3">
+                <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 py-2 px-3 bg-white border border-stone-200 rounded-xl text-xs font-medium mb-3">
                   <div className="flex items-center space-x-1.5">
                     <Droplets className="w-4 h-4 text-blue-500 shrink-0" />
                     <span>
-                      {t.water_need} <strong className="uppercase">{crop.water_need || t.no_data}</strong>
+                      {t.water_need}{" "}
+                      <strong className="uppercase">
+                        {crop.water_need_mm ? `${crop.water_need_mm} mm` : crop.water_need || t.no_data}
+                      </strong>
                     </span>
                   </div>
                   <div className="flex items-center space-x-1.5">
@@ -161,6 +165,20 @@ export const WhatToPlantModal: React.FC<WhatToPlantModalProps> = ({
                     <span>
                       {t.sowing_time} <strong>{crop.duration_days || t.no_data} दिवस</strong>
                     </span>
+                  </div>
+                  <div>
+                    <span className="text-stone-500">उत्पादन/एकर: </span>
+                    <strong className="text-emerald-900">
+                      {crop.expected_yield_qtl_acre ? `${crop.expected_yield_qtl_acre} qtl` : t.no_data}
+                    </strong>
+                  </div>
+                  <div>
+                    <span className="text-stone-500">संदर्भ दर: </span>
+                    <strong className="text-stone-800">
+                      {crop.price_range_inr_qtl?.modal
+                        ? `₹${crop.price_range_inr_qtl.modal}/qtl`
+                        : t.no_data}
+                    </strong>
                   </div>
                 </div>
 

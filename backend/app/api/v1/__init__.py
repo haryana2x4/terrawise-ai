@@ -31,6 +31,8 @@ from app.repositories import (
     TelemetryRepository,
 )
 from app.schemas import (
+    ALLOWED_IRRIGATION_SOURCES,
+    ALLOWED_SOIL_TYPES,
     require_json_body,
     validate_create_farmer_payload,
     validate_create_parcel_payload,
@@ -455,6 +457,64 @@ def create_parcel():
     return jsonify({"parcel": created, "measurements": measured}), 201
 
 
+@api_v1.route("/parcels/<int:parcel_id>", methods=["PATCH"])
+@require_auth()
+def update_parcel(parcel_id: int):
+    """Update parcel metadata or re-validated boundary geometry with RBAC ownership checks."""
+    geo_service, _, _, _ = _get_services()
+    body = require_json_body(request.get_json(silent=True))
+
+    with db_manager.session_scope() as session:
+        parcel = session.query(Parcel).filter(Parcel.id == parcel_id).first()
+        if not parcel:
+            raise AppError("PARCEL_NOT_FOUND", "Parcel not found.", 404)
+        check_object_ownership(parcel.farmer_id)
+
+        if "name" in body and str(body["name"]).strip():
+            parcel.name = str(body["name"]).strip()[:120]
+        if "survey_number" in body:
+            survey_raw = str(body["survey_number"] or "").strip()[:64]
+            parcel.survey_number_encrypted = (
+                encrypt_field(survey_raw, current_app.config["SECRET_KEY"]) if survey_raw else None
+            )
+        if "soil_type" in body and body["soil_type"] is not None:
+            soil_val = str(body["soil_type"]).strip().lower()
+            if soil_val not in ALLOWED_SOIL_TYPES:
+                raise AppError("INVALID_SOIL_TYPE", f"Unsupported soil_type: {soil_val}", 400)
+            parcel.soil_type = soil_val
+        if "irrigation_source" in body and body["irrigation_source"] is not None:
+            irr_val = str(body["irrigation_source"]).strip().lower()
+            if irr_val not in ALLOWED_IRRIGATION_SOURCES:
+                raise AppError("INVALID_IRRIGATION_SOURCE", f"Unsupported irrigation_source: {irr_val}", 400)
+            parcel.irrigation_source = irr_val
+        if "geojson" in body and body["geojson"]:
+            measured = geo_service.validate_and_measure_polygon(body["geojson"])
+            others = [
+                (p.id, p.farmer_id, p.geojson)
+                for p in session.query(Parcel).filter(Parcel.id != parcel.id).all()
+            ]
+            has_overlap, overlap_msg = geo_service.check_overlap(measured["geojson"], others)
+            if has_overlap:
+                raise AppError("PARCEL_OVERLAP", overlap_msg or "Polygon overlaps another parcel.", 409)
+            parcel.geojson = measured["geojson"]
+            parcel.area_acres = measured["area_acres"]
+            parcel.area_gunthas = measured["area_gunthas"]
+            parcel.centroid_lat = measured["centroid_lat"]
+            parcel.centroid_lon = measured["centroid_lon"]
+
+        CommunityRepository.log_audit(
+            session,
+            actor_id=g.current_farmer_id,
+            action="UPDATE_PARCEL",
+            target_id=str(parcel_id),
+            ip_address=request.remote_addr,
+        )
+        session.commit()
+        session.refresh(parcel)
+        updated = _serialize_parcel(parcel)
+    return jsonify({"parcel": updated}), 200
+
+
 @api_v1.route("/parcels/<int:parcel_id>", methods=["DELETE"])
 @require_auth()
 def delete_parcel(parcel_id: int):
@@ -627,11 +687,20 @@ def get_farmer_dashboard():
             p_dict["centroid"] = {"lat": p_dict["centroid_lat"], "lon": p_dict["centroid_lon"]}
             p_dict["boundary_source"] = "Verified 7/12" if p_dict["land_verified"] else "WGS84 Geodesic"
 
-        active_parcel = parcels_serialized[0] if parcels_serialized else None
+        requested_pid = request.args.get("parcel_id", type=int)
+        active_parcel = next(
+            (p for p in parcels_serialized if requested_pid and p["id"] == requested_pid),
+            parcels_serialized[0] if parcels_serialized else None,
+        )
         lat = active_parcel["centroid_lat"] if active_parcel else 19.39
         lon = active_parcel["centroid_lon"] if active_parcel else 74.65
         soil_type = active_parcel["soil_type"] if active_parcel else "medium_black"
         irrigation = active_parcel["irrigation_source"] if active_parcel else "rainfed"
+        prev_crop = (
+            active_parcel["crop_history"][0]["crop_id"]
+            if active_parcel and active_parcel.get("crop_history")
+            else None
+        )
 
         weather = OpenMeteoClient.fetch_weather(lat, lon, db_session=session, skip_network=skip_net)
         suitability = advice_service.evaluate_crop_suitability(
@@ -639,9 +708,16 @@ def get_farmer_dashboard():
             irrigation_source=irrigation,
             season="auto",
             weather=weather,
+            previous_crop_id=prev_crop,
             lang=lang,
         )
         risks = advice_service.evaluate_risks_and_pests(weather=weather, lang=lang)
+        precision_analytics = advice_service.compute_precision_agronomy(
+            weather=weather,
+            suitability=suitability,
+            parcel=active_parcel,
+            lang=lang,
+        )
 
         # Announcements for farmer's district/taluka
         ann_rows = (
@@ -698,6 +774,7 @@ def get_farmer_dashboard():
                 "weather": weather,
                 "suitability": suitability,
                 "risks": risks,
+                "precision_analytics": precision_analytics,
                 "announcements": announcements,
                 "observations": observations,
                 "today_card": {

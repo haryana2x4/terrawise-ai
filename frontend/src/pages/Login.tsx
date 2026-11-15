@@ -16,11 +16,13 @@ import {
   Activity,
   X
 } from "lucide-react";
-import { computeSunTheme, SunPhase } from "../utils/sunEngine";
-import { AmbientWeatherCanvas } from "../components/AmbientWeatherCanvas";
+import { computeSunTheme } from "../utils/sunEngine";
+import { LivingBackground } from "../components/LivingBackground";
 
 interface LoginProps {
   lang: Language;
+  tier: "full" | "lite";
+  onToggleTier: () => void;
   onLanguageChange: (l: Language) => void;
   onLoginSuccess: (farmerData: any, token: string) => void;
 }
@@ -36,6 +38,8 @@ interface DistrictWeather {
 
 export const Login: React.FC<LoginProps> = ({
   lang,
+  tier,
+  onToggleTier,
   onLanguageChange,
   onLoginSuccess
 }) => {
@@ -52,19 +56,6 @@ export const Login: React.FC<LoginProps> = ({
     return window.location.pathname === "/status" ? "status" : null;
   });
   const [statusPayload, setStatusPayload] = useState<any>(null);
-
-  const [tier, setTier] = useState<"full" | "lite">(() => {
-    const saved = localStorage.getItem("kshetra_tier");
-    if (saved === "lite" || saved === "full") return saved;
-    if (
-      typeof navigator !== "undefined" &&
-      navigator.hardwareConcurrency &&
-      navigator.hardwareConcurrency < 4
-    ) {
-      return "lite";
-    }
-    return "full";
-  });
 
   const [sunTheme, setSunTheme] = useState(() => computeSunTheme());
   const [weatherData, setWeatherData] = useState<DistrictWeather[]>([]);
@@ -113,9 +104,7 @@ export const Login: React.FC<LoginProps> = ({
   }, [infoModal]);
 
   const handleTierToggle = () => {
-    const nextTier = tier === "full" ? "lite" : "full";
-    setTier(nextTier);
-    localStorage.setItem("kshetra_tier", nextTier);
+    onToggleTier();
   };
 
   const handleIdChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -169,56 +158,13 @@ export const Login: React.FC<LoginProps> = ({
     }
   };
 
-  const getHeroImage = (phase: SunPhase) => {
-    switch (phase) {
-      case "dawn":
-        return "/img/hero/dawn_onion_mist_desktop_1600.webp";
-      case "morning":
-        return "/img/hero/morning_vineyard_niphad_desktop_1600.webp";
-      case "noon":
-        return "/img/hero/noon_lush_crops_desktop_1600.webp";
-      case "golden_hour":
-        return "/img/hero/golden_hour_fields_desktop_1600.webp";
-      case "dusk":
-        return "/img/hero/dusk_horizon_glow_desktop_1600.webp";
-      case "night":
-      default:
-        return "/img/hero/night_sky_field_desktop_1600.webp";
-    }
-  };
-
-  const heroSrc = getHeroImage(sunTheme.phase);
   const greetingText = sunTheme.greeting[lang] || sunTheme.greeting.mr;
   const phaseLabel = sunTheme.phaseLabel[lang] || sunTheme.phaseLabel.mr;
 
   return (
     <div className="relative min-h-screen flex flex-col justify-between overflow-x-hidden text-stone-900 font-sans selection:bg-amber-300 selection:text-emerald-950">
-      {/* 1. BACKGROUND PHOTO LAYER */}
-      <div
-        className="fixed inset-0 z-0 bg-cover bg-center transition-all duration-1000 ease-out"
-        style={{
-          backgroundImage: `url(${heroSrc})`,
-          filter: tier === "full" ? "brightness(0.96) saturate(1.05)" : "none"
-        }}
-        aria-hidden="true"
-      />
-
-      {/* 2. REAL SUN-GLOW & SKY TINT OVERLAY */}
-      <div
-        className="fixed inset-0 z-0 pointer-events-none transition-all duration-1000"
-        style={{
-          background: sunTheme.skyTintOverlay,
-          opacity: 0.85
-        }}
-        aria-hidden="true"
-      />
-
-      {/* 3. AMBIENT PARTICLES */}
-      <AmbientWeatherCanvas
-        phase={sunTheme.phase}
-        hasRain={false}
-        isLiteTier={tier === "lite"}
-      />
+      {/* 1. LIVING ASTRONOMICAL HERO BACKGROUND LAYER */}
+      <LivingBackground variant="hero" sunTheme={sunTheme} hasRain={false} isLiteTier={tier === "lite"} />
 
       {/* 4. TOP NAVIGATION BAR */}
       <header className="relative z-10 w-full px-2 sm:px-6 pt-2 pb-1 max-w-full overflow-hidden">
@@ -330,10 +276,13 @@ export const Login: React.FC<LoginProps> = ({
                   : "0 10px 25px -5px rgba(0, 0, 0, 0.2)"
             }}
           >
-            <div className="flex items-center justify-between mb-2.5 sm:mb-4">
+            <div className="flex items-center justify-between mb-2.5 sm:mb-4 gap-2">
               <span className="inline-flex items-center space-x-1.5 px-2 py-0.5 sm:px-2.5 sm:py-1 rounded-full bg-emerald-950/10 border border-emerald-900/15 text-emerald-900 text-[10px] sm:text-xs font-bold">
                 <Sun className="w-3 h-3 sm:w-3.5 sm:h-3.5 text-amber-600" />
                 <span>{phaseLabel}</span>
+                <span className="hidden sm:inline text-emerald-700/80 font-mono text-[10px]">
+                  • {sunTheme.altitudeDeg}°
+                </span>
               </span>
               <span className="text-[10px] sm:text-xs font-semibold text-stone-600">
                 {greetingText} 🙏

@@ -1,5 +1,8 @@
 import React, { useState, useEffect, useCallback } from "react";
 import { Language, translations } from "../i18n/translations";
+import { computeSunTheme } from "../utils/sunEngine";
+import { LivingBackground } from "../components/LivingBackground";
+import { FarmMap } from "../components/FarmMap";
 import {
   UserPlus,
   Printer,
@@ -14,19 +17,32 @@ import {
   AlertTriangle,
   Download,
   Megaphone,
-  FileCheck2
+  FileCheck2,
+  MapPin,
+  LogOut,
+  Compass
 } from "lucide-react";
 
 interface AdminPortalProps {
   token: string;
   lang: Language;
+  tier?: "full" | "lite";
   onBack: () => void;
+  onLogout?: () => void;
 }
 
-export const AdminPortal: React.FC<AdminPortalProps> = ({ token, lang, onBack }) => {
+export const AdminPortal: React.FC<AdminPortalProps> = ({
+  token,
+  lang,
+  tier = "full",
+  onBack,
+  onLogout
+}) => {
   const [overview, setOverview] = useState<any>(null);
   const [showAddModal, setShowAddModal] = useState<boolean>(false);
   const [showAnnModal, setShowAnnModal] = useState<boolean>(false);
+  const [mappingFarmer, setMappingFarmer] = useState<any | null>(null);
+  const [sunTheme] = useState(() => computeSunTheme());
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [actionMsg, setActionMsg] = useState<string | null>(null);
   const [issuedPasswords, setIssuedPasswords] = useState<Record<string, string>>({});
@@ -278,17 +294,45 @@ export const AdminPortal: React.FC<AdminPortalProps> = ({ token, lang, onBack })
   const auditLogs = overview?.audit_logs || [];
   const feedbackList = overview?.feedback || [];
 
+  const totalMappedParcels = farmersList.reduce(
+    (sum: number, f: any) => sum + ((f.parcels || []).length || 0),
+    0
+  );
+  const verifiedParcelsCount = farmersList.reduce(
+    (sum: number, f: any) =>
+      sum + ((f.parcels || []).filter((p: any) => p.land_verified).length || 0),
+    0
+  );
+  const totalMappedAcres = farmersList.reduce(
+    (sum: number, f: any) =>
+      sum +
+      (f.parcels || []).reduce(
+        (pSum: number, p: any) => pSum + (Number(p.area_acres) || 0),
+        0
+      ),
+    0
+  );
+  const healthySourcesCount = sourceHealth.filter((s: any) => s.status === "healthy").length;
+
   return (
-    <div className="min-h-screen bg-stone-100 flex flex-col font-sans">
+    <div className="relative min-h-screen flex flex-col font-sans overflow-x-hidden">
+      <LivingBackground
+        variant="workspace"
+        sunTheme={sunTheme}
+        isLiteTier={tier === "lite"}
+      />
+
       {/* Admin Top Header */}
-      <header className="bg-amber-950 text-white px-4 py-3 shadow-md border-b-2 border-amber-800">
+      <header className="sticky top-0 z-30 bg-amber-950/92 backdrop-blur-md text-white px-4 py-3 shadow-lg border-b-2 border-amber-800/80">
         <div className="max-w-6xl mx-auto flex flex-wrap items-center justify-between gap-2">
           <div className="flex items-center space-x-3">
             <button
               onClick={onBack}
-              className="p-1.5 hover:bg-amber-900 rounded-lg text-amber-200 transition-colors"
+              className="px-2.5 py-1.5 bg-amber-900/80 hover:bg-amber-800 rounded-xl text-amber-100 text-xs font-extrabold flex items-center space-x-1.5 border border-amber-700/60 transition-colors"
+              title="Open Farmer Workspace & Field Map"
             >
-              <ArrowLeft className="w-5 h-5" />
+              <ArrowLeft className="w-4 h-4" />
+              <span className="hidden sm:inline">शेतकरी डॅशबोर्ड</span>
             </button>
             <div>
               <h1 className="font-extrabold text-lg sm:text-xl text-amber-100 flex items-center space-x-2">
@@ -334,13 +378,23 @@ export const AdminPortal: React.FC<AdminPortalProps> = ({ token, lang, onBack })
               <Download className="w-4 h-4" />
               <span>CSV</span>
             </button>
+
+            {onLogout && (
+              <button
+                onClick={onLogout}
+                className="bg-rose-900/90 hover:bg-rose-800 text-rose-100 px-2.5 py-1.5 rounded-xl text-xs font-extrabold flex items-center space-x-1 shadow border border-rose-700/60"
+                title={t.logout}
+              >
+                <LogOut className="w-4 h-4" />
+              </button>
+            )}
           </div>
         </div>
       </header>
 
-      <main className="max-w-6xl w-full mx-auto p-4 sm:p-6 flex-1 space-y-6">
+      <main className="relative z-10 max-w-6xl w-full mx-auto p-4 sm:p-6 flex-1 space-y-5">
         {actionMsg && (
-          <div className="p-3.5 bg-emerald-50 border border-emerald-400 rounded-2xl flex items-center justify-between text-emerald-950 text-xs sm:text-sm font-bold shadow-xs">
+          <div className="p-3.5 bg-emerald-50/95 backdrop-blur-sm border border-emerald-400 rounded-2xl flex items-center justify-between text-emerald-950 text-xs sm:text-sm font-bold shadow-xs">
             <span className="font-mono">{actionMsg}</span>
             <button onClick={() => setActionMsg(null)} className="text-emerald-700 ml-3">
               ✕
@@ -348,8 +402,51 @@ export const AdminPortal: React.FC<AdminPortalProps> = ({ token, lang, onBack })
           </div>
         )}
 
+        {/* Executive Precision Telemetry Summary */}
+        <section className="grid grid-cols-2 md:grid-cols-4 gap-3">
+          <div className="bg-white/90 backdrop-blur-md rounded-2xl p-3.5 border border-stone-200/80 shadow-xs">
+            <span className="text-[10px] font-extrabold uppercase text-stone-500 block">
+              सक्रिय शेतकरी (Active Roster)
+            </span>
+            <p className="text-xl font-black text-emerald-900 tabular-nums mt-0.5">
+              {capacity.active_farmers}{" "}
+              <span className="text-xs font-bold text-stone-400">/ {capacity.max_farmers}</span>
+            </p>
+          </div>
+
+          <div className="bg-white/90 backdrop-blur-md rounded-2xl p-3.5 border border-stone-200/80 shadow-xs">
+            <span className="text-[10px] font-extrabold uppercase text-stone-500 block">
+              एकूण नकाशा क्षेत्र (Mapped Acres)
+            </span>
+            <p className="text-xl font-black text-sky-900 tabular-nums mt-0.5 flex items-center space-x-1.5">
+              <Compass className="w-4 h-4 text-sky-600" />
+              <span>{totalMappedAcres.toFixed(2)} ac</span>
+            </p>
+          </div>
+
+          <div className="bg-white/90 backdrop-blur-md rounded-2xl p-3.5 border border-stone-200/80 shadow-xs">
+            <span className="text-[10px] font-extrabold uppercase text-stone-500 block">
+              ७/१२ पडताळणी (7/12 Verified)
+            </span>
+            <p className="text-xl font-black text-amber-900 tabular-nums mt-0.5">
+              {verifiedParcelsCount}{" "}
+              <span className="text-xs font-bold text-stone-400">/ {totalMappedParcels} plots</span>
+            </p>
+          </div>
+
+          <div className="bg-white/90 backdrop-blur-md rounded-2xl p-3.5 border border-stone-200/80 shadow-xs">
+            <span className="text-[10px] font-extrabold uppercase text-stone-500 block">
+              डेटा स्रोत (Healthy Telemetry)
+            </span>
+            <p className="text-xl font-black text-stone-900 tabular-nums mt-0.5">
+              {healthySourcesCount}{" "}
+              <span className="text-xs font-bold text-stone-400">/ {sourceHealth.length || 0} feeds</span>
+            </p>
+          </div>
+        </section>
+
         {/* 1. Capacity Meter Bar (N of 20) */}
-        <section className="bg-white rounded-3xl p-5 shadow-xs border border-stone-200">
+        <section className="bg-white/90 backdrop-blur-md rounded-3xl p-5 shadow-xs border border-stone-200/80">
           <div className="flex items-center justify-between mb-2">
             <span className="font-black text-sm text-stone-900">
               नोंदणीकृत शेतकरी कोटा (Hard Cap Enforcement: {capacity.active_farmers} of {capacity.max_farmers})
@@ -448,6 +545,14 @@ export const AdminPortal: React.FC<AdminPortalProps> = ({ token, lang, onBack })
                         )}
                       </td>
                       <td className="py-3 px-2 text-right space-x-1 whitespace-nowrap">
+                        <button
+                          onClick={() => setMappingFarmer(f)}
+                          className="px-2 py-1.5 bg-sky-50 hover:bg-sky-100 text-sky-800 rounded-lg inline-flex items-center space-x-1 text-[11px] font-extrabold border border-sky-200 align-middle"
+                          title="शेतकरी जमिनीचा नकाशा आखा (Map Farmer Land)"
+                        >
+                          <MapPin className="w-3.5 h-3.5" />
+                          <span className="hidden lg:inline">नकाशा</span>
+                        </button>
                         <button
                           onClick={() => handleToggleLock(f.farmer_id, Boolean(f.is_locked))}
                           className="p-1.5 bg-stone-100 hover:bg-stone-200 text-stone-700 rounded-lg"
@@ -768,6 +873,27 @@ export const AdminPortal: React.FC<AdminPortalProps> = ({ token, lang, onBack })
           </div>
         </div>
       )}
+
+      {/* Officer GIS Land Mapping Modal for Selected Farmer */}
+      {mappingFarmer && (() => {
+        const liveFarmer =
+          farmersList.find((x: any) => x.farmer_id === mappingFarmer.farmer_id) || mappingFarmer;
+        const farmerParcels = liveFarmer.parcels || [];
+        return (
+          <FarmMap
+            parcels={farmerParcels}
+            activeParcel={farmerParcels[0] || null}
+            targetFarmerId={liveFarmer.farmer_id}
+            targetFarmerName={liveFarmer.name}
+            defaultDistrict={liveFarmer.district}
+            defaultTaluka={liveFarmer.taluka}
+            token={token}
+            lang={lang}
+            onClose={() => setMappingFarmer(null)}
+            onParcelChanged={loadOverview}
+          />
+        );
+      })()}
     </div>
   );
 };

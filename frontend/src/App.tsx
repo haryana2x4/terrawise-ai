@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import { Language } from "./i18n/translations";
 import { Login } from "./pages/Login";
 import { FarmerHome } from "./pages/FarmerHome";
@@ -15,11 +15,29 @@ export const App: React.FC = () => {
   const [token, setToken] = useState<string>(() => {
     return localStorage.getItem("kshetra_token") || "";
   });
+  const [tier, setTier] = useState<"full" | "lite">(() => {
+    const saved = localStorage.getItem("kshetra_tier");
+    if (saved === "lite" || saved === "full") return saved;
+    if (
+      typeof navigator !== "undefined" &&
+      navigator.hardwareConcurrency &&
+      navigator.hardwareConcurrency < 4
+    ) {
+      return "lite";
+    }
+    return "full";
+  });
   const [view, setView] = useState<"farmer" | "admin">("farmer");
 
   const handleLanguageChange = (newLang: Language) => {
     setLang(newLang);
     localStorage.setItem("kshetra_lang", newLang);
+  };
+
+  const handleToggleTier = () => {
+    const nextTier = tier === "full" ? "lite" : "full";
+    setTier(nextTier);
+    localStorage.setItem("kshetra_tier", nextTier);
   };
 
   const handleLoginSuccess = (farmerData: any, authToken: string) => {
@@ -35,7 +53,12 @@ export const App: React.FC = () => {
   };
 
   const handleLogout = () => {
-    fetch("/api/auth/logout", { method: "POST" }).catch(() => {});
+    if (token) {
+      fetch("/api/v1/auth/logout", {
+        method: "POST",
+        headers: { Authorization: `Bearer ${token}` }
+      }).catch(() => {});
+    }
     setFarmer(null);
     setToken("");
     localStorage.removeItem("kshetra_farmer");
@@ -47,6 +70,8 @@ export const App: React.FC = () => {
     return (
       <Login
         lang={lang}
+        tier={tier}
+        onToggleTier={handleToggleTier}
         onLanguageChange={handleLanguageChange}
         onLoginSuccess={handleLoginSuccess}
       />
@@ -58,7 +83,9 @@ export const App: React.FC = () => {
       <AdminPortal
         token={token}
         lang={lang}
+        tier={tier}
         onBack={() => setView("farmer")}
+        onLogout={handleLogout}
       />
     );
   }
@@ -68,6 +95,8 @@ export const App: React.FC = () => {
       farmer={farmer}
       token={token}
       lang={lang}
+      tier={tier}
+      onToggleTier={handleToggleTier}
       onLanguageChange={handleLanguageChange}
       onLogout={handleLogout}
       onOpenAdmin={() => setView("admin")}

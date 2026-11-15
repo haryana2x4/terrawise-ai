@@ -169,7 +169,8 @@ class OpenMeteoClient:
                 "latitude": lat_grid,
                 "longitude": lon_grid,
                 "current": "temperature_2m,relative_humidity_2m,precipitation,wind_speed_10m,soil_moisture_0_to_7cm",
-                "daily": "temperature_2m_max,temperature_2m_min,precipitation_sum,precipitation_probability_max,et0_fao_evapotranspiration,wind_speed_10m_max",
+                "hourly": "temperature_2m,relative_humidity_2m,precipitation,wind_speed_10m",
+                "daily": "temperature_2m_max,temperature_2m_min,precipitation_sum,precipitation_probability_max,et0_fao_evapotranspiration,wind_speed_10m_max,shortwave_radiation_sum",
                 "past_days": 30,
                 "forecast_days": 7,
                 "timezone": "Asia/Kolkata",
@@ -228,6 +229,7 @@ class OpenMeteoClient:
             },
             "forecast_7d": [],
             "history_30d": [],
+            "hourly_48h": [],
             "summary": {
                 "rain_7d_forecast_mm": None,
                 "rain_30d_total_mm": None,
@@ -255,25 +257,62 @@ class OpenMeteoClient:
         prob = daily.get("precipitation_probability_max", [])
         et0 = daily.get("et0_fao_evapotranspiration", [])
         wind = daily.get("wind_speed_10m_max", [])
+        solar = daily.get("shortwave_radiation_sum", [])
 
         history_30d: List[Dict[str, Any]] = []
         forecast_7d: List[Dict[str, Any]] = []
         split_idx = max(0, len(times) - 7)
 
         for idx, dt_str in enumerate(times):
+            rain_v = rain[idx] if idx < len(rain) else None
+            et0_v = et0[idx] if idx < len(et0) else None
+            water_bal = (
+                round(float(rain_v) - float(et0_v), 1)
+                if rain_v is not None and et0_v is not None
+                else None
+            )
             day_entry = {
                 "date": dt_str,
                 "temp_max_c": tmax[idx] if idx < len(tmax) else None,
                 "temp_min_c": tmin[idx] if idx < len(tmin) else None,
-                "rain_mm": rain[idx] if idx < len(rain) else None,
+                "rain_mm": rain_v,
                 "rain_prob_pct": prob[idx] if idx < len(prob) else None,
-                "et0_mm": et0[idx] if idx < len(et0) else None,
+                "et0_mm": et0_v,
+                "water_balance_mm": water_bal,
                 "wind_max_kmh": wind[idx] if idx < len(wind) else None,
+                "solar_mj_m2": solar[idx] if idx < len(solar) else None,
             }
             if idx < split_idx:
                 history_30d.append(day_entry)
             else:
                 forecast_7d.append(day_entry)
+
+        # Extract next 48 hourly slots starting from today's forecast window
+        hourly = raw.get("hourly") or {}
+        h_times = hourly.get("time") or []
+        h_temp = hourly.get("temperature_2m") or []
+        h_rh = hourly.get("relative_humidity_2m") or []
+        h_rain = hourly.get("precipitation") or []
+        h_wind = hourly.get("wind_speed_10m") or []
+        hourly_48h: List[Dict[str, Any]] = []
+        cur_time = str(cur.get("time") or "")
+        start_h_idx = 0
+        if cur_time and h_times:
+            prefix = cur_time[:13]
+            for i, ht in enumerate(h_times):
+                if str(ht) >= prefix:
+                    start_h_idx = i
+                    break
+        for i in range(start_h_idx, min(len(h_times), start_h_idx + 48)):
+            hourly_48h.append(
+                {
+                    "time": h_times[i],
+                    "temp_c": h_temp[i] if i < len(h_temp) else None,
+                    "rh_pct": h_rh[i] if i < len(h_rh) else None,
+                    "rain_mm": h_rain[i] if i < len(h_rain) else None,
+                    "wind_kmh": h_wind[i] if i < len(h_wind) else None,
+                }
+            )
 
         valid_rain_7d = [d["rain_mm"] for d in forecast_7d if d["rain_mm"] is not None]
         valid_rain_30d = [d["rain_mm"] for d in history_30d if d["rain_mm"] is not None]
@@ -293,6 +332,7 @@ class OpenMeteoClient:
             },
             "forecast_7d": forecast_7d,
             "history_30d": history_30d,
+            "hourly_48h": hourly_48h,
             "summary": {
                 "rain_7d_forecast_mm": round(sum(valid_rain_7d), 1) if valid_rain_7d else None,
                 "rain_30d_total_mm": round(sum(valid_rain_30d), 1) if valid_rain_30d else None,
@@ -355,7 +395,8 @@ class SoilGridsClient:
                     "clay_pct": safe_value(props.get("clay"), "%"),
                     "sand_pct": safe_value(props.get("sand"), "%"),
                     "organic_carbon_g_kg": safe_value(props.get("soc"), "g/kg"),
-                    "Provenance": format_provenance("ISRIC SoilGrids 250m v2.0", now_iso, stale=False),
+                    "nitrogen_g_kg": safe_value(props.get("nitrogen"), "g/kg"),
+                    "provenance": format_provenance("ISRIC SoilGrids 250m v2.0", now_iso, stale=False),
                 }
                 integration_cache.set(cache_key, result, ttl_seconds=86400)
                 return result
@@ -367,6 +408,7 @@ class SoilGridsClient:
             "clay_pct": safe_value(None, "%"),
             "sand_pct": safe_value(None, "%"),
             "organic_carbon_g_kg": safe_value(None, "g/kg"),
+            "nitrogen_g_kg": safe_value(None, "g/kg"),
             "provenance": {
                 "source": "Farmer Parcel Declaration (ISRIC SoilGrids live query unavailable)",
                 "fetched_at": now_iso,

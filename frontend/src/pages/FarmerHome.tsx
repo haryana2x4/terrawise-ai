@@ -6,6 +6,9 @@ import { MiniCards } from "../components/MiniCards";
 import { WhatToPlantModal } from "../components/WhatToPlantModal";
 import { FarmMap } from "../components/FarmMap";
 import { AssistantChat } from "../components/AssistantChat";
+import { LivingBackground } from "../components/LivingBackground";
+import { PrecisionAnalyticsPanel } from "../components/PrecisionAnalyticsPanel";
+import { computeSunTheme } from "../utils/sunEngine";
 import {
   Sprout,
   Map,
@@ -18,32 +21,49 @@ import {
   Trash2,
   MessageSquareWarning,
   ShieldCheck,
-  KeyRound
+  KeyRound,
+  BarChart3,
+  Printer,
+  Compass,
+  Layers,
+  MapPin,
+  Sun
 } from "lucide-react";
 
 interface FarmerHomeProps {
   farmer: any;
   token: string;
   lang: Language;
+  tier: "full" | "lite";
+  onToggleTier: () => void;
   onLanguageChange: (l: Language) => void;
   onLogout: () => void;
   onOpenAdmin: () => void;
 }
 
+type HomeTab = "today" | "precision" | "dossier";
+
 export const FarmerHome: React.FC<FarmerHomeProps> = ({
   farmer,
   token,
   lang,
+  tier,
+  onToggleTier,
   onLanguageChange,
   onLogout,
   onOpenAdmin
 }) => {
   const [dashboardData, setDashboardData] = useState<any>(null);
   const [isLoading, setIsLoading] = useState<boolean>(true);
+  const [selectedParcelId, setSelectedParcelId] = useState<number | null>(null);
+  const [activeTab, setActiveTab] = useState<HomeTab>("today");
+
   const [showWhatToPlant, setShowWhatToPlant] = useState<boolean>(false);
   const [showMap, setShowMap] = useState<boolean>(false);
   const [showAssistant, setShowAssistant] = useState<boolean>(false);
   const [showMenu, setShowMenu] = useState<boolean>(false);
+
+  const [sunTheme, setSunTheme] = useState(() => computeSunTheme());
 
   // First-login consent & password change states
   const [consentAccepted, setConsentAccepted] = useState<boolean>(
@@ -70,10 +90,21 @@ export const FarmerHome: React.FC<FarmerHomeProps> = ({
 
   const t = translations[lang];
 
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setSunTheme(computeSunTheme());
+    }, 60_000);
+    return () => clearInterval(timer);
+  }, []);
+
   const loadDashboard = useCallback(async () => {
     setIsLoading(true);
     try {
-      const resp = await fetch(`/api/v1/farmer/dashboard?lang=${lang}`, {
+      const qs = new URLSearchParams({ lang });
+      if (selectedParcelId !== null) {
+        qs.set("parcel_id", String(selectedParcelId));
+      }
+      const resp = await fetch(`/api/v1/farmer/dashboard?${qs.toString()}`, {
         headers: { Authorization: `Bearer ${token}` }
       });
       const data = await resp.json();
@@ -83,13 +114,17 @@ export const FarmerHome: React.FC<FarmerHomeProps> = ({
           setConsentAccepted(Boolean(data.farmer.consent_accepted));
           setMustChangePwd(Boolean(data.farmer.must_change_password));
         }
+        const activeP = data?.today_card?.active_parcel;
+        if (activeP && selectedParcelId !== activeP.id) {
+          setSelectedParcelId(activeP.id);
+        }
       }
     } catch {
       // Offline / network error handled gracefully
     } finally {
       setIsLoading(false);
     }
-  }, [token, lang]);
+  }, [token, lang, selectedParcelId]);
 
   useEffect(() => {
     loadDashboard();
@@ -245,43 +280,66 @@ export const FarmerHome: React.FC<FarmerHomeProps> = ({
     }
   };
 
-  if (isLoading) {
-    return (
-      <div className="min-h-screen bg-stone-100 flex flex-col items-center justify-center p-4">
-        <div className="w-14 h-14 rounded-full border-4 border-emerald-800 border-t-transparent animate-spin mb-4" />
-        <p className="font-bold text-emerald-950 text-lg">माहिती लोड होत आहे...</p>
-        <p className="text-xs text-stone-500 mt-1">
-          Fetching live weather &amp; parcel telemetry
-        </p>
-      </div>
-    );
-  }
-
   const todayData = dashboardData?.today_card;
   const weather = dashboardData?.weather;
   const suitability = dashboardData?.suitability;
+  const precision = dashboardData?.precision_analytics;
   const risks = dashboardData?.risks;
   const parcels = dashboardData?.parcels || [];
   const announcements = dashboardData?.announcements || [];
   const observations = dashboardData?.observations || [];
   const activeParcel = todayData?.active_parcel || parcels[0] || null;
-  const displayName = dashboardData?.farmer?.name || farmer?.name || farmer?.full_name || "";
+  const farmerProfile = dashboardData?.farmer || farmer;
+  const displayName = farmerProfile?.name || farmerProfile?.full_name || "";
+  const rainLikely =
+    (typeof weather?.rain_mm === "number" && weather.rain_mm > 0) ||
+    (typeof weather?.rain_prob === "number" && weather.rain_prob >= 55);
+
+  if (isLoading && !dashboardData) {
+    return (
+      <div className="relative min-h-screen flex flex-col items-center justify-center p-4 overflow-hidden">
+        <LivingBackground
+          variant="workspace"
+          sunTheme={sunTheme}
+          isLiteTier={tier === "lite"}
+        />
+        <div className="relative z-10 bg-white/90 backdrop-blur-md p-6 rounded-3xl shadow-xl border border-emerald-200/70 flex flex-col items-center">
+          <div className="w-14 h-14 rounded-full border-4 border-emerald-800 border-t-transparent animate-spin mb-4" />
+          <p className="font-bold text-emerald-950 text-lg">माहिती लोड होत आहे...</p>
+          <p className="text-xs text-stone-500 mt-1">
+            Fetching live weather, soil chemistry &amp; parcel telemetry
+          </p>
+        </div>
+      </div>
+    );
+  }
 
   return (
-    <div className="min-h-screen bg-stone-100 flex flex-col justify-between font-sans">
-      <Header
-        farmer={dashboardData?.farmer || farmer}
-        lang={lang}
-        onLanguageChange={onLanguageChange}
-        onLogout={onLogout}
-        onOpenAdmin={farmer.role === "admin" ? onOpenAdmin : undefined}
-        onOpenAssistant={() => setShowAssistant(true)}
+    <div className="relative min-h-screen flex flex-col justify-between font-sans overflow-x-hidden">
+      <LivingBackground
+        variant="workspace"
+        sunTheme={sunTheme}
+        hasRain={rainLikely}
+        isLiteTier={tier === "lite"}
       />
 
-      <main className="max-w-md sm:max-w-xl md:max-w-2xl w-full mx-auto px-3.5 sm:px-6 py-3 flex-1 flex flex-col justify-between space-y-3">
+      <div className="no-print">
+        <Header
+          farmer={farmerProfile}
+          lang={lang}
+          tier={tier}
+          onToggleTier={onToggleTier}
+          onLanguageChange={onLanguageChange}
+          onLogout={onLogout}
+          onOpenAdmin={farmer.role === "admin" ? onOpenAdmin : undefined}
+          onOpenAssistant={() => setShowAssistant(true)}
+        />
+      </div>
+
+      <main className="relative z-10 max-w-4xl w-full mx-auto px-3.5 sm:px-6 py-4 flex-1 flex flex-col space-y-3.5">
         {/* Officer Announcements Inbox Banner */}
         {announcements.length > 0 && (
-          <div className="bg-amber-50 border-2 border-amber-400 rounded-2xl p-3 shadow-xs space-y-1">
+          <div className="bg-amber-50/95 backdrop-blur-sm border-2 border-amber-400 rounded-2xl p-3 shadow-xs space-y-1">
             {announcements.slice(0, 2).map((ann: any) => (
               <div key={ann.id} className="flex items-start space-x-2 text-xs">
                 <Megaphone className="w-4 h-4 text-amber-700 shrink-0 mt-0.5" />
@@ -298,155 +356,389 @@ export const FarmerHome: React.FC<FarmerHomeProps> = ({
           </div>
         )}
 
-        {/* Farmer Greeting & Active Parcel Status */}
-        <div className="flex items-center justify-between pt-1">
-          <div>
-            <h1 className="text-lg sm:text-xl font-black text-stone-900 leading-tight">
-              {todayData?.greeting_mr || `राम राम, ${displayName}!`}
-            </h1>
-            <p className="text-xs text-stone-600 font-semibold mt-0.5">
-              शेत:{" "}
-              <span className="font-bold text-emerald-900">
-                {activeParcel
-                  ? `${activeParcel.name} (${activeParcel.area_acres} एकर / ${activeParcel.area_gunthas} गुंठे)`
-                  : lang === "mr"
-                  ? "अजून शेत नकाशावर जोडलेले नाही (No parcel mapped yet)"
-                  : "No parcel mapped yet — open My Field Map to draw"}
-              </span>
-            </p>
-          </div>
-
-          <button
-            onClick={() => setShowMenu(true)}
-            className="p-2 rounded-xl bg-white border border-stone-200 text-stone-700 hover:bg-stone-50 shadow-sm"
-            title="Menu"
-          >
-            <Menu className="w-5 h-5" />
-          </button>
-        </div>
-
-        {/* 1. Big "Today" Card */}
-        <TodayCard todayData={todayData} lang={lang} />
-
-        {/* 2. Three Mini Cards (Weather, Soil Water, Pests & IPM) */}
-        <MiniCards
-          weather={weather}
-          suitability={suitability}
-          risks={risks}
-          lang={lang}
-        />
-
-        {/* 3. Three Primary Action Buttons (What to Plant, Field Map, Krishi Mitra AI) */}
-        <div className="grid grid-cols-3 gap-2.5 pt-1">
-          <button
-            onClick={() => setShowWhatToPlant(true)}
-            className="py-3 px-2 rounded-2xl bg-emerald-800 hover:bg-emerald-700 active:scale-[0.98] text-white font-black text-xs sm:text-base shadow-md flex flex-col items-center justify-center text-center transition-all"
-          >
-            <Sprout className="w-5 h-5 mb-1 text-emerald-300" />
-            <span>{t.what_to_plant_btn}</span>
-          </button>
-
-          <button
-            onClick={() => setShowMap(true)}
-            className="py-3 px-2 rounded-2xl bg-stone-900 hover:bg-stone-800 active:scale-[0.98] text-white font-black text-xs sm:text-base shadow-md flex flex-col items-center justify-center text-center transition-all"
-          >
-            <Map className="w-5 h-5 mb-1 text-emerald-400" />
-            <span>{t.my_field_map_btn}</span>
-          </button>
-
-          <button
-            onClick={() => setShowAssistant(true)}
-            className="py-3 px-2 rounded-2xl bg-amber-700 hover:bg-amber-600 active:scale-[0.98] text-white font-black text-xs sm:text-base shadow-md flex flex-col items-center justify-center text-center transition-all"
-          >
-            <Bot className="w-5 h-5 mb-1 text-amber-200" />
-            <span>{t.assistant_btn}</span>
-          </button>
-        </div>
-
-        {/* 4. Real Field Observation Log ("No data yet. Add today's rain.") */}
-        <section className="bg-white rounded-2xl p-3.5 border border-stone-200 shadow-xs">
-          <div className="flex items-center justify-between mb-2">
-            <div className="flex items-center space-x-1.5 text-xs font-extrabold text-stone-800">
-              <CloudRain className="w-4 h-4 text-sky-600" />
-              <span>
-                {lang === "mr"
-                  ? "शेतातील प्रत्यक्ष पर्जन्य व निरीक्षण नोंद"
-                  : "Field Rain & Observation Log"}
-              </span>
-            </div>
-            {observations.length === 0 && (
-              <span className="text-[11px] text-stone-500 font-semibold">
-                {lang === "mr"
-                  ? "अजून नोंद नाही. आजचा पाऊस जोडा."
-                  : "No data yet. Add today's rain."}
-              </span>
-            )}
-          </div>
-
-          {activeParcel ? (
-            <form
-              onSubmit={e => handleAddObservation(e, activeParcel.id)}
-              className="flex flex-wrap items-center gap-2"
-            >
-              <input
-                type="number"
-                step="0.1"
-                min="0"
-                max="500"
-                value={rainMmInput}
-                onChange={e => setRainMmInput(e.target.value)}
-                placeholder={lang === "mr" ? "पाऊस (मिमी)" : "Rain (mm)"}
-                className="w-28 px-2.5 py-1.5 rounded-xl border border-stone-300 text-xs font-bold"
-              />
-              <input
-                type="text"
-                value={obsNoteInput}
-                onChange={e => setObsNoteInput(e.target.value)}
-                placeholder={
-                  lang === "mr"
-                    ? "निरीक्षण (उदा. सिंचन केले / कीड पाहणी)"
-                    : "Field note (irrigation / scouting)"
-                }
-                className="flex-1 min-w-[140px] px-2.5 py-1.5 rounded-xl border border-stone-300 text-xs font-semibold"
-              />
-              <button
-                type="submit"
-                className="px-3 py-1.5 rounded-xl bg-emerald-800 hover:bg-emerald-700 text-white text-xs font-extrabold"
-              >
-                {lang === "mr" ? "नोंद जतन करा" : "Log"}
-              </button>
-            </form>
-          ) : (
-            <p className="text-xs text-stone-500">
-              {lang === "mr"
-                ? "पावसाची नोंद करण्यासाठी प्रथम 'माझा शेत नकाशा' उघडून शेताची सीमा जोडा."
-                : "Map your first parcel in 'My Field Map' to log daily rainfall observations."}
-            </p>
-          )}
-
-          {obsStatus && (
-            <p className="text-xs text-emerald-800 font-bold mt-1.5">{obsStatus}</p>
-          )}
-
-          {observations.length > 0 && (
-            <div className="mt-2 pt-2 border-t border-stone-100 flex flex-wrap gap-2 text-[11px] text-stone-600">
-              {observations.slice(0, 3).map((o: any) => (
-                <span
-                  key={o.id}
-                  className="bg-stone-100 px-2 py-0.5 rounded-lg font-medium"
-                >
-                  {o.observed_date}:{" "}
-                  <strong>{o.rain_mm !== null ? `${o.rain_mm} mm` : t.no_data}</strong>{" "}
-                  {o.notes ? `(${o.notes})` : ""}
+        {/* Greeting Header + Solar Badge + Quick Controls */}
+        <div className="bg-white/85 backdrop-blur-md rounded-3xl p-4 border border-stone-200/80 shadow-sm flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+          <div className="min-w-0">
+            <div className="flex flex-wrap items-center gap-2 mb-1">
+              <span className="inline-flex items-center space-x-1 text-[10px] font-extrabold uppercase tracking-wide bg-emerald-100/90 text-emerald-900 px-2 py-0.5 rounded-full border border-emerald-200">
+                <Sun className="w-3 h-3 text-amber-600" />
+                <span>{sunTheme.phaseLabel[lang] || sunTheme.phaseLabel.mr}</span>
+                <span className="font-mono text-emerald-700">
+                  ({Math.round(sunTheme.altitudeDeg)}° EL)
                 </span>
-              ))}
+              </span>
+              {activeParcel?.land_verified && (
+                <span className="inline-flex items-center space-x-1 text-[10px] font-extrabold bg-emerald-700 text-white px-2 py-0.5 rounded-full">
+                  <ShieldCheck className="w-3 h-3" />
+                  <span>7/12 Verified</span>
+                </span>
+              )}
             </div>
-          )}
-        </section>
+
+            <h1 className="text-lg sm:text-xl font-black text-stone-900 leading-tight">
+              {todayData?.greeting_mr || `${sunTheme.greeting[lang] || sunTheme.greeting.mr}, ${displayName}!`}
+            </h1>
+            <p className="text-xs text-stone-600 font-semibold mt-0.5 flex flex-wrap items-center gap-x-2">
+              <span>
+                {lang === "mr" ? "सक्रिय शेत:" : "Active Parcel:"}{" "}
+                <strong className="text-emerald-900">
+                  {activeParcel
+                    ? `${activeParcel.name} (${activeParcel.area_acres} एकर / ${activeParcel.area_gunthas} गुंठे • ${activeParcel.soil_type})`
+                    : lang === "mr"
+                    ? "अजून शेत नकाशावर जोडलेले नाही"
+                    : "No parcel mapped yet"}
+                </strong>
+              </span>
+            </p>
+          </div>
+
+          <div className="no-print flex items-center space-x-2 shrink-0">
+            <button
+              onClick={() => window.print()}
+              className="px-2.5 py-2 rounded-xl bg-stone-100 hover:bg-stone-200 border border-stone-200 text-stone-800 text-xs font-bold flex items-center space-x-1.5 shadow-xs transition-colors"
+              title="Print Field Dossier"
+            >
+              <Printer className="w-4 h-4 text-emerald-800" />
+              <span className="hidden sm:inline">
+                {lang === "mr" ? "शेत अहवाल" : "Dossier"}
+              </span>
+            </button>
+            <button
+              onClick={() => setShowMenu(true)}
+              className="p-2 rounded-xl bg-white hover:bg-stone-50 border border-stone-200 text-stone-700 shadow-xs transition-colors"
+              title="Menu"
+            >
+              <Menu className="w-5 h-5" />
+            </button>
+          </div>
+        </div>
+
+        {/* Parcel Switcher Strip OR Call-To-Action when 0 Parcels */}
+        {parcels.length > 0 ? (
+          <div className="no-print flex items-center gap-2 overflow-x-auto pb-1">
+            {parcels.map((p: any) => {
+              const isSelected = activeParcel?.id === p.id;
+              return (
+                <button
+                  key={p.id}
+                  onClick={() => setSelectedParcelId(p.id)}
+                  className={`shrink-0 px-3 py-1.5 rounded-2xl text-xs font-extrabold border transition-all flex items-center space-x-1.5 shadow-xs ${
+                    isSelected
+                      ? "bg-emerald-900 text-white border-emerald-900 shadow-md"
+                      : "bg-white/90 text-stone-700 border-stone-200 hover:bg-emerald-50"
+                  }`}
+                >
+                  <MapPin className={`w-3.5 h-3.5 ${isSelected ? "text-emerald-300" : "text-emerald-700"}`} />
+                  <span>{p.name}</span>
+                  <span className={`font-mono text-[10px] ${isSelected ? "text-emerald-200" : "text-stone-500"}`}>
+                    ({p.area_acres} ac)
+                  </span>
+                </button>
+              );
+            })}
+            <button
+              onClick={() => setShowMap(true)}
+              className="shrink-0 px-3 py-1.5 rounded-2xl text-xs font-extrabold bg-amber-100/90 hover:bg-amber-200 text-amber-950 border border-amber-300 flex items-center space-x-1 transition-colors"
+            >
+              <Layers className="w-3.5 h-3.5" />
+              <span>{lang === "mr" ? "+ नकाशा / बदल" : "+ Map / Edit"}</span>
+            </button>
+          </div>
+        ) : (
+          <div className="no-print bg-gradient-to-r from-emerald-900 via-emerald-800 to-teal-900 text-white rounded-3xl p-4 sm:p-5 shadow-lg border border-emerald-500/40 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+            <div className="space-y-1">
+              <div className="flex items-center space-x-2">
+                <Compass className="w-5 h-5 text-emerald-300" />
+                <h2 className="font-black text-sm sm:text-base">
+                  {lang === "mr"
+                    ? "पहिल्यांदाच वापरत आहात? तुमचे शेत उपग्रह नकाशावर आखा!"
+                    : "Mark Your Exact Land Boundary on Live Satellite Imagery"}
+                </h2>
+              </div>
+              <p className="text-xs text-emerald-100/90 max-w-xl">
+                {lang === "mr"
+                  ? "तालुका निवडा आणि तुमच्या शेताच्या चारही कोपऱ्यांवर क्लिक करा — एकर/गुंठे क्षेत्रफळ, ISRIC मातीचा अहवाल आणि पाण्याची गरज लगेच मिळेल."
+                  : "Pick your taluka and click corners of your plot on satellite view — get instant Acre/Guntha geodesy, ISRIC soil chemistry, and irrigation balance."}
+              </p>
+            </div>
+            <button
+              onClick={() => setShowMap(true)}
+              className="shrink-0 px-4 py-2.5 rounded-2xl bg-amber-400 hover:bg-amber-300 text-stone-950 font-black text-xs sm:text-sm shadow-md flex items-center justify-center space-x-1.5 transition-transform active:scale-[0.98]"
+            >
+              <Map className="w-4 h-4" />
+              <span>{lang === "mr" ? "शेत नकाशा उघडा" : "Open Field Map"}</span>
+            </button>
+          </div>
+        )}
+
+        {/* Workspace Tab Navigation */}
+        <div className="no-print bg-white/85 backdrop-blur-md p-1.5 rounded-2xl border border-stone-200/80 shadow-xs grid grid-cols-3 gap-1">
+          <button
+            onClick={() => setActiveTab("today")}
+            className={`py-2 px-2 rounded-xl text-xs font-extrabold flex items-center justify-center space-x-1.5 transition-all ${
+              activeTab === "today"
+                ? "bg-emerald-800 text-white shadow-sm"
+                : "text-stone-700 hover:bg-stone-100/80"
+            }`}
+          >
+            <Sprout className="w-4 h-4" />
+            <span>{lang === "mr" ? "आजचा सल्ला" : lang === "hi" ? "आज की सलाह" : "Today"}</span>
+          </button>
+
+          <button
+            onClick={() => setActiveTab("precision")}
+            className={`py-2 px-2 rounded-xl text-xs font-extrabold flex items-center justify-center space-x-1.5 transition-all ${
+              activeTab === "precision"
+                ? "bg-emerald-800 text-white shadow-sm"
+                : "text-stone-700 hover:bg-stone-100/80"
+            }`}
+          >
+            <BarChart3 className="w-4 h-4" />
+            <span>
+              {lang === "mr" ? "अचूक विश्लेषण" : lang === "hi" ? "सटीक विश्लेषण" : "Precision Lab"}
+            </span>
+          </button>
+
+          <button
+            onClick={() => setActiveTab("dossier")}
+            className={`py-2 px-2 rounded-xl text-xs font-extrabold flex items-center justify-center space-x-1.5 transition-all ${
+              activeTab === "dossier"
+                ? "bg-emerald-800 text-white shadow-sm"
+                : "text-stone-700 hover:bg-stone-100/80"
+            }`}
+          >
+            <CloudRain className="w-4 h-4" />
+            <span>
+              {lang === "mr" ? "नोंद व अहवाल" : lang === "hi" ? "फील्ड लॉग" : "Field Log"}
+            </span>
+          </button>
+        </div>
+
+        {/* TAB 1: Today + Actions + Quick Rain Log */}
+        {activeTab === "today" && (
+          <div className="space-y-3.5">
+            <TodayCard todayData={todayData} lang={lang} />
+
+            <MiniCards
+              weather={weather}
+              suitability={suitability}
+              risks={risks}
+              lang={lang}
+            />
+
+            {/* Primary 3 Action Buttons */}
+            <div className="no-print grid grid-cols-3 gap-2.5 pt-0.5">
+              <button
+                onClick={() => setShowWhatToPlant(true)}
+                className="py-3.5 px-2 rounded-2xl bg-emerald-800 hover:bg-emerald-700 active:scale-[0.98] text-white font-black text-xs sm:text-base shadow-md flex flex-col items-center justify-center text-center transition-all border border-emerald-600/40"
+              >
+                <Sprout className="w-5 h-5 mb-1 text-emerald-300" />
+                <span>{t.what_to_plant_btn}</span>
+              </button>
+
+              <button
+                onClick={() => setShowMap(true)}
+                className="py-3.5 px-2 rounded-2xl bg-stone-900 hover:bg-stone-800 active:scale-[0.98] text-white font-black text-xs sm:text-base shadow-md flex flex-col items-center justify-center text-center transition-all border border-stone-700"
+              >
+                <Map className="w-5 h-5 mb-1 text-emerald-400" />
+                <span>{t.my_field_map_btn}</span>
+              </button>
+
+              <button
+                onClick={() => setShowAssistant(true)}
+                className="py-3.5 px-2 rounded-2xl bg-amber-700 hover:bg-amber-600 active:scale-[0.98] text-white font-black text-xs sm:text-base shadow-md flex flex-col items-center justify-center text-center transition-all border border-amber-500/40"
+              >
+                <Bot className="w-5 h-5 mb-1 text-amber-200" />
+                <span>{t.assistant_btn}</span>
+              </button>
+            </div>
+
+            {/* Real Field Observation Log */}
+            <section className="bg-white/90 backdrop-blur-sm rounded-2xl p-3.5 border border-stone-200 shadow-xs">
+              <div className="flex items-center justify-between mb-2">
+                <div className="flex items-center space-x-1.5 text-xs font-extrabold text-stone-800">
+                  <CloudRain className="w-4 h-4 text-sky-600" />
+                  <span>
+                    {lang === "mr"
+                      ? "शेतातील प्रत्यक्ष पर्जन्य व निरीक्षण नोंद"
+                      : "Field Rain & Observation Log"}
+                  </span>
+                </div>
+                {observations.length === 0 && (
+                  <span className="text-[11px] text-stone-500 font-semibold">
+                    {lang === "mr"
+                      ? "अजून नोंद नाही. आजचा पाऊस जोडा."
+                      : "No data yet. Add today's rain."}
+                  </span>
+                )}
+              </div>
+
+              {activeParcel ? (
+                <form
+                  onSubmit={e => handleAddObservation(e, activeParcel.id)}
+                  className="flex flex-wrap items-center gap-2"
+                >
+                  <input
+                    type="number"
+                    step="0.1"
+                    min="0"
+                    max="500"
+                    value={rainMmInput}
+                    onChange={e => setRainMmInput(e.target.value)}
+                    placeholder={lang === "mr" ? "पाऊस (मिमी)" : "Rain (mm)"}
+                    className="w-28 px-2.5 py-1.5 rounded-xl border border-stone-300 text-xs font-bold bg-white"
+                  />
+                  <input
+                    type="text"
+                    value={obsNoteInput}
+                    onChange={e => setObsNoteInput(e.target.value)}
+                    placeholder={
+                      lang === "mr"
+                        ? "निरीक्षण (उदा. सिंचन केले / कीड पाहणी)"
+                        : "Field note (irrigation / scouting)"
+                    }
+                    className="flex-1 min-w-[140px] px-2.5 py-1.5 rounded-xl border border-stone-300 text-xs font-semibold bg-white"
+                  />
+                  <button
+                    type="submit"
+                    className="px-3 py-1.5 rounded-xl bg-emerald-800 hover:bg-emerald-700 text-white text-xs font-extrabold"
+                  >
+                    {lang === "mr" ? "नोंद जतन करा" : "Log"}
+                  </button>
+                </form>
+              ) : (
+                <p className="text-xs text-stone-500">
+                  {lang === "mr"
+                    ? "पावसाची नोंद करण्यासाठी प्रथम 'माझा शेत नकाशा' उघडून शेताची सीमा जोडा."
+                    : "Map your first parcel in 'My Field Map' to log daily rainfall observations."}
+                </p>
+              )}
+
+              {obsStatus && (
+                <p className="text-xs text-emerald-800 font-bold mt-1.5">{obsStatus}</p>
+              )}
+
+              {observations.length > 0 && (
+                <div className="mt-2 pt-2 border-t border-stone-100 flex flex-wrap gap-2 text-[11px] text-stone-600">
+                  {observations.slice(0, 4).map((o: any) => (
+                    <span
+                      key={o.id}
+                      className="bg-stone-100 px-2 py-0.5 rounded-lg font-medium"
+                    >
+                      {o.observed_date}:{" "}
+                      <strong>{o.rain_mm !== null ? `${o.rain_mm} mm` : t.no_data}</strong>{" "}
+                      {o.notes ? `(${o.notes})` : ""}
+                    </span>
+                  ))}
+                </div>
+              )}
+            </section>
+          </div>
+        )}
+
+        {/* TAB 2: Precision Agronomy Dashboard */}
+        {activeTab === "precision" && (
+          <PrecisionAnalyticsPanel
+            weather={weather}
+            suitability={suitability}
+            precision={precision}
+            activeParcel={activeParcel}
+            token={token}
+            lang={lang}
+            defaultDistrict={farmerProfile?.district || "Ahilya Nagar"}
+          />
+        )}
+
+        {/* TAB 3: Complete Field Dossier & Observation Ledger */}
+        {activeTab === "dossier" && (
+          <div className="space-y-4">
+            <section className="bg-white/95 backdrop-blur-md rounded-3xl p-5 border border-stone-200 shadow-sm space-y-4">
+              <div className="flex flex-wrap items-center justify-between gap-2 border-b border-stone-200 pb-3">
+                <div>
+                  <h2 className="text-base font-black text-stone-900">
+                    {lang === "mr"
+                      ? "संपूर्ण शेत नोंदपत्र व सातबारा सारांश"
+                      : "Field Cadastral Dossier & Agronomy Ledger"}
+                  </h2>
+                  <p className="text-xs text-stone-500">
+                    {farmerProfile?.village}, {farmerProfile?.taluka}, {farmerProfile?.district} • Farmer ID:{" "}
+                    <span className="font-mono font-bold text-emerald-900">
+                      {farmerProfile?.farmer_id}
+                    </span>
+                  </p>
+                </div>
+                <button
+                  onClick={() => window.print()}
+                  className="no-print px-3 py-1.5 rounded-xl bg-emerald-800 hover:bg-emerald-700 text-white text-xs font-extrabold flex items-center space-x-1.5 shadow-xs"
+                >
+                  <Printer className="w-4 h-4" />
+                  <span>{lang === "mr" ? "PDF / प्रिंट काढा" : "Print Dossier"}</span>
+                </button>
+              </div>
+
+              <div>
+                <h3 className="text-xs font-extrabold uppercase tracking-wide text-stone-500 mb-2">
+                  {lang === "mr" ? "नोंदणीकृत शेत भूखंड" : "Registered Farm Parcels"} ({parcels.length})
+                </h3>
+                {parcels.length === 0 ? (
+                  <p className="text-xs text-stone-500 italic">
+                    {t.no_data} — {lang === "mr" ? "अजून कोणताही भूखंड मोजलेला नाही." : "No parcels mapped yet."}
+                  </p>
+                ) : (
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+                    {parcels.map((p: any) => (
+                      <div
+                        key={p.id}
+                        className="p-3 rounded-2xl bg-stone-50 border border-stone-200 text-xs space-y-1"
+                      >
+                        <div className="flex items-center justify-between">
+                          <strong className="text-stone-900 font-black">{p.name}</strong>
+                          <span className="font-mono font-bold text-emerald-900 tabular-nums">
+                            {p.area_acres} ac / {p.area_gunthas} गुंठे
+                          </span>
+                        </div>
+                        <p className="text-stone-600">
+                          Soil: <strong>{p.soil_type}</strong> • Irrigation:{" "}
+                          <strong>{p.irrigation_source}</strong>
+                        </p>
+                        <p className="text-[11px] font-mono text-stone-500">
+                          Lat {p.centroid_lat?.toFixed(5)}°, Lon {p.centroid_lon?.toFixed(5)}°
+                        </p>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+
+              <div>
+                <h3 className="text-xs font-extrabold uppercase tracking-wide text-stone-500 mb-2">
+                  {lang === "mr" ? "पर्जन्य व शेती नोंदी" : "Field Observation History"} ({observations.length})
+                </h3>
+                {observations.length === 0 ? (
+                  <p className="text-xs text-stone-500">{t.no_data}</p>
+                ) : (
+                  <div className="divide-y divide-stone-100 text-xs">
+                    {observations.map((o: any) => (
+                      <div key={o.id} className="py-2 flex items-center justify-between gap-2">
+                        <span className="font-mono text-stone-500">{o.observed_date}</span>
+                        <span className="font-bold text-sky-900 tabular-nums">
+                          {o.rain_mm !== null ? `${o.rain_mm} mm` : t.no_data}
+                        </span>
+                        <span className="text-stone-700 flex-1 text-right truncate">
+                          {o.notes || "—"}
+                        </span>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+            </section>
+          </div>
+        )}
       </main>
 
       {/* Persistent Provenance Bar */}
-      <footer className="bg-white border-t border-stone-200 py-2 px-4 text-center text-[11px] text-stone-500 font-medium">
+      <footer className="relative z-10 bg-white/85 backdrop-blur-md border-t border-stone-200 py-2 px-4 text-center text-[11px] text-stone-600 font-medium">
         <span>
           {weather?.provenance?.label ||
             "Source: Open-Meteo & ISRIC SoilGrids • Real-time Telemetry"}
@@ -471,6 +763,9 @@ export const FarmerHome: React.FC<FarmerHomeProps> = ({
           suitability={suitability}
           token={token}
           lang={lang}
+          defaultDistrict={farmerProfile?.district}
+          defaultTaluka={farmerProfile?.taluka}
+          onSelectParcel={p => setSelectedParcelId(p.id)}
           onClose={() => setShowMap(false)}
           onParcelChanged={loadDashboard}
         />
@@ -480,7 +775,7 @@ export const FarmerHome: React.FC<FarmerHomeProps> = ({
       {showAssistant && (
         <AssistantChat
           token={token}
-          farmer={dashboardData?.farmer || farmer}
+          farmer={farmerProfile}
           activeParcel={activeParcel}
           lang={lang}
           onClose={() => setShowAssistant(false)}
@@ -489,7 +784,7 @@ export const FarmerHome: React.FC<FarmerHomeProps> = ({
 
       {/* Slide-out Menu Modal */}
       {showMenu && (
-        <div className="fixed inset-0 z-50 bg-black/60 flex justify-end">
+        <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs flex justify-end">
           <div className="bg-white w-4/5 max-w-xs h-full p-5 shadow-2xl flex flex-col justify-between overflow-y-auto">
             <div>
               <div className="flex items-center justify-between pb-3 border-b border-stone-200 mb-4">
@@ -535,7 +830,7 @@ export const FarmerHome: React.FC<FarmerHomeProps> = ({
                   <span>{t.my_field_map_btn}</span>
                 </button>
 
-                {/* Honest Live Mandi Feed Section (Zero fabricated numbers) */}
+                {/* Honest Live Mandi Feed Section */}
                 <div className="pt-2 border-t border-stone-100">
                   <div className="text-xs text-stone-600 font-normal p-2.5 bg-stone-50 rounded-xl border border-stone-200">
                     <p className="font-extrabold text-stone-900 mb-1">

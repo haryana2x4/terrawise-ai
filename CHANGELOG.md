@@ -2,6 +2,18 @@
 
 All notable architectural and API changes to **Kshetra (formerly TERRAWISE AI)** are documented here.
 
+## [2.1.0] — 2026-11-15 — Competition Precision GIS, Living Environment & Agronomy Suite
+
+### Added & Upgraded
+- **Interactive Satellite GIS Land Marking ([`FarmMap.tsx`](file:///C:/Users/Rocky/.gemini/antigravity/scratch/terrawise-ai/frontend/src/components/FarmMap.tsx))**:
+  - Bundled `leaflet/dist/leaflet.css` directly with automatic `ResizeObserver`/`invalidateSize()`, Esri World Imagery Satellite default + OpenStreetMap + OpenTopoMap layer switcher, 29-taluka centroid selector across Ahilya Nagar & Nashik, one-click **Drop 1-Acre Quick Plot**, real-time spherical geodesy HUD (Acres, Gunthas, Hectares, Perimeter), inline **Edit Metadata / Delete / GeoJSON Download**, and Officer-side farmer land mapping directly inside [`AdminPortal.tsx`](file:///C:/Users/Rocky/.gemini/antigravity/scratch/terrawise-ai/frontend/src/pages/AdminPortal.tsx).
+- **Astronomical Living Background & Design Polish ([`LivingBackground.tsx`](file:///C:/Users/Rocky/.gemini/antigravity/scratch/terrawise-ai/frontend/src/components/LivingBackground.tsx), [`FarmerHome.tsx`](file:///C:/Users/Rocky/.gemini/antigravity/scratch/terrawise-ai/frontend/src/pages/FarmerHome.tsx), [`Login.tsx`](file:///C:/Users/Rocky/.gemini/antigravity/scratch/terrawise-ai/frontend/src/pages/Login.tsx))**:
+  - Dynamic solar phase gradients, astronomical sun altitude readout, subtle weather atmosphere (Full/Lite toggle synced across Header, Login, Farmer, and Officer views), multi-parcel switcher pills, and printable `@media print` Field Dossier.
+- **Competition Precision Agronomy ([`AdviceAndRiskService`](file:///C:/Users/Rocky/.gemini/antigravity/scratch/terrawise-ai/backend/app/services/__init__.py), [`PrecisionAnalyticsPanel.tsx`](file:///C:/Users/Rocky/.gemini/antigravity/scratch/terrawise-ai/frontend/src/components/PrecisionAnalyticsPanel.tsx))**:
+  - Fixed `crops.json` schema mapping (`marathi_name`, `hindi_name`, `common_name`, `water_need_mm`, `soil_preference`, `temp_range_c`, `typical_yield_kg_ha`, `price_range_inr_qtl`, `key_growth_stages`).
+  - Added FAO-56 parcel net water volume engine (Liters/day & Liters/week), Magnus-Tetens dew point, 48-hour hourly optimal spray safety window evaluator, 7-day Recharts Rainfall/ET0/Tmax hydro-thermal chart, ISRIC SoilGrids 250m soil chemistry panel, and parcel yield/value estimate.
+  - Added `PATCH /api/v1/parcels/<id>` metadata/geometry editor and `?parcel_id=` dashboard switcher.
+
 ## [2.0.0] — 2026-11-15
 
 ### Breaking / Production Upgrade Changes
