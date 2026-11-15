@@ -1,10 +1,10 @@
-# TERRAWISE AI
+# Kshetra (क्षेत्र)
 
 Precision agro-climatic advisor and interactive 3D companion suite built for smallholder farmers in **Ahilya Nagar** and **Nashik**, Maharashtra.
 
 ## Overview
 
-- **TERRAWISE Agro-Advisor (`backend/`, `frontend/`, `data/`, `tests/`)** — Full-stack GIS and meteorological decision-support platform powered by Open-Meteo and NASA POWER telemetry. Supports Marathi, Hindi, and English with interactive parcel boundary validation, multi-factor crop suitability scoring, IPM advisories, and printable farmer credential cards.
+- **Kshetra Agro-Advisor (`backend/`, `frontend/`, `data/`, `tests/`)** — Full-stack GIS and meteorological decision-support platform powered by Open-Meteo and NASA POWER telemetry. Supports Marathi, Hindi, and English with interactive parcel boundary validation, multi-factor crop suitability scoring, IPM advisories, and printable farmer credential cards.
 - **SUNDAY v2 (`services/ai-bot/`)** — Local-first Node.js + Three.js 3D voxel companion and sandboxed skill runner.
 - **Beyond Earth — Orien (`modules/orien/`)** — React 19 + TypeScript + Three.js orbital telemetry and mission portal.
 
@@ -13,7 +13,7 @@ Precision agro-climatic advisor and interactive 3D companion suite built for sma
 ## Project Structure
 
 ```text
-terrawise-ai/
+kshetra/
 ├── backend/            # Flask REST API, SQLAlchemy models, Shapely/PyProj GIS validator
 ├── frontend/           # React + TypeScript + Vite + Tailwind CSS web client
 ├── data/               # District/taluka GeoJSON layers & crop/IPM reference datasets
@@ -32,7 +32,7 @@ terrawise-ai/
 cp .env.example .env
 ```
 
-### 2. Backend & Frontend (TERRAWISE AI)
+### 2. Backend & Frontend (Kshetra)
 
 ```bash
 # Install backend dependencies
