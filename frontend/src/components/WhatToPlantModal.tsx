@@ -1,17 +1,53 @@
-import React from "react";
+import React, { useState } from "react";
 import { Language, translations } from "../i18n/translations";
-import { X, CheckCircle, AlertTriangle, Droplets, Calendar, TrendingUp, Sparkles } from "lucide-react";
+import {
+  X,
+  Droplets,
+  Calendar,
+  Sparkles,
+  ThumbsUp,
+  ThumbsDown,
+  ShieldCheck
+} from "lucide-react";
 
 interface WhatToPlantModalProps {
-  advice: any;
+  suitability: any;
+  token?: string;
   lang: Language;
   onClose: () => void;
 }
 
-export const WhatToPlantModal: React.FC<WhatToPlantModalProps> = ({ advice, lang, onClose }) => {
+export const WhatToPlantModal: React.FC<WhatToPlantModalProps> = ({
+  suitability,
+  token,
+  lang,
+  onClose
+}) => {
   const t = translations[lang];
-  const topCrops = advice?.top_crops || [];
-  const season = advice?.season || {};
+  const recommendations = suitability?.recommendations || [];
+  const season = suitability?.season || "auto";
+  const [ratedCrops, setRatedCrops] = useState<Record<string, number>>({});
+
+  const submitCropFeedback = async (cropId: string, rating: 1 | -1) => {
+    setRatedCrops(prev => ({ ...prev, [cropId]: rating }));
+    if (!token) return;
+    try {
+      await fetch("/api/v1/feedback", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`
+        },
+        body: JSON.stringify({
+          target_type: "crop_recommendation",
+          target_ref: cropId,
+          rating
+        })
+      });
+    } catch {
+      // Ignore network errors
+    }
+  };
 
   return (
     <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-end sm:items-center justify-center p-0 sm:p-4 overflow-y-auto">
@@ -21,12 +57,11 @@ export const WhatToPlantModal: React.FC<WhatToPlantModalProps> = ({ advice, lang
           <div>
             <div className="flex items-center space-x-2">
               <Sparkles className="w-5 h-5 text-amber-300" />
-              <h2 className="text-lg sm:text-xl font-bold">
-                {t.top_3_crops}
-              </h2>
+              <h2 className="text-lg sm:text-xl font-bold">{t.top_3_crops}</h2>
             </div>
             <p className="text-xs text-emerald-200 mt-0.5">
-              हंगाम: <span className="font-bold text-white">{lang === "mr" ? season.name_mr : season.name_en} ({lang === "mr" ? season.months_mr : season.months_en})</span>
+              हंगाम (Season): <span className="font-bold uppercase text-white">{season}</span> • माती:{" "}
+              <span className="font-bold text-white">{suitability?.soil_type || t.no_data}</span>
             </p>
           </div>
           <button
@@ -39,105 +74,131 @@ export const WhatToPlantModal: React.FC<WhatToPlantModalProps> = ({ advice, lang
 
         {/* Crops List */}
         <div className="p-4 sm:p-6 overflow-y-auto space-y-4">
-          {topCrops.map((crop: any, index: number) => {
-            const fitLabel = crop.fit?.[lang] || crop.fit?.mr;
-            const riskLabel = crop.risk?.[lang] || crop.risk?.mr;
+          {recommendations.length === 0 && (
+            <div className="p-6 text-center text-stone-500 font-semibold">
+              {t.no_data}
+            </div>
+          )}
+
+          {recommendations.slice(0, 6).map((crop: any, index: number) => {
             const isTop = index === 0;
+            const score = crop.suitability_score ?? 0;
+            const bandColor =
+              score >= 75
+                ? "bg-emerald-100 text-emerald-900 border-emerald-300"
+                : score >= 55
+                ? "bg-amber-100 text-amber-900 border-amber-300"
+                : "bg-stone-100 text-stone-800 border-stone-300";
 
-            const fitColor = crop.fit?.en === "Good" 
-              ? "bg-emerald-100 text-emerald-900 border-emerald-300" 
-              : "bg-amber-100 text-amber-900 border-amber-300";
-
-            const riskColor = crop.risk?.en === "Low" 
-              ? "bg-emerald-50 text-emerald-800 border-emerald-300" 
-              : (crop.risk?.en === "Medium" ? "bg-amber-50 text-amber-800 border-amber-300" : "bg-rose-50 text-rose-800 border-rose-300");
+            const breakdown = crop.breakdown || {};
+            const currentRating = ratedCrops[crop.crop_id];
 
             return (
               <div
                 key={crop.crop_id}
                 className={`rounded-2xl p-4 border-2 transition-all ${
-                  isTop ? "border-emerald-600 bg-emerald-50/40 shadow-md ring-2 ring-emerald-500/20" : "border-stone-200 bg-white"
+                  isTop
+                    ? "border-emerald-600 bg-emerald-50/40 shadow-md ring-2 ring-emerald-500/20"
+                    : "border-stone-200 bg-white"
                 }`}
               >
-                {/* Crop Title & Rank */}
                 <div className="flex items-start justify-between mb-3">
                   <div className="flex items-center space-x-3">
                     <span className="w-8 h-8 rounded-full bg-emerald-800 text-white font-extrabold flex items-center justify-center text-sm">
                       #{index + 1}
                     </span>
                     <div>
-                      <h3 className="text-xl sm:text-2xl font-black text-stone-900 leading-tight">
-                        {crop.marathi_name} ({crop.common_name})
+                      <h3 className="text-lg sm:text-xl font-black text-stone-900 leading-tight">
+                        {crop.names?.[lang] || crop.name}
                       </h3>
-                      <p className="text-xs text-stone-500 italic">{crop.scientific_name}</p>
+                      <p className="text-xs text-stone-500">
+                        {crop.names?.en} • {crop.band} Fit
+                      </p>
                     </div>
                   </div>
 
-                  {/* Fit Badge */}
                   <div className="flex flex-col items-end space-y-1">
-                    <span className={`text-xs font-bold px-2.5 py-1 rounded-full border ${fitColor}`}>
-                      {t.fit} {fitLabel}
-                    </span>
-                    <span className={`text-xs font-bold px-2 py-0.5 rounded-full border ${riskColor}`}>
-                      {t.risk} {riskLabel}
+                    <span className={`text-xs font-extrabold px-2.5 py-1 rounded-full border ${bandColor}`}>
+                      {t.fit} {score}/100
                     </span>
                   </div>
                 </div>
 
-                {/* Top 2 Reasons in Plain Words */}
-                <div className="mb-3 space-y-1">
-                  <span className="text-xs font-bold text-stone-500 uppercase tracking-wider block">
-                    का निवडावे (Reasons):
-                  </span>
-                  {(crop.top_reasons?.[lang] || crop.top_reasons?.mr || []).map((reason: string, rIdx: number) => (
-                    <div key={rIdx} className="flex items-center space-x-2 text-sm sm:text-base font-semibold text-stone-800">
-                      <CheckCircle className="w-4 h-4 text-emerald-600 shrink-0" />
-                      <span>{reason}</span>
-                    </div>
-                  ))}
-                </div>
-
-                {/* Vital Statistics Row (At most 3 numbers) */}
-                <div className="grid grid-cols-3 gap-2 py-2.5 px-3 bg-stone-100/80 rounded-xl text-xs sm:text-sm font-medium mb-3">
+                {/* 5-Factor Suitability Breakdown */}
+                <div className="grid grid-cols-5 gap-1.5 text-[10px] sm:text-xs bg-stone-100/90 p-2.5 rounded-xl mb-3 text-center">
                   <div>
-                    <span className="block text-stone-500 text-[11px] flex items-center space-x-1">
-                      <Droplets className="w-3.5 h-3.5 text-blue-500" />
-                      <span>{t.water_need}</span>
-                    </span>
-                    <span className="font-extrabold text-stone-800">{crop.water_need_mm} मिमी</span>
+                    <span className="block text-stone-500">पाणी</span>
+                    <span className="font-extrabold text-stone-900">{breakdown.water_match ?? 0}/30</span>
                   </div>
-
                   <div>
-                    <span className="block text-stone-500 text-[11px] flex items-center space-x-1">
-                      <TrendingUp className="w-3.5 h-3.5 text-emerald-500" />
-                      <span>{t.mandi_price}</span>
-                    </span>
-                    <span className="font-extrabold text-stone-800">
-                      {crop.mandi_price_modal_inr ? `₹${crop.mandi_price_modal_inr}` : t.no_data}
-                    </span>
+                    <span className="block text-stone-500">माती</span>
+                    <span className="font-extrabold text-stone-900">{breakdown.soil_match ?? 0}/25</span>
                   </div>
-
                   <div>
-                    <span className="block text-stone-500 text-[11px] flex items-center space-x-1">
-                      <Calendar className="w-3.5 h-3.5 text-amber-500" />
-                      <span>कालावधी:</span>
-                    </span>
-                    <span className="font-extrabold text-stone-800">{crop.duration_days} दिवस</span>
+                    <span className="block text-stone-500">हंगाम</span>
+                    <span className="font-extrabold text-stone-900">{breakdown.season_temp_match ?? 0}/20</span>
+                  </div>
+                  <div>
+                    <span className="block text-stone-500">कालावधी</span>
+                    <span className="font-extrabold text-stone-900">{breakdown.duration_efficiency ?? 0}/15</span>
+                  </div>
+                  <div>
+                    <span className="block text-stone-500">फेरपालट</span>
+                    <span className="font-extrabold text-stone-900">{breakdown.rotation_health ?? 0}/10</span>
                   </div>
                 </div>
 
-                {/* First 3 Things to Do */}
-                <div className="bg-white rounded-xl p-3 border border-stone-200">
-                  <span className="text-xs font-extrabold text-emerald-900 block mb-1">
-                    {t.first_3_things}
-                  </span>
-                  <ol className="text-xs sm:text-sm space-y-1 text-stone-700">
-                    {(crop.first_3_actions?.[lang] || crop.first_3_actions?.mr || []).map((act: string, aIdx: number) => (
-                      <li key={aIdx} className="font-medium">
-                        {act}
-                      </li>
-                    ))}
-                  </ol>
+                {/* Vital Stats */}
+                <div className="grid grid-cols-2 gap-2 py-2 px-3 bg-white border border-stone-200 rounded-xl text-xs font-medium mb-3">
+                  <div className="flex items-center space-x-1.5">
+                    <Droplets className="w-4 h-4 text-blue-500 shrink-0" />
+                    <span>
+                      {t.water_need} <strong className="uppercase">{crop.water_need || t.no_data}</strong>
+                    </span>
+                  </div>
+                  <div className="flex items-center space-x-1.5">
+                    <Calendar className="w-4 h-4 text-amber-500 shrink-0" />
+                    <span>
+                      {t.sowing_time} <strong>{crop.duration_days || t.no_data} दिवस</strong>
+                    </span>
+                  </div>
+                </div>
+
+                {/* IPM Guidance & Thumbs Feedback */}
+                <div className="bg-white rounded-xl p-3 border border-stone-200 flex items-center justify-between gap-2">
+                  <div className="text-xs text-stone-700 flex items-start space-x-1.5">
+                    <ShieldCheck className="w-4 h-4 text-emerald-700 shrink-0 mt-0.5" />
+                    <span>
+                      {typeof crop.ipm_guidance === "string"
+                        ? crop.ipm_guidance
+                        : suitability?.ipm_disclaimer}
+                    </span>
+                  </div>
+
+                  <div className="flex items-center space-x-1 shrink-0">
+                    <button
+                      onClick={() => submitCropFeedback(crop.crop_id, 1)}
+                      className={`p-1.5 rounded-lg border ${
+                        currentRating === 1
+                          ? "bg-emerald-100 border-emerald-500 text-emerald-800"
+                          : "border-stone-200 text-stone-500 hover:bg-stone-50"
+                      }`}
+                      title="Helpful recommendation"
+                    >
+                      <ThumbsUp className="w-3.5 h-3.5" />
+                    </button>
+                    <button
+                      onClick={() => submitCropFeedback(crop.crop_id, -1)}
+                      className={`p-1.5 rounded-lg border ${
+                        currentRating === -1
+                          ? "bg-rose-100 border-rose-500 text-rose-800"
+                          : "border-stone-200 text-stone-500 hover:bg-stone-50"
+                      }`}
+                      title="Not suitable for my field"
+                    >
+                      <ThumbsDown className="w-3.5 h-3.5" />
+                    </button>
+                  </div>
                 </div>
               </div>
             );
@@ -146,8 +207,8 @@ export const WhatToPlantModal: React.FC<WhatToPlantModalProps> = ({ advice, lang
 
         {/* Footer Disclaimer */}
         <div className="p-4 border-t border-stone-200 bg-stone-50 rounded-b-3xl text-center">
-          <p className="text-xs text-stone-500 font-medium">
-            {lang === "mr" ? advice?.disclaimer_mr : advice?.disclaimer_en}
+          <p className="text-xs text-stone-600 font-medium">
+            {suitability?.ipm_disclaimer || "Consult your local Krishi Vigyan Kendra (KVK) before applying chemical pesticides."}
           </p>
         </div>
       </div>

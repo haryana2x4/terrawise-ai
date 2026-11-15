@@ -1,58 +1,93 @@
 import React, { useState } from "react";
 import { Language, translations } from "../i18n/translations";
-import { CloudSun, Droplets, Bug, ChevronDown, ChevronUp, Wind, Thermometer, ShieldCheck } from "lucide-react";
+import { CloudSun, Droplets, Bug, ChevronDown, ChevronUp } from "lucide-react";
 
 interface MiniCardsProps {
   weather: any;
-  diagnostics: any;
+  suitability?: any;
+  risks?: any;
   lang: Language;
 }
 
-export const MiniCards: React.FC<MiniCardsProps> = ({ weather, diagnostics, lang }) => {
+export const MiniCards: React.FC<MiniCardsProps> = ({
+  weather,
+  suitability,
+  risks,
+  lang
+}) => {
   const [expandedCard, setExpandedCard] = useState<string | null>(null);
   const t = translations[lang];
 
   const curr = weather?.current || {};
-  const tempVal = curr.temperature?.value;
-  const tempDisplay = curr.temperature?.display?.[lang] || t.no_data;
-  const rainNow = curr.precipitation_now_mm?.display?.[lang] || "0";
-  const soilWaterVal = curr.soil_root_hydration_pct?.value;
-  const soilWaterDisplay = curr.soil_root_hydration_pct?.display?.[lang] || t.no_data;
-  const vpdVal = curr.vpd_kpa?.display?.[lang] || t.no_data;
-  const windVal = curr.wind_speed_kmh?.display?.[lang] || t.no_data;
+  const tempObj = curr.temperature_c || curr.temperature || {};
+  const tempVal = tempObj.value ?? null;
+  const tempDisplay = tempVal !== null ? `${tempVal} °C` : t.no_data;
+
+  const rainObj = curr.precipitation_mm || curr.precipitation_now_mm || {};
+  const rainVal = rainObj.value ?? null;
+  const rainDisplay = rainVal !== null ? `${rainVal} mm` : t.no_data;
+
+  const smObj = curr.soil_moisture_m3m3 || curr.soil_root_hydration_pct || {};
+  const smVal = smObj.value ?? null;
+  const smDisplay = smVal !== null ? `${smVal} ${smObj.unit || "m³/m³"}` : t.no_data;
+
+  const windObj = curr.wind_kmh || curr.wind_speed_kmh || {};
+  const windDisplay = windObj.value !== null && windObj.value !== undefined ? `${windObj.value} km/h` : t.no_data;
+
+  const vpdObj = suitability?.indices?.vpd_kpa || {};
+  const vpdDisplay = vpdObj.value !== null && vpdObj.value !== undefined ? `${vpdObj.value} kPa` : t.no_data;
+
+  const rshiObj = suitability?.indices?.rshi_score || {};
+  const rshiVal = rshiObj.value ?? null;
+  const rshiDisplay = rshiVal !== null ? `${rshiVal}/100` : t.no_data;
+
+  const provLabel = weather?.provenance?.label || t.no_data;
 
   // Temperature word badge
-  let tempWord = t.temp_good;
-  let tempIconColor = "text-emerald-600";
-  if (tempVal !== null && tempVal !== undefined) {
+  let tempWord = t.no_data;
+  let tempIconColor = "text-stone-500";
+  if (tempVal !== null) {
     if (tempVal < 16) {
       tempWord = t.temp_cool;
       tempIconColor = "text-blue-600";
-    } else if (tempVal > 33) {
+    } else if (tempVal > 35) {
       tempWord = t.temp_hot;
       tempIconColor = "text-rose-600";
+    } else {
+      tempWord = t.temp_good;
+      tempIconColor = "text-emerald-600";
     }
   }
 
-  // Soil water 3-step meter word badge
-  let soilWord = t.soil_good;
-  let soilMeterStep = 2; // 1: dry, 2: good, 3: wet
-  if (soilWaterVal !== null && soilWaterVal !== undefined) {
-    if (soilWaterVal < 35) {
+  // Soil water 3-step meter
+  let soilWord = t.no_data;
+  let soilMeterStep = 0;
+  if (rshiVal !== null) {
+    if (rshiVal < 35) {
       soilWord = t.soil_dry;
       soilMeterStep = 1;
-    } else if (soilWaterVal > 75) {
+    } else if (rshiVal > 75) {
       soilWord = t.soil_wet;
       soilMeterStep = 3;
+    } else {
+      soilWord = t.soil_good;
+      soilMeterStep = 2;
     }
   }
 
-  // Pest risk badge
-  const pestDiag = diagnostics?.pest_risk || {};
-  const pestWord = lang === "mr" ? (pestDiag.label_mr || "कमी धोका") : (pestDiag.label_en || "Low Risk");
+  const alerts = risks?.alerts || [];
+  const firstAlert = alerts[0] || null;
+  const pestWord =
+    weather?.status === "unavailable"
+      ? t.no_data
+      : firstAlert
+      ? firstAlert.title
+      : lang === "mr"
+      ? "नियमित IPM पाहणी करा"
+      : "Routine IPM Scouting";
 
   const toggleExpand = (card: string) => {
-    setExpandedCard(prev => prev === card ? null : card);
+    setExpandedCard(prev => (prev === card ? null : card));
   };
 
   return (
@@ -72,19 +107,16 @@ export const MiniCards: React.FC<MiniCardsProps> = ({ weather, diagnostics, lang
             </span>
           </div>
 
-          {/* At most 3 numbers */}
           <div className="my-2">
             <div className="flex items-baseline space-x-1">
-              <span className="text-3xl font-extrabold text-stone-900">{tempDisplay}</span>
-              <span className="text-base font-bold text-stone-500">°C</span>
+              <span className="text-2xl sm:text-3xl font-extrabold text-stone-900">{tempDisplay}</span>
             </div>
             <p className="text-xs text-stone-500 font-medium mt-0.5">
-              पाऊस: <span className="font-bold text-stone-800">{rainNow} मिमी</span>
+              पाऊस (Rain): <span className="font-bold text-stone-800">{rainDisplay}</span>
             </p>
           </div>
         </div>
 
-        {/* Expand for expert detail */}
         <div>
           <button
             onClick={() => toggleExpand("weather")}
@@ -96,10 +128,14 @@ export const MiniCards: React.FC<MiniCardsProps> = ({ weather, diagnostics, lang
 
           {expandedCard === "weather" && (
             <div className="mt-2 pt-2 text-xs space-y-1.5 text-stone-600 bg-stone-50 p-2 rounded-lg">
-              <p className="flex justify-between"><span>वारा (Wind):</span> <span className="font-bold">{windVal} km/h</span></p>
-              <p className="flex justify-between"><span>बाष्पीभवन ताण (VPD):</span> <span className="font-bold">{vpdVal} kPa</span></p>
-              <p className="text-[11px] text-stone-400 pt-1 border-t border-stone-200">
-                {t.source_label} {weather?.source || "Open-Meteo"}
+              <p className="flex justify-between">
+                <span>वारा (Wind):</span> <span className="font-bold">{windDisplay}</span>
+              </p>
+              <p className="flex justify-between">
+                <span>बाष्पीभवन ताण (VPD):</span> <span className="font-bold">{vpdDisplay}</span>
+              </p>
+              <p className="text-[10px] text-stone-500 pt-1 border-t border-stone-200">
+                {provLabel}
               </p>
             </div>
           )}
@@ -121,18 +157,20 @@ export const MiniCards: React.FC<MiniCardsProps> = ({ weather, diagnostics, lang
             </span>
           </div>
 
-          {/* 3-Step Meter Visual + Percentage */}
           <div className="my-2">
             <div className="flex items-baseline space-x-1">
-              <span className="text-3xl font-extrabold text-stone-900">{soilWaterDisplay}</span>
-              <span className="text-base font-bold text-stone-500">%</span>
+              <span className="text-2xl sm:text-3xl font-extrabold text-stone-900">
+                {rshiDisplay}
+              </span>
             </div>
-            
-            {/* Visual 3-step gauge bar */}
+            <p className="text-xs text-stone-500 font-medium mt-0.5">
+              ओलावा (0–7cm): <span className="font-bold text-stone-800">{smDisplay}</span>
+            </p>
+
             <div className="grid grid-cols-3 gap-1.5 mt-2">
-              <div className={`h-2 rounded-full ${soilMeterStep >= 1 ? "bg-amber-400" : "bg-stone-200"}`} title="कोरडी (Dry)"></div>
-              <div className={`h-2 rounded-full ${soilMeterStep >= 2 ? "bg-emerald-500" : "bg-stone-200"}`} title="उत्तम (Good)"></div>
-              <div className={`h-2 rounded-full ${soilMeterStep >= 3 ? "bg-blue-500" : "bg-stone-200"}`} title="जास्त पाणी (Wet)"></div>
+              <div className={`h-2 rounded-full ${soilMeterStep >= 1 ? "bg-amber-400" : "bg-stone-200"}`} />
+              <div className={`h-2 rounded-full ${soilMeterStep >= 2 ? "bg-emerald-500" : "bg-stone-200"}`} />
+              <div className={`h-2 rounded-full ${soilMeterStep >= 3 ? "bg-blue-500" : "bg-stone-200"}`} />
             </div>
           </div>
         </div>
@@ -148,17 +186,31 @@ export const MiniCards: React.FC<MiniCardsProps> = ({ weather, diagnostics, lang
 
           {expandedCard === "soil" && (
             <div className="mt-2 pt-2 text-xs space-y-1.5 text-stone-600 bg-stone-50 p-2 rounded-lg">
-              <p className="flex justify-between"><span>वरचा थर (0-7cm):</span> <span className="font-bold">{curr.soil_top_hydration_pct?.display?.[lang] || t.no_data}%</span></p>
-              <p className="flex justify-between"><span>मुळांची कक्षा (28-100cm):</span> <span className="font-bold">{curr.soil_root_hydration_pct?.display?.[lang] || t.no_data}%</span></p>
-              <p className="text-[11px] text-stone-400 pt-1 border-t border-stone-200">
-                {t.source_label} Open-Meteo & NASA MERRA-2
+              <p className="flex justify-between">
+                <span>७ दिवसांचा पाऊस अंदाज:</span>
+                <span className="font-bold">
+                  {weather?.summary?.rain_7d_forecast_mm !== null && weather?.summary?.rain_7d_forecast_mm !== undefined
+                    ? `${weather.summary.rain_7d_forecast_mm} mm`
+                    : t.no_data}
+                </span>
+              </p>
+              <p className="flex justify-between">
+                <span>मागील ३० दिवसांचा पाऊस:</span>
+                <span className="font-bold">
+                  {weather?.summary?.rain_30d_total_mm !== null && weather?.summary?.rain_30d_total_mm !== undefined
+                    ? `${weather.summary.rain_30d_total_mm} mm`
+                    : t.no_data}
+                </span>
+              </p>
+              <p className="text-[10px] text-stone-500 pt-1 border-t border-stone-200">
+                {provLabel}
               </p>
             </div>
           )}
         </div>
       </div>
 
-      {/* 3. Pest & Disease Mini Card */}
+      {/* 3. Pest & IPM Mini Card */}
       <div className="bg-white rounded-2xl p-4 shadow-sm border border-stone-200 flex flex-col justify-between">
         <div>
           <div className="flex items-center justify-between mb-2">
@@ -174,11 +226,15 @@ export const MiniCards: React.FC<MiniCardsProps> = ({ weather, diagnostics, lang
           </div>
 
           <div className="my-2">
-            <span className="text-xl font-extrabold text-stone-900 block leading-tight">
+            <span className="text-base sm:text-lg font-extrabold text-stone-900 block leading-snug">
               {pestWord}
             </span>
             <p className="text-xs text-stone-600 font-medium mt-1 line-clamp-2">
-              {lang === "mr" ? pestDiag.text_mr : pestDiag.text_en}
+              {firstAlert
+                ? firstAlert.action
+                : lang === "mr"
+                ? "पिवळे व निळे चिकट सापळे लावून किडींचे निरीक्षण करा."
+                : "Deploy yellow/blue sticky traps and scout canopy."}
             </p>
           </div>
         </div>
@@ -194,9 +250,11 @@ export const MiniCards: React.FC<MiniCardsProps> = ({ weather, diagnostics, lang
 
           {expandedCard === "pest" && (
             <div className="mt-2 pt-2 text-xs space-y-1.5 text-stone-600 bg-stone-50 p-2 rounded-lg">
-              <p><b>कारवाई:</b> {lang === "mr" ? pestDiag.action_mr : pestDiag.action_en}</p>
-              <p className="text-[11px] text-emerald-800 font-semibold pt-1 border-t border-stone-200">
-                सल्ला: रासायनिक फवारणीपूर्वी KVK चा सल्ला घ्या.
+              <p className="text-[11px] text-emerald-900 font-semibold">
+                {risks?.ipm_disclaimer || "Consult your local KVK before chemical pesticide application."}
+              </p>
+              <p className="text-[10px] text-stone-500 pt-1 border-t border-stone-200">
+                {provLabel}
               </p>
             </div>
           )}

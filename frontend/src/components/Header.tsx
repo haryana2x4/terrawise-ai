@@ -1,6 +1,6 @@
 import React from "react";
 import { Language, translations } from "../i18n/translations";
-import { User, LogOut, ShieldAlert, Globe } from "lucide-react";
+import { User, LogOut, ShieldAlert, Bot } from "lucide-react";
 
 interface HeaderProps {
   farmer: any;
@@ -8,6 +8,7 @@ interface HeaderProps {
   onLanguageChange: (l: Language) => void;
   onLogout: () => void;
   onOpenAdmin?: () => void;
+  onOpenAssistant?: () => void;
 }
 
 export const Header: React.FC<HeaderProps> = ({
@@ -15,7 +16,8 @@ export const Header: React.FC<HeaderProps> = ({
   lang,
   onLanguageChange,
   onLogout,
-  onOpenAdmin
+  onOpenAdmin,
+  onOpenAssistant
 }) => {
   const t = translations[lang];
 
@@ -32,23 +34,32 @@ export const Header: React.FC<HeaderProps> = ({
               <span className="font-bold text-lg text-emerald-100 tracking-wide">
                 Kshetra
               </span>
-              {farmer?.is_demo && (
-                <span className="bg-amber-600/90 text-white text-xs font-semibold px-2 py-0.5 rounded-full border border-amber-400">
-                  {t.demo_badge}
-                </span>
-              )}
+              <span className="bg-emerald-800/90 text-emerald-200 text-[10px] font-semibold px-2 py-0.5 rounded-full border border-emerald-600">
+                {farmer?.district || "Maharashtra"}
+              </span>
             </div>
             <div className="text-xs text-emerald-300 flex items-center space-x-1">
               <User className="w-3.5 h-3.5" />
               <span className="font-mono font-bold tracking-wider">{farmer?.farmer_id}</span>
               <span>•</span>
-              <span>{farmer?.taluka || farmer?.district}</span>
+              <span>{farmer?.taluka || farmer?.village || farmer?.district}</span>
             </div>
           </div>
         </div>
 
         {/* Action Controls */}
         <div className="flex items-center space-x-2">
+          {onOpenAssistant && (
+            <button
+              onClick={onOpenAssistant}
+              className="bg-emerald-700 hover:bg-emerald-600 text-white px-2.5 py-1.5 rounded-lg text-xs font-bold flex items-center space-x-1 border border-emerald-500 shadow-sm"
+              title={t.assistant_btn}
+            >
+              <Bot className="w-4 h-4 text-amber-300" />
+              <span className="hidden sm:inline">कृषी मित्र AI</span>
+            </button>
+          )}
+
           {/* Language Switcher */}
           <div className="bg-emerald-900/80 rounded-lg p-0.5 border border-emerald-700 flex items-center text-xs font-medium">
             <button
@@ -76,7 +87,7 @@ export const Header: React.FC<HeaderProps> = ({
             <button
               onClick={onOpenAdmin}
               className="bg-amber-700 hover:bg-amber-600 text-white p-2 rounded-lg text-xs font-bold flex items-center space-x-1"
-              title="Admin Portal"
+              title={t.admin_btn}
             >
               <ShieldAlert className="w-4 h-4" />
             </button>
