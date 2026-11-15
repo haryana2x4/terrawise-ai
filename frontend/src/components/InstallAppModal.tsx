@@ -132,13 +132,17 @@ export const InstallAppModal: React.FC<InstallAppModalProps> = ({
                   <span>
                     {lang === "mr"
                       ? "१. मोबाईल आणि संगणकावर थेट अ‍ॅप इंस्टॉल (PWA)"
-                      : "1. Direct App Installation (Android, iOS & Desktop PWA)"}
+                      : lang === "hi"
+                        ? "1. मोबाइल और कंप्यूटर पर सीधा ऐप इंस्टॉल (PWA)"
+                        : "1. Direct App Installation (Android, iOS & Desktop PWA)"}
                   </span>
                 </h3>
                 <p className="text-xs text-stone-600 mt-0.5">
                   {lang === "mr"
                     ? "ऑफलाईन शेती डेटा व थेट आयकॉनसह ब्राउझर न उघडता स्वतंत्र अ‍ॅपसारखा वापर."
-                    : "Runs in standalone full-screen window mode with offline shell caching and quick shortcuts."}
+                    : lang === "hi"
+                      ? "ऑफलाइन कृषि डेटा और होम-स्क्रीन आइकन के साथ ब्राउज़र के बिना सीधा ऐप अनुभव।"
+                      : "Runs in standalone full-screen window mode with offline shell caching and quick shortcuts."}
                 </p>
               </div>
               {accessInfo?.pwa_manifest_ready && (
@@ -154,7 +158,9 @@ export const InstallAppModal: React.FC<InstallAppModalProps> = ({
                 <span>
                   {lang === "mr"
                     ? "Kshetra आधीपासून तुमच्या डिव्हाइसवर अ‍ॅप म्हणून इंस्टॉल आहे."
-                    : "Kshetra is currently running as an installed standalone application."}
+                    : lang === "hi"
+                      ? "Kshetra पहले से आपके डिवाइस पर ऐप के रूप में इंस्टॉल है।"
+                      : "Kshetra is currently running as an installed standalone application."}
                 </span>
               </div>
             ) : canNativeInstall ? (
@@ -166,7 +172,9 @@ export const InstallAppModal: React.FC<InstallAppModalProps> = ({
                 <span>
                   {lang === "mr"
                     ? "आताच अ‍ॅप इंस्टॉल करा (One-Click Install)"
-                    : "Install Kshetra App Now"}
+                    : lang === "hi"
+                      ? "अभी ऐप इंस्टॉल करें (One-Click Install)"
+                      : "Install Kshetra App Now"}
                 </span>
               </button>
             ) : (

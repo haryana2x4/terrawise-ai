@@ -163,7 +163,9 @@ export const FarmerHome: React.FC<FarmerHomeProps> = ({
       setPwdMsg(
         lang === "mr"
           ? "नवीन पासवर्ड किमान ८ अक्षरांचा असावा."
-          : "New password must be at least 8 characters."
+          : lang === "hi"
+            ? "नया पासवर्ड कम से कम 8 अक्षरों का होना चाहिए।"
+            : "New password must be at least 8 characters."
       );
       return;
     }
@@ -206,7 +208,13 @@ export const FarmerHome: React.FC<FarmerHomeProps> = ({
       if (resp.ok) {
         setRainMmInput("");
         setObsNoteInput("");
-        setObsStatus(lang === "mr" ? "आजची नोंद जतन झाली!" : "Field observation saved!");
+        setObsStatus(
+          lang === "mr"
+            ? "आजची नोंद जतन झाली!"
+            : lang === "hi"
+              ? "आज की खेत नोंद सहेजी गई!"
+              : "Field observation saved!"
+        );
         loadDashboard();
       }
     } catch {
@@ -386,28 +394,36 @@ export const FarmerHome: React.FC<FarmerHomeProps> = ({
               )}
               {farmerProfile?.farming_experience_years != null && (
                 <span className="inline-flex items-center text-[10px] font-extrabold bg-amber-50 text-amber-900 px-2 py-0.5 rounded-full border border-amber-200">
-                  {farmerProfile.farming_experience_years} {lang === "mr" ? "वर्षे अनुभव" : "yrs exp"}
+                  {farmerProfile.farming_experience_years}{" "}
+                  {lang === "mr" ? "वर्षे अनुभव" : lang === "hi" ? "वर्ष अनुभव" : "yrs exp"}
                 </span>
               )}
             </div>
 
             <h1 className="text-lg sm:text-xl font-black text-stone-900 leading-tight">
-              {todayData?.greeting_mr || `${sunTheme.greeting[lang] || sunTheme.greeting.mr}, ${displayName}!`}
+              {(lang === "mr"
+                ? todayData?.greeting_mr
+                : lang === "hi"
+                  ? todayData?.greeting_hi || todayData?.greeting_mr
+                  : todayData?.greeting_en) ||
+                `${sunTheme.greeting[lang] || sunTheme.greeting.mr}, ${displayName}!`}
             </h1>
             <p className="text-xs text-stone-600 font-semibold mt-0.5 flex flex-wrap items-center gap-x-2">
               <span>
-                {lang === "mr" ? "सक्रिय शेत:" : "Active Parcel:"}{" "}
+                {lang === "mr" ? "सक्रिय शेत:" : lang === "hi" ? "सक्रिय खेत:" : "Active Parcel:"}{" "}
                 <strong className="text-emerald-900">
                   {activeParcel
-                    ? `${activeParcel.name} (${activeParcel.area_acres} एकर / ${activeParcel.area_gunthas} गुंठे • ${activeParcel.soil_type})`
+                    ? `${activeParcel.name} (${activeParcel.area_acres} ${lang === "mr" ? "एकर" : lang === "hi" ? "एकड़" : "ac"} / ${activeParcel.area_gunthas} ${lang === "mr" ? "गुंठे" : lang === "hi" ? "गुंठा" : "gunthas"} • ${activeParcel.soil_type})`
                     : lang === "mr"
                     ? "अजून शेत नकाशावर जोडलेले नाही"
+                    : lang === "hi"
+                    ? "अभी तक मानचित्र पर खेत नहीं जोड़ा गया है"
                     : "No parcel mapped yet"}
                 </strong>
               </span>
               {farmerProfile?.primary_crops && (
                 <span className="text-emerald-800">
-                  • {lang === "mr" ? "मुख्य पिके:" : "Crops:"}{" "}
+                  • {lang === "mr" ? "मुख्य पिके:" : lang === "hi" ? "मुख्य फसलें:" : "Crops:"}{" "}
                   <strong>{farmerProfile.primary_crops}</strong>
                 </span>
               )}
@@ -422,7 +438,7 @@ export const FarmerHome: React.FC<FarmerHomeProps> = ({
             >
               <Printer className="w-4 h-4 text-emerald-800" />
               <span className="hidden sm:inline">
-                {lang === "mr" ? "शेत अहवाल" : "Dossier"}
+                {lang === "mr" ? "शेत अहवाल" : lang === "hi" ? "खेत रिपोर्ट" : "Dossier"}
               </span>
             </button>
             <button
@@ -463,7 +479,7 @@ export const FarmerHome: React.FC<FarmerHomeProps> = ({
               className="shrink-0 px-3 py-1.5 rounded-2xl text-xs font-extrabold bg-amber-100/90 hover:bg-amber-200 text-amber-950 border border-amber-300 flex items-center space-x-1 transition-colors"
             >
               <Layers className="w-3.5 h-3.5" />
-              <span>{lang === "mr" ? "+ नकाशा / बदल" : "+ Map / Edit"}</span>
+              <span>{lang === "mr" ? "+ नकाशा / बदल" : lang === "hi" ? "+ मानचित्र / बदलें" : "+ Map / Edit"}</span>
             </button>
           </div>
         ) : (
@@ -474,13 +490,17 @@ export const FarmerHome: React.FC<FarmerHomeProps> = ({
                 <h2 className="font-black text-sm sm:text-base">
                   {lang === "mr"
                     ? "पहिल्यांदाच वापरत आहात? तुमचे शेत उपग्रह नकाशावर आखा!"
-                    : "Mark Your Exact Land Boundary on Live Satellite Imagery"}
+                    : lang === "hi"
+                      ? "पहली बार उपयोग कर रहे हैं? उपग्रह मानचित्र पर अपना खेत अंकित करें!"
+                      : "Mark Your Exact Land Boundary on Live Satellite Imagery"}
                 </h2>
               </div>
               <p className="text-xs text-emerald-100/90 max-w-xl">
                 {lang === "mr"
                   ? "तालुका निवडा आणि तुमच्या शेताच्या चारही कोपऱ्यांवर क्लिक करा — एकर/गुंठे क्षेत्रफळ, ISRIC मातीचा अहवाल आणि पाण्याची गरज लगेच मिळेल."
-                  : "Pick your taluka and click corners of your plot on satellite view — get instant Acre/Guntha geodesy, ISRIC soil chemistry, and irrigation balance."}
+                  : lang === "hi"
+                    ? "तहसील चुनें और खेत के चारों कोनों पर क्लिक करें — एकड़/गुंठा क्षेत्रफल, मिट्टी रिपोर्ट और सिंचाई आवश्यकता तुरंत प्राप्त करें।"
+                    : "Pick your taluka and click corners of your plot on satellite view — get instant Acre/Guntha geodesy, ISRIC soil chemistry, and irrigation balance."}
               </p>
             </div>
             <button
@@ -488,7 +508,7 @@ export const FarmerHome: React.FC<FarmerHomeProps> = ({
               className="shrink-0 px-4 py-2.5 rounded-2xl bg-amber-400 hover:bg-amber-300 text-stone-950 font-black text-xs sm:text-sm shadow-md flex items-center justify-center space-x-1.5 transition-transform active:scale-[0.98]"
             >
               <Map className="w-4 h-4" />
-              <span>{lang === "mr" ? "शेत नकाशा उघडा" : "Open Field Map"}</span>
+              <span>{lang === "mr" ? "शेत नकाशा उघडा" : lang === "hi" ? "खेत मानचित्र खोलें" : "Open Field Map"}</span>
             </button>
           </div>
         )}
@@ -583,14 +603,18 @@ export const FarmerHome: React.FC<FarmerHomeProps> = ({
                   <span>
                     {lang === "mr"
                       ? "शेतातील प्रत्यक्ष पर्जन्य व निरीक्षण नोंद"
-                      : "Field Rain & Observation Log"}
+                      : lang === "hi"
+                        ? "खेत में वर्षा व निरीक्षण लॉग"
+                        : "Field Rain & Observation Log"}
                   </span>
                 </div>
                 {observations.length === 0 && (
                   <span className="text-[11px] text-stone-500 font-semibold">
                     {lang === "mr"
                       ? "अजून नोंद नाही. आजचा पाऊस जोडा."
-                      : "No data yet. Add today's rain."}
+                      : lang === "hi"
+                        ? "अभी तक कोई रिकॉर्ड नहीं। आज की बारिश दर्ज करें।"
+                        : "No data yet. Add today's rain."}
                   </span>
                 )}
               </div>
@@ -607,7 +631,7 @@ export const FarmerHome: React.FC<FarmerHomeProps> = ({
                     max="500"
                     value={rainMmInput}
                     onChange={e => setRainMmInput(e.target.value)}
-                    placeholder={lang === "mr" ? "पाऊस (मिमी)" : "Rain (mm)"}
+                    placeholder={lang === "mr" ? "पाऊस (मिमी)" : lang === "hi" ? "बारिश (मिमी)" : "Rain (mm)"}
                     className="w-28 px-2.5 py-1.5 rounded-xl border border-stone-300 text-xs font-bold bg-white"
                   />
                   <input
@@ -617,7 +641,9 @@ export const FarmerHome: React.FC<FarmerHomeProps> = ({
                     placeholder={
                       lang === "mr"
                         ? "निरीक्षण (उदा. सिंचन केले / कीड पाहणी)"
-                        : "Field note (irrigation / scouting)"
+                        : lang === "hi"
+                          ? "अवलोकन (उदा. सिंचाई की / कीट जांच)"
+                          : "Field note (irrigation / scouting)"
                     }
                     className="flex-1 min-w-[140px] px-2.5 py-1.5 rounded-xl border border-stone-300 text-xs font-semibold bg-white"
                   />
@@ -625,14 +651,16 @@ export const FarmerHome: React.FC<FarmerHomeProps> = ({
                     type="submit"
                     className="px-3 py-1.5 rounded-xl bg-emerald-800 hover:bg-emerald-700 text-white text-xs font-extrabold"
                   >
-                    {lang === "mr" ? "नोंद जतन करा" : "Log"}
+                    {lang === "mr" ? "नोंद जतन करा" : lang === "hi" ? "दर्ज करें" : "Log"}
                   </button>
                 </form>
               ) : (
                 <p className="text-xs text-stone-500">
                   {lang === "mr"
                     ? "पावसाची नोंद करण्यासाठी प्रथम 'माझा शेत नकाशा' उघडून शेताची सीमा जोडा."
-                    : "Map your first parcel in 'My Field Map' to log daily rainfall observations."}
+                    : lang === "hi"
+                      ? "बारिश दर्ज करने के लिए पहले 'खेत का नक्शा' खोलकर अपने खेत की सीमा जोड़ें।"
+                      : "Map your first parcel in 'My Field Map' to log daily rainfall observations."}
                 </p>
               )}
 
@@ -680,7 +708,9 @@ export const FarmerHome: React.FC<FarmerHomeProps> = ({
                   <h2 className="text-base font-black text-stone-900">
                     {lang === "mr"
                       ? "संपूर्ण शेत नोंदपत्र व सातबारा सारांश"
-                      : "Field Cadastral Dossier & Agronomy Ledger"}
+                      : lang === "hi"
+                        ? "संपूर्ण खेत रिकॉर्ड एवं 7/12 सारांश"
+                        : "Field Cadastral Dossier & Agronomy Ledger"}
                   </h2>
                   <p className="text-xs text-stone-500">
                     {farmerProfile?.village}, {farmerProfile?.taluka}, {farmerProfile?.district} • Farmer ID:{" "}
@@ -694,17 +724,22 @@ export const FarmerHome: React.FC<FarmerHomeProps> = ({
                   className="no-print px-3 py-1.5 rounded-xl bg-emerald-800 hover:bg-emerald-700 text-white text-xs font-extrabold flex items-center space-x-1.5 shadow-xs"
                 >
                   <Printer className="w-4 h-4" />
-                  <span>{lang === "mr" ? "PDF / प्रिंट काढा" : "Print Dossier"}</span>
+                  <span>{lang === "mr" ? "PDF / प्रिंट काढा" : lang === "hi" ? "PDF / प्रिंट निकालें" : "Print Dossier"}</span>
                 </button>
               </div>
 
               <div>
                 <h3 className="text-xs font-extrabold uppercase tracking-wide text-stone-500 mb-2">
-                  {lang === "mr" ? "नोंदणीकृत शेत भूखंड" : "Registered Farm Parcels"} ({parcels.length})
+                  {lang === "mr" ? "नोंदणीकृत शेत भूखंड" : lang === "hi" ? "पंजीकृत खेत भूखंड" : "Registered Farm Parcels"} ({parcels.length})
                 </h3>
                 {parcels.length === 0 ? (
                   <p className="text-xs text-stone-500 italic">
-                    {t.no_data} — {lang === "mr" ? "अजून कोणताही भूखंड मोजलेला नाही." : "No parcels mapped yet."}
+                    {t.no_data} —{" "}
+                    {lang === "mr"
+                      ? "अजून कोणताही भूखंड मोजलेला नाही."
+                      : lang === "hi"
+                        ? "अभी तक कोई भूखंड मैप नहीं किया गया है।"
+                        : "No parcels mapped yet."}
                   </p>
                 ) : (
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">

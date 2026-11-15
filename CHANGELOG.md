@@ -2,6 +2,18 @@
 
 All notable architectural and API changes to **Kshetra (formerly TERRAWISE AI)** are documented here.
 
+## [2.3.0] — 2026-11-15 — Upgraded Natural AI Voice v2 & Trilingual Marathi/Hindi/English Translation Everywhere
+
+### Added & Upgraded
+- **Natural Voice & Read-Aloud Engine v2 ([`speech.ts`](file:///C:/Users/Rocky/.gemini/antigravity/scratch/terrawise-ai/frontend/src/utils/speech.ts))**:
+  - Async `waitForVoices()` detection, Neural/Online Indian voice scoring (prioritizing Microsoft `Aarohi`/`Swara`/`Madhur` and Google `हिन्दी`/`मराठी`/`en-IN`), cross-Devanagari fallback (`mr -> hi-IN`), sentence-chunked sequential playback (fixing Chrome long-utterance cutoff), warm agronomic phonetic normalization (`°C`, `mm`, `km/h`, `₹`, `/100`, `IPM`, `KVK`), persisted speech speed (`0.85x`/`1.0x`/`1.1x`) & Auto-Voice settings, and lifecycle callbacks (`onStart`, `onEnd`, `onError`).
+- **Backend Translation & Trilingual Daily Advisories ([`services/__init__.py`](file:///C:/Users/Rocky/.gemini/antigravity/scratch/terrawise-ai/backend/app/services/__init__.py), [`api/v1/__init__.py`](file:///C:/Users/Rocky/.gemini/antigravity/scratch/terrawise-ai/backend/app/api/v1/__init__.py))**:
+  - Added `AssistantService.translate_text()` & `POST /api/v1/assistant/translate` supporting LLM-assisted + offline deterministic trilingual agronomic translation (`mr` <-> `hi` <-> `en`, including `crops.json` names, weather metrics, soil/irrigation terms, alerts, and KVK IPM notices).
+  - Enriched `GET /api/v1/farmer/dashboard` `today_card` with `greeting_hi`, `greeting_en`, `one_sentence_hi`, and `one_action_hi` (powered by alert `title_i18n`/`action_i18n`).
+- **Trilingual UI & Chat Experience Everywhere**:
+  - Upgraded [`AssistantChat.tsx`](file:///C:/Users/Rocky/.gemini/antigravity/scratch/terrawise-ai/frontend/src/components/AssistantChat.tsx) with AI Reply language toggle (`मरा`/`हिं`/`EN`), Auto-Read Aloud button, Voice Speed & Neural Voice selector, and per-message **Translate (`मराठी` | `हिंदी` | `EN`) + Speak** buttons.
+  - Upgraded [`TodayCard.tsx`](file:///C:/Users/Rocky/.gemini/antigravity/scratch/terrawise-ai/frontend/src/components/TodayCard.tsx) with real speech completion tracking and an inline `मराठी | हिंदी | EN` card translator, and eliminated Hindi fallbacks to English across [`Header.tsx`](file:///C:/Users/Rocky/.gemini/antigravity/scratch/terrawise-ai/frontend/src/components/Header.tsx), [`MiniCards.tsx`](file:///C:/Users/Rocky/.gemini/antigravity/scratch/terrawise-ai/frontend/src/components/MiniCards.tsx), [`PrecisionAnalyticsPanel.tsx`](file:///C:/Users/Rocky/.gemini/antigravity/scratch/terrawise-ai/frontend/src/components/PrecisionAnalyticsPanel.tsx), [`FarmMap.tsx`](file:///C:/Users/Rocky/.gemini/antigravity/scratch/terrawise-ai/frontend/src/components/FarmMap.tsx), [`WhatToPlantModal.tsx`](file:///C:/Users/Rocky/.gemini/antigravity/scratch/terrawise-ai/frontend/src/components/WhatToPlantModal.tsx), [`InstallAppModal.tsx`](file:///C:/Users/Rocky/.gemini/antigravity/scratch/terrawise-ai/frontend/src/components/InstallAppModal.tsx), [`FarmerHome.tsx`](file:///C:/Users/Rocky/.gemini/antigravity/scratch/terrawise-ai/frontend/src/pages/FarmerHome.tsx), and [`Login.tsx`](file:///C:/Users/Rocky/.gemini/antigravity/scratch/terrawise-ai/frontend/src/pages/Login.tsx).
+
 ## [2.2.0] — 2026-11-15 — 40-Farmer Capacity, Human Profile Enrichments & Crop Rotation Logging
 
 ### Added & Updated

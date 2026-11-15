@@ -244,10 +244,14 @@ export const WhatToPlantModal: React.FC<WhatToPlantModalProps> = ({
                           {loggedCropId === crop.crop_id
                             ? lang === "mr"
                               ? "नोंदवले"
-                              : "Logged"
+                              : lang === "hi"
+                                ? "दर्ज किया गया"
+                                : "Logged"
                             : lang === "mr"
                             ? "पेरणी नोंदवा"
-                            : "Log Sown"}
+                            : lang === "hi"
+                              ? "बुवाई दर्ज करें"
+                              : "Log Sown"}
                         </span>
                       </button>
                     )}

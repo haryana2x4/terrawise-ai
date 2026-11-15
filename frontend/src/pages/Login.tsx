@@ -123,7 +123,9 @@ export const Login: React.FC<LoginProps> = ({
       setErrorMsg(
         lang === "mr"
           ? "कृपया शेतकरी आयडी आणि पासवर्ड टाका"
-          : "Please enter Farmer ID and password"
+          : lang === "hi"
+            ? "कृपया किसान आईडी और पासवर्ड दर्ज करें"
+            : "Please enter Farmer ID and password"
       );
       return;
     }
@@ -146,7 +148,7 @@ export const Login: React.FC<LoginProps> = ({
         throw new Error(
           data?.error?.message ||
             data?.message ||
-            (lang === "mr" ? "लॉगिन अयशस्वी" : "Login failed")
+            (lang === "mr" ? "लॉगिन अयशस्वी" : lang === "hi" ? "लॉगिन असफल" : "Login failed")
         );
       }
 
@@ -156,7 +158,9 @@ export const Login: React.FC<LoginProps> = ({
         err.message ||
           (lang === "mr"
             ? "लॉगिन करता आले नाही. आयडी किंवा पासवर्ड तपासा."
-            : "Could not sign in. Verify your credentials.")
+            : lang === "hi"
+              ? "लॉगिन नहीं हो सका। कृपया आईडी या पासवर्ड जांचें।"
+              : "Could not sign in. Verify your credentials.")
       );
     } finally {
       setIsLoading(false);
@@ -411,7 +415,9 @@ export const Login: React.FC<LoginProps> = ({
               href="#how-it-works"
               className="inline-flex items-center space-x-1.5 text-xs font-bold text-white bg-black/40 hover:bg-black/60 backdrop-blur-md px-3.5 py-1.5 rounded-full border border-white/20 transition-all"
             >
-              <span>{lang === "mr" ? "हे कसे काम करते? (पहा)" : "How it works"}</span>
+              <span>
+                {lang === "mr" ? "हे कसे काम करते? (पहा)" : lang === "hi" ? "यह कैसे काम करता है?" : "How it works"}
+              </span>
               <ChevronDown className="w-3.5 h-3.5 animate-bounce" />
             </a>
           </div>
@@ -426,12 +432,14 @@ export const Login: React.FC<LoginProps> = ({
         <div className="max-w-5xl mx-auto">
           <div className="text-center max-w-2xl mx-auto mb-10">
             <span className="text-xs font-extrabold uppercase tracking-widest text-amber-400 bg-amber-400/10 px-3 py-1 rounded-full border border-amber-400/30">
-              {lang === "mr" ? "३ सोप्या पायऱ्या" : "3 Simple Steps"}
+              {lang === "mr" ? "३ सोप्या पायऱ्या" : lang === "hi" ? "3 सरल चरण" : "3 Simple Steps"}
             </span>
             <h2 className="text-2xl sm:text-3xl font-black text-white mt-3">
               {lang === "mr"
                 ? "शेतकऱ्यांसाठी सोपे, खात्रीशीर आणि सुरक्षित"
-                : "Simple, Verified, and Built for Smallholders"}
+                : lang === "hi"
+                  ? "किसानों के लिए सरल, सटीक और सुरक्षित"
+                  : "Simple, Verified, and Built for Smallholders"}
             </h2>
           </div>
 
@@ -442,17 +450,23 @@ export const Login: React.FC<LoginProps> = ({
                   १
                 </div>
                 <h3 className="text-lg font-black text-white mb-2">
-                  {lang === "mr" ? "आपला शेतकरी आयडी टाका" : "Enter Your Farmer ID"}
+                  {lang === "mr"
+                    ? "आपला शेतकरी आयडी टाका"
+                    : lang === "hi"
+                      ? "अपना किसान आईडी दर्ज करें"
+                      : "Enter Your Farmer ID"}
                 </h3>
                 <p className="text-sm text-stone-300 leading-relaxed">
                   {lang === "mr"
                     ? "प्रत्येक शेतकऱ्याला कृषी कार्यालयाकडून स्वतंत्र कार्ड आणि आयडी मिळतो. तुमची जमीन फक्त तुम्हालाच दिसते."
-                    : "Each registered farmer holds an individual credential card and private parcel workspace."}
+                    : lang === "hi"
+                      ? "प्रत्येक पंजीकृत किसान को कृषि कार्यालय से अलग कार्ड और आईडी मिलता है। आपका खेत केवल आपको दिखता है।"
+                      : "Each registered farmer holds an individual credential card and private parcel workspace."}
                 </p>
               </div>
               <div className="mt-4 pt-3 border-t border-stone-700 text-xs text-stone-400 flex items-center gap-1.5">
                 <ShieldCheck className="w-4 h-4 text-emerald-400" />
-                <span>DPDP Act 2023 सुसंगत गोपनीयता</span>
+                <span>DPDP Act 2023 {lang === "en" ? "Privacy" : "गोपनीयता"}</span>
               </div>
             </div>
 
@@ -462,17 +476,23 @@ export const Login: React.FC<LoginProps> = ({
                   २
                 </div>
                 <h3 className="text-lg font-black text-white mb-2">
-                  {lang === "mr" ? "उपग्रहावरून जमिनीची पाहणी" : "Satellite & Weather Telemetry"}
+                  {lang === "mr"
+                    ? "उपग्रहावरून जमिनीची पाहणी"
+                    : lang === "hi"
+                      ? "उपग्रह एवं मौसम डेटा निगरानी"
+                      : "Satellite & Weather Telemetry"}
                 </h3>
                 <p className="text-sm text-stone-300 leading-relaxed">
                   {lang === "mr"
                     ? "Open-Meteo, NASA POWER आणि ISRIC SoilGrids द्वारे मातीतील पाणी, तापमान व पावसाची नोंद थेट तुमच्या शेतासाठी."
-                    : "Live soil water balance, temperature, and rainfall forecasts calibrated to your parcel centroid."}
+                    : lang === "hi"
+                      ? "Open-Meteo, NASA POWER और ISRIC SoilGrids से मिट्टी की नमी, तापमान और बारिश का लाइव डेटा सीधे आपके खेत के लिए।"
+                      : "Live soil water balance, temperature, and rainfall forecasts calibrated to your parcel centroid."}
                 </p>
               </div>
               <div className="mt-4 pt-3 border-t border-stone-700 text-xs text-stone-400 flex items-center gap-1.5">
                 <Satellite className="w-4 h-4 text-sky-400" />
-                <span>प्रत्यक्ष उपग्रह व हवामान डेटा</span>
+                <span>{lang === "mr" ? "प्रत्यक्ष उपग्रह व हवामान डेटा" : lang === "hi" ? "लाइव उपग्रह व मौसम डेटा" : "Live Satellite Telemetry"}</span>
               </div>
             </div>
 
@@ -482,12 +502,18 @@ export const Login: React.FC<LoginProps> = ({
                   ३
                 </div>
                 <h3 className="text-lg font-black text-white mb-2">
-                  {lang === "mr" ? "कृषी मित्र AI आणि पीक सल्ला" : "Krishi Mitra AI & Crop Suitability"}
+                  {lang === "mr"
+                    ? "कृषी मित्र AI आणि पीक सल्ला"
+                    : lang === "hi"
+                      ? "कृषि मित्र AI एवं फसल सलाह"
+                      : "Krishi Mitra AI & Crop Suitability"}
                 </h3>
                 <p className="text-sm text-stone-300 leading-relaxed">
                   {lang === "mr"
                     ? "० ते १०० गुणांसह पीक निवड आणि एकात्मिक कीड व्यवस्थापन (IPM) मार्गदर्शन मराठी, हिंदी व इंग्रजीमध्ये."
-                    : "0-100 crop suitability scoring and IPM-first pest guidance in Marathi, Hindi, and English."}
+                    : lang === "hi"
+                      ? "0 से 100 अंकों के साथ फसल चयन और समग्र कीट प्रबंधन (IPM) सलाह मराठी, हिंदी व अंग्रेज़ी में आवाज़ सहित।"
+                      : "0-100 crop suitability scoring and IPM-first pest guidance in Marathi, Hindi, and English with natural voice."}
                 </p>
               </div>
               <div className="mt-4 pt-3 border-t border-stone-700 text-xs text-stone-400 flex items-center gap-1.5">

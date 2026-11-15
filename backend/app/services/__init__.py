@@ -692,73 +692,89 @@ class AdviceAndRiskService:
             }
 
         if rain_7d is not None and rain_7d >= 65.0:
+            title_i18n = {
+                "en": f"Heavy Rain Forecast ({rain_7d} mm in next 7 days)",
+                "mr": f"मुसळधार पावसाचा अंदाज (पुढील ७ दिवसांत {rain_7d} मिमी)",
+                "hi": f"भारी वर्षा का पूर्वानुमान (अगले 7 दिनों में {rain_7d} मिमी)",
+            }
+            action_i18n = {
+                "en": "Clear field drainage channels and postpone foliar sprays or fertilizer top-dressing.",
+                "mr": "शेतातील पाण्याचा निचरा होणारे पाट मोकळे करा आणि फवारणी किंवा खताची वरखते देणे पुढे ढकला.",
+                "hi": "खेत की जल निकासी नालियां साफ करें और छिड़काव या उर्वरक डालना स्थगित करें।",
+            }
             alerts.append(
                 {
                     "code": "HEAVY_RAIN_FORECAST",
                     "severity": "high",
-                    "title": {
-                        "en": f"Heavy Rain Forecast ({rain_7d} mm in next 7 days)",
-                        "mr": f"मुसळधार पावसाचा अंदाज (पुढील ७ दिवसांत {rain_7d} मिमी)",
-                        "hi": f"भारी वर्षा का पूर्वानुमान (अगले 7 दिनों में {rain_7d} मिमी)",
-                    }.get(lang),
-                    "action": {
-                        "en": "Clear field drainage channels and postpone foliar sprays or fertilizer top-dressing.",
-                        "mr": "शेतातील पाण्याचा निचरा होणारे पाट मोकळे करा आणि फवारणी किंवा खताची वरखते देणे पुढे ढकला.",
-                        "hi": "खेत की जल निकासी नालियां साफ करें और छिड़काव या उर्वरक डालना स्थगित करें।",
-                    }.get(lang),
+                    "title": title_i18n.get(lang, title_i18n["en"]),
+                    "action": action_i18n.get(lang, action_i18n["en"]),
+                    "title_i18n": title_i18n,
+                    "action_i18n": action_i18n,
                 }
             )
         elif rain_7d is not None and rain_7d < 5.0:
+            title_i18n = {
+                "en": f"Dry Spell Watch ({rain_7d} mm expected over 7 days)",
+                "mr": f"कोरड्या हवामानाची शक्यता (७ दिवसांत फक्त {rain_7d} मिमी पाऊस)",
+                "hi": f"सूखे की संभावना (7 दिनों में केवल {rain_7d} मिमी बारिश)",
+            }
+            action_i18n = {
+                "en": "Prioritize evening drip/mulch conservation to reduce soil evaporation loss.",
+                "mr": "बाष्पीभवन कमी करण्यासाठी आच्छादन (मल्चिंग) आणि संध्याकाळी ठिबक सिंचनाचा वापर करा.",
+                "hi": "वाष्पीकरण कम करने के लिए मल्चिंग और शाम के समय ड्रिप सिंचाई को प्राथमिकता दें।",
+            }
             alerts.append(
                 {
                     "code": "DRY_SPELL_WATCH",
                     "severity": "moderate",
-                    "title": {
-                        "en": f"Dry Spell Watch ({rain_7d} mm expected over 7 days)",
-                        "mr": f"कोरड्या हवामानाची शक्यता (७ दिवसांत फक्त {rain_7d} मिमी पाऊस)",
-                        "hi": f"सूखे की संभावना (7 दिनों में केवल {rain_7d} मिमी बारिश)",
-                    }.get(lang),
-                    "action": {
-                        "en": "Prioritize evening drip/mulch conservation to reduce soil evaporation loss.",
-                        "mr": "बाष्पीभवन कमी करण्यासाठी आच्छादन (मल्चिंग) आणि संध्याकाळी ठिबक सिंचनाचा वापर करा.",
-                        "hi": "वाष्पीकरण कम करने के लिए मल्चिंग और शाम के समय ड्रिप सिंचाई को प्राथमिकता दें।",
-                    }.get(lang),
+                    "title": title_i18n.get(lang, title_i18n["en"]),
+                    "action": action_i18n.get(lang, action_i18n["en"]),
+                    "title_i18n": title_i18n,
+                    "action_i18n": action_i18n,
                 }
             )
 
         if max_temp is not None and max_temp >= 38.0:
+            title_i18n = {
+                "en": f"High Temperature Stress ({max_temp} °C peak)",
+                "mr": f"उष्णतेचा ताण (कमाल तापमान {max_temp} °C)",
+                "hi": f"उच्च तापमान तनाव (अधिकतम तापमान {max_temp} °C)",
+            }
+            action_i18n = {
+                "en": "Irrigate during early morning or late evening; inspect for thrips and mites under warm dry conditions.",
+                "mr": "सकाळी लवकर किंवा संध्याकाळी उशिरा पाणी द्या; उष्ण व कोरड्या हवामानात फुलकिडे आणि कोळी किडीची पाहणी करा.",
+                "hi": "सुबह जल्दी या देर शाम सिंचाई करें; गर्म और शुष्क मौसम में थ्रिप्स और माइट्स की जांच करें।",
+            }
             alerts.append(
                 {
                     "code": "HEAT_STRESS_ADVISORY",
                     "severity": "high" if max_temp >= 41.0 else "moderate",
-                    "title": {
-                        "en": f"High Temperature Stress ({max_temp} °C peak)",
-                        "mr": f"उष्णतेचा ताण (कमाल तापमान {max_temp} °C)",
-                        "hi": f"उच्च तापमान तनाव (अधिकतम तापमान {max_temp} °C)",
-                    }.get(lang),
-                    "action": {
-                        "en": "Irrigate during early morning or late evening; inspect for thrips and mites under warm dry conditions.",
-                        "mr": "सकाळी लवकर किंवा संध्याकाळी उशिरा पाणी द्या; उष्ण व कोरड्या हवामानात फुलकिडे आणि कोळी किडीची पाहणी करा.",
-                        "hi": "सुबह जल्दी या देर शाम सिंचाई करें; गर्म और शुष्क मौसम में थ्रिप्स और माइट्स की जांच करें।",
-                    }.get(lang),
+                    "title": title_i18n.get(lang, title_i18n["en"]),
+                    "action": action_i18n.get(lang, action_i18n["en"]),
+                    "title_i18n": title_i18n,
+                    "action_i18n": action_i18n,
                 }
             )
 
         if hum is not None and float(hum) >= 78.0:
+            title_i18n = {
+                "en": f"High Humidity Fungal Watch ({hum}% RH)",
+                "mr": f"जास्त आर्द्रतेमुळे बुरशीजन्य रोगाची शक्यता ({hum}% आर्द्रता)",
+                "hi": f"उच्च आर्द्रता के कारण फफूंद रोग की निगरानी ({hum}% आर्द्रता)",
+            }
+            action_i18n = {
+                "en": "Scout lower canopy for blight/mildew lesions; ensure airflow and use yellow/blue sticky traps first (IPM).",
+                "mr": "पानांच्या खालच्या बाजूला करपा किंवा भुरी रोगाची लक्षणे तपासा; एकात्मिक कीड व्यवस्थापनासाठी (IPM) चिकट सापळे लावा.",
+                "hi": "निचली पत्तियों पर झुलसा या फफूंद के लक्षणों की जांच करें; समग्र कीट प्रबंधन (IPM) के तहत चिपचिपे ट्रैप लगाएं।",
+            }
             alerts.append(
                 {
                     "code": "FUNGAL_HUMIDITY_WATCH",
                     "severity": "moderate",
-                    "title": {
-                        "en": f"High Humidity Fungal Watch ({hum}% RH)",
-                        "mr": f"जास्त आर्द्रतेमुळे बुरशीजन्य रोगाची शक्यता ({hum}% आर्द्रता)",
-                        "hi": f"उच्च आर्द्रता के कारण फफूंद रोग की निगरानी ({hum}% आर्द्रता)",
-                    }.get(lang),
-                    "action": {
-                        "en": "Scout lower canopy for blight/mildew lesions; ensure airflow and use yellow/blue sticky traps first (IPM).",
-                        "mr": "पानांच्या खालच्या बाजूला करपा किंवा भुरी रोगाची लक्षणे तपासा; एकात्मिक कीड व्यवस्थापनासाठी (IPM) चिकट सापळे लावा.",
-                        "hi": "निचली पत्तियों पर झुलसा या फफूंद के लक्षणों की जांच करें; समग्र कीट प्रबंधन (IPM) के तहत चिपचिपे ट्रैप लगाएं।",
-                    }.get(lang),
+                    "title": title_i18n.get(lang, title_i18n["en"]),
+                    "action": action_i18n.get(lang, action_i18n["en"]),
+                    "title_i18n": title_i18n,
+                    "action_i18n": action_i18n,
                 }
             )
 
@@ -1273,6 +1289,230 @@ class AssistantService:
             logger.warning("OpenAI API call failed, falling back to grounded engine: %s", exc)
         return None
 
+    def translate_text(
+        self,
+        *,
+        text: str,
+        target_lang: str,
+        source_lang: Optional[str] = None,
+        skip_network: bool = False,
+    ) -> Dict[str, str]:
+        """Translate agricultural advice cleanly between Marathi (mr), Hindi (hi), and English (en)."""
+        norm_target = (target_lang or "mr").strip().lower()[:2]
+        if norm_target not in ("mr", "hi", "en"):
+            norm_target = "mr"
+        cleaned = (text or "").strip()[:4000]
+        if not cleaned:
+            return {"translated_text": "", "target_lang": norm_target, "provider": "none"}
+
+        lang_label = {
+            "mr": "Marathi (Devanagari script, natural rural Maharashtra farming idiom)",
+            "hi": "Hindi (Devanagari script, clear standard agrarian Hindi)",
+            "en": "English (clear concise agricultural terminology)",
+        }[norm_target]
+        sys_prompt = (
+            f"You are an expert agricultural translator for Kshetra in Maharashtra.\n"
+            f"Translate the following advisory accurately into {lang_label}.\n"
+            f"Rules:\n"
+            f"1. Preserve every numeric reading, date, unit (°C, mm, acres, gunthas, INR/qtl), farmer/village name, and data source name.\n"
+            f"2. Preserve Markdown formatting (headings, bold labels, lists, blockquotes).\n"
+            f"3. Do NOT add extra commentary or invent data. Output ONLY the translated text."
+        )
+
+        provider = (self.config.get("ASSISTANT_PROVIDER") or "auto").lower()
+        gemini_key = (self.config.get("GEMINI_API_KEY") or "").strip()
+        openai_key = (self.config.get("OPENAI_API_KEY") or "").strip()
+
+        if not skip_network:
+            if provider in ("auto", "gemini") and gemini_key:
+                ans = self._call_gemini(gemini_key, sys_prompt, cleaned)
+                if ans:
+                    return {"translated_text": ans, "target_lang": norm_target, "provider": "gemini"}
+            if provider in ("auto", "openai") and openai_key:
+                ans = self._call_openai(openai_key, sys_prompt, cleaned)
+                if ans:
+                    return {"translated_text": ans, "target_lang": norm_target, "provider": "openai"}
+
+        return {
+            "translated_text": self._deterministic_translate(cleaned, norm_target),
+            "target_lang": norm_target,
+            "provider": "kshetra-translator",
+        }
+
+    def _deterministic_translate(self, text: str, target_lang: str) -> str:
+        """Deterministic trilingual agronomic translator covering headings, crops, alerts, and units."""
+        trilingual_phrases: List[Tuple[str, str, str]] = [
+            # Full disclaimers & sentences first (longest match wins)
+            (
+                self.advice_service.IPM_DISCLAIMER["mr"],
+                self.advice_service.IPM_DISCLAIMER["hi"],
+                self.advice_service.IPM_DISCLAIMER["en"],
+            ),
+            (
+                "कृपया कोणतीही रासायनिक फवारणी करण्यापूर्वी जवळच्या कृषी विज्ञान केंद्र (KVK) किंवा तालुका कृषी अधिकाऱ्यांचा सल्ला घ्या.",
+                "कृपया किसी भी रासायनिक छिड़काव से पहले अपने नजदीकी कृषि विज्ञान केंद्र (KVK) या कृषि अधिकारी से सलाह लें।",
+                "Always verify chemical spray dosages with your nearest Krishi Vigyan Kendra (KVK) or Taluka Agriculture Officer.",
+            ),
+            (
+                "पुढील ७ दिवसांसाठी कोणताही गंभीर हवामान इशारा नाही.",
+                "अगले 7 दिनों के लिए कोई गंभीर मौसम चेतावनी नहीं है।",
+                "No severe weather alerts triggered for the next 7 days.",
+            ),
+            (
+                "पुढील ७ दिवसांत गंभीर हवामान धोका नाही.",
+                "अगले 7 दिनों में कोई गंभीर मौसम खतरा नहीं है।",
+                "No severe weather risk detected for the next 7 days.",
+            ),
+            (
+                "मातीतील ओलावा तपासून गरजेनुसार सिंचन व चिकट सापळ्यांची पाहणी करा.",
+                "मिट्टी की नमी जांचकर आवश्यकतानुसार सिंचाई करें और पीले चिपचिपे ट्रैप देखें।",
+                "Inspect soil moisture before irrigating and check IPM sticky traps.",
+            ),
+            (
+                "सध्या थेट हवामान डेटा उपलब्ध नाही (माहिती नाही).",
+                "वर्तमान में लाइव मौसम डेटा उपलब्ध नहीं है (कोई जानकारी नहीं)।",
+                "Live weather telemetry is currently unavailable (No data).",
+            ),
+            (
+                "आजच्या पावसाची किंवा निरीक्षणाची नोंद खालील फॉर्ममध्ये करा.",
+                "आज की बारिश या खेत का अवलोकन नीचे दिए फॉर्म में दर्ज करें।",
+                "Log today's field rainfall or observation below.",
+            ),
+            (
+                "शेतातील पाण्याचा निचरा होणारे पाट मोकळे करा आणि फवारणी किंवा खताची वरखते देणे पुढे ढकला.",
+                "खेत की जल निकासी नालियां साफ करें और छिड़काव या उर्वरक डालना स्थगित करें।",
+                "Clear field drainage channels and postpone foliar sprays or fertilizer top-dressing.",
+            ),
+            (
+                "बाष्पीभवन कमी करण्यासाठी आच्छादन (मल्चिंग) आणि संध्याकाळी ठिबक सिंचनाचा वापर करा.",
+                "वाष्पीकरण कम करने के लिए मल्चिंग और शाम के समय ड्रिप सिंचाई को प्राथमिकता दें।",
+                "Prioritize evening drip/mulch conservation to reduce soil evaporation loss.",
+            ),
+            (
+                "सकाळी लवकर किंवा संध्याकाळी उशिरा पाणी द्या; उष्ण व कोरड्या हवामानात फुलकिडे आणि कोळी किडीची पाहणी करा.",
+                "सुबह जल्दी या देर शाम सिंचाई करें; गर्म और शुष्क मौसम में थ्रिप्स और माइट्स की जांच करें।",
+                "Irrigate during early morning or late evening; inspect for thrips and mites under warm dry conditions.",
+            ),
+            (
+                "पानांच्या खालच्या बाजूला करपा किंवा भुरी रोगाची लक्षणे तपासा; एकात्मिक कीड व्यवस्थापनासाठी (IPM) चिकट सापळे लावा.",
+                "निचली पत्तियों पर झुलसा या फफूंद के लक्षणों की जांच करें; समग्र कीट प्रबंधन (IPM) के तहत चिपचिपे ट्रैप लगाएं।",
+                "Scout lower canopy for blight/mildew lesions; ensure airflow and use yellow/blue sticky traps first (IPM).",
+            ),
+            (
+                "तुम्ही अजून शेताची हद्द नकाशावर आखलेली नाही. अचूक एकर/गुंठे क्षेत्रफळ आणि सल्ल्यासाठी नकाशावर शेत जोडा.",
+                "आपने अभी तक खेत की सीमा मैप नहीं की है। सटीक एकड़/गुंठा क्षेत्रफल के लिए मानचित्र पर अपना खेत जोड़ें।",
+                "You have not mapped a field boundary yet. Draw your parcel on the map to get exact acre/guntha calculations.",
+            ),
+            # Headings and section titles
+            ("१. सध्याची हवामान आणि पाणी स्थिती", "1. वर्तमान मौसम और जल स्थिति", "1. Field Telemetry & Water Status"),
+            ("२. तुमच्या शेतासाठी सर्वोत्तम पिके", "2. आपके खेत के लिए उपयुक्त फसलें", "2. Top Recommended Crops for Your Field"),
+            ("३. हवामान आणि कीड दक्षता (IPM)", "3. मौसम एवं समग्र कीट प्रबंधन (IPM) सलाह", "3. Weather Risks & IPM Guidance"),
+            ("सध्याची हवामान आणि पाणी स्थिती", "वर्तमान मौसम और जल स्थिति", "Field Telemetry & Water Status"),
+            ("तुमच्या शेतासाठी सर्वोत्तम पिके", "आपके खेत के लिए उपयुक्त फसलें", "Top Recommended Crops for Your Field"),
+            ("हवामान आणि कीड दक्षता (IPM)", "मौसम एवं समग्र कीट प्रबंधन (IPM) सलाह", "Weather Risks & IPM Guidance"),
+            ("हवामान आणि कीड दक्षता", "मौसम एवं कीट प्रबंधन सलाह", "Weather Risks & IPM Guidance"),
+            ("पुढील ७ दिवसांचा पाऊस अंदाज", "अगले 7 दिनों की बारिश का अनुमान", "7-Day Rain Forecast"),
+            ("मागील ३० दिवसांचा पाऊस", "पिछले 30 दिनों की बारिश", "30-Day Cumulative Rain"),
+            ("मुसळधार पावसाचा अंदाज", "भारी वर्षा का पूर्वानुमान", "Heavy Rain Forecast"),
+            ("कोरड्या हवामानाची शक्यता", "सूखे की संभावना", "Dry Spell Watch"),
+            ("जास्त आर्द्रतेमुळे बुरशीजन्य रोगाची शक्यता", "उच्च आर्द्रता के कारण फफूंद रोग की निगरानी", "High Humidity Fungal Watch"),
+            ("उष्णतेचा ताण", "उच्च तापमान तनाव", "High Temperature Stress"),
+            ("मातीतील ओलावा", "मिट्टी की नमी", "Soil Moisture"),
+            ("सध्याचे शेत", "सक्रिय खेत", "Active Parcel"),
+            ("कृषी सुरक्षा सूचना", "कृषि सुरक्षा सूचना", "KVK Safety Notice"),
+            ("पाण्याची गरज", "पानी की आवश्यकता", "water need"),
+            ("पाणी गरज", "पानी की आवश्यकता", "water need"),
+            ("आर्द्रता", "नमी / आर्द्रता", "Humidity"),
+            ("तापमान", "तापमान", "Temperature"),
+            ("नमस्कार", "नमस्ते", "Hello"),
+            ("माहिती नाही", "कोई जानकारी नहीं", "No data"),
+            ("माती:", "मिट्टी:", "soil:"),
+            ("सिंचन:", "सिंचाई:", "irrigation:"),
+            ("पाणी:", "सिंचाई:", "irrigation:"),
+            ("स्रोत:", "स्रोत:", "Source:"),
+            ("स्रोत", "स्रोत", "Source"),
+            ("एकर", "एकड़", "acres"),
+            ("गुंठे", "गुंठा", "gunthas"),
+            ("टीप:", "नोट:", "Note:"),
+            # Soil & irrigation labels
+            ("medium_black", "मध्यम काली मिट्टी", "medium_black"),
+            ("deep_black", "गहरी काली मिट्टी", "deep_black"),
+            ("red_sandy", "लाल रेतीली मिट्टी", "red_sandy"),
+            ("drip", "ड्रिप सिंचाई", "drip"),
+            ("borewell", "बोरवेल", "borewell"),
+            ("well", "कुआं", "well"),
+            ("canal", "नहर सिंचाई", "canal"),
+            ("rainfed", "वर्षा आधारित", "rainfed"),
+            # Quality bands
+            ("(High,", "(उत्तम,", "(High,"),
+            ("(Moderate,", "(मध्यम,", "(Moderate,"),
+            ("(Low,", "(कम,", "(Low,"),
+            # Common units in alerts/weather
+            ("मिमी", "मिमी", "mm"),
+            ("दिनांक", "दिनांक", "Date"),
+        ]
+
+        # Dynamically append crop names loaded from crops.json
+        for crop in getattr(self.advice_service, "crops", []) or []:
+            names = crop.get("names") or {}
+            c_en = str(names.get("en") or crop.get("common_name") or "").strip()
+            c_mr = str(names.get("mr") or crop.get("marathi_name") or c_en).strip()
+            c_hi = str(names.get("hi") or crop.get("hindi_name") or c_en).strip()
+            if c_en or c_mr or c_hi:
+                trilingual_phrases.append((c_mr or c_en, c_hi or c_en, c_en or c_mr))
+
+        # Common English/Marathi/Hindi single crop & soil aliases for cross-translation
+        extra_crop_soil_map: List[Tuple[str, str, str]] = [
+            ("मध्यम काळी", "मध्यम काली", "Medium Black"),
+            ("खोल काळी", "गहरी काली", "Deep Black"),
+            ("हलकी मुरमाड", "हल्की लाल मुरम", "Light Shallow"),
+            ("ठिबक सिंचन", "ड्रिप सिंचाई", "Drip Irrigation"),
+            ("पावसावर आधारित", "वर्षा आधारित", "Rainfed"),
+            ("कांदा", "प्याज", "Onion"),
+            ("सोयाबीन", "सोयाबीन", "Soybean"),
+            ("डाळिंब", "अनार", "Pomegranate"),
+            ("कापूस", "कपास", "Cotton"),
+            ("ऊस", "गन्ना", "Sugarcane"),
+            ("गहू", "गेहूं", "Wheat"),
+            ("हरभरा", "चना", "Chickpea"),
+            ("ज्वारी", "ज्वार", "Jowar"),
+            ("बाजरी", "बाजरा", "Bajra"),
+            ("तूर", "अरहर / तूर", "Pigeonpea"),
+            ("टोमॅटो", "टमाटर", "Tomato"),
+            ("द्राक्षे", "अंगूर", "Grapes"),
+        ]
+        trilingual_phrases.extend(extra_crop_soil_map)
+
+        target_idx = {"mr": 0, "hi": 1, "en": 2}[target_lang]
+        # Build longest-first substitution pairs from either source language into target_lang
+        pairs: List[Tuple[str, str]] = []
+        seen_sources = set()
+        for tup in trilingual_phrases:
+            tgt_val = tup[target_idx]
+            if not tgt_val:
+                continue
+            for idx, src_val in enumerate(tup):
+                if idx == target_idx or not src_val or src_val == tgt_val:
+                    continue
+                if src_val not in seen_sources:
+                    seen_sources.add(src_val)
+                    pairs.append((src_val, tgt_val))
+
+        pairs.sort(key=lambda item: len(item[0]), reverse=True)
+        out = text
+        # Protect ASCII words only when source is ASCII to prevent partial substring collisions
+        for src, tgt in pairs:
+            if src in out:
+                if src.isascii() and src.replace("_", "").isalnum():
+                    out = re.sub(rf"(?<![A-Za-z0-9_]){re.escape(src)}(?![A-Za-z0-9_])", tgt, out)
+                else:
+                    out = out.replace(src, tgt)
+
+        # Clean up duplicate English/Marathi artifacts like "(उत्तम, ..." when target is mr
+        if target_lang == "mr":
+            out = out.replace("(High,", "(उत्तम,").replace("(Moderate,", "(मध्यम,").replace("(Low,", "(कमी,")
+        return out
+
     def _deterministic_agronomic_reply(
         self,
         *,
@@ -1291,13 +1531,35 @@ class AssistantService:
         summary = weather.get("summary", {})
         rain_7d = summary.get("rain_7d_forecast_mm")
         rain_30d = summary.get("rain_30d_total_mm")
-        rain_7d_str = f"{rain_7d} mm" if rain_7d is not None else "No data"
-        rain_30d_str = f"{rain_30d} mm" if rain_30d is not None else "No data"
+        rain_7d_str = f"{rain_7d} mm" if rain_7d is not None else {"mr": "माहिती नाही", "hi": "कोई जानकारी नहीं", "en": "No data"}.get(lang, "No data")
+        rain_30d_str = f"{rain_30d} mm" if rain_30d is not None else {"mr": "माहिती नाही", "hi": "कोई जानकारी नहीं", "en": "No data"}.get(lang, "No data")
         prov_label = (weather.get("provenance") or {}).get("label", "Open-Meteo")
+
+        band_labels = {
+            "High": {"mr": "उत्तम", "hi": "उत्तम", "en": "High"},
+            "Moderate": {"mr": "मध्यम", "hi": "मध्यम", "en": "Moderate"},
+            "Low": {"mr": "कमी", "hi": "कम", "en": "Low"},
+        }
+        soil_labels = {
+            "medium_black": {"mr": "मध्यम काळी", "hi": "मध्यम काली", "en": "medium black"},
+            "deep_black": {"mr": "खोल काळी", "hi": "गहरी काली", "en": "deep black"},
+            "red_sandy": {"mr": "लाल मुरमाड", "hi": "लाल रेतीली", "en": "red sandy"},
+            "loamy": {"mr": "चिकणमाती / गाळाची", "hi": "दोमट", "en": "loamy"},
+        }
+        irr_labels = {
+            "drip": {"mr": "ठिबक सिंचन", "hi": "ड्रिप सिंचाई", "en": "drip irrigation"},
+            "borewell": {"mr": "बोअरवेल", "hi": "बोरवेल", "en": "borewell"},
+            "well": {"mr": "विहीर", "hi": "कुआं", "en": "open well"},
+            "canal": {"mr": "कालवा", "hi": "नहर", "en": "canal"},
+            "rainfed": {"mr": "पावसावर आधारित", "hi": "वर्षा आधारित", "en": "rainfed"},
+        }
+        water_lbl = {"mr": "पाणी गरज", "hi": "पानी की आवश्यकता", "en": "water need"}.get(lang, "water need")
+        soil_lbl_val = soil_labels.get(active_parcel.soil_type, {}).get(lang, active_parcel.soil_type) if active_parcel else ""
+        irr_lbl_val = irr_labels.get(active_parcel.irrigation_source, {}).get(lang, active_parcel.irrigation_source) if active_parcel else ""
 
         top_recs = (suitability.get("recommendations") or [])[:3]
         crops_bullet = "\n".join(
-            f"- **{c['name']}**: {c['suitability_score']}/100 ({c['band']}, water need: {c['water_need']})"
+            f"- **{c['name']}**: {c['suitability_score']}/100 ({band_labels.get(c['band'], {}).get(lang, c['band'])}, {water_lbl}: {c['water_need']})"
             for c in top_recs
         )
         alerts = risks.get("alerts") or []
@@ -1311,6 +1573,23 @@ class AssistantService:
             }.get(lang, "- No severe weather alerts.")
         )
 
+        # Focused quick summary based on farmer question intent
+        q_lower = (question or "").lower()
+        top_crop_name = top_recs[0]["name"] if top_recs else ""
+        focus_note = ""
+        if any(w in q_lower for w in ("पाऊस", "बारिश", "rain", "पाणी", "सिंचन", "सिंचाई", "water", "drip")):
+            focus_note = {
+                "mr": f"**झटपट उत्तर**: पुढील ७ दिवसांत सुमारे **{rain_7d_str}** पावसाची शक्यता असून सध्याची मातीतील ओलावा **{sm_disp}** आहे. जमिनीचा ओलावा पाहून {irr_lbl_val or 'सिंचन'} नियोजन करा.",
+                "hi": f"**त्वरित उत्तर**: अगले 7 दिनों में लगभग **{rain_7d_str}** बारिश का अनुमान है और वर्तमान मिट्टी की नमी **{sm_disp}** है। नमी के अनुसार {irr_lbl_val or 'सिंचाई'} की योजना बनाएं।",
+                "en": f"**Quick Answer**: 7-day forecast rainfall is **{rain_7d_str}** with current soil moisture at **{sm_disp}**. Schedule irrigation only when root-zone moisture dips.",
+            }.get(lang, "")
+        elif any(w in q_lower for w in ("पेराव", "पिक", "फसल", "बोएं", "crop", "plant", "sow", "मंडी", "भाव", "price")) and top_crop_name:
+            focus_note = {
+                "mr": f"**झटपट उत्तर**: तुमच्या शेताच्या माती व पाण्याच्या स्थितीनुसार **{top_crop_name}** हे सर्वात योग्य पीक ठरत आहे.",
+                "hi": f"**त्वरित उत्तर**: आपके खेत की मिट्टी और सिंचाई स्थिति के अनुसार **{top_crop_name}** सबसे उपयुक्त फसल है।",
+                "en": f"**Quick Answer**: Based on your soil and water profile, **{top_crop_name}** scores highest for your field.",
+            }.get(lang, "")
+
         if not active_parcel:
             no_parcel_note = {
                 "en": "Note: You have not mapped a field boundary yet. Draw your parcel on the map to get exact acre/guntha calculations.",
@@ -1319,16 +1598,18 @@ class AssistantService:
             }.get(lang, "")
         else:
             no_parcel_note = {
-                "en": f"**Active Parcel**: {active_parcel.name} ({active_parcel.area_acres} acres / {active_parcel.area_gunthas} gunthas, soil: {active_parcel.soil_type}, irrigation: {active_parcel.irrigation_source})",
-                "mr": f"**सध्याचे शेत**: {active_parcel.name} ({active_parcel.area_acres} एकर / {active_parcel.area_gunthas} गुंठे, माती: {active_parcel.soil_type}, पाणी: {active_parcel.irrigation_source})",
-                "hi": f"**सक्रिय खेत**: {active_parcel.name} ({active_parcel.area_acres} एकड़ / {active_parcel.area_gunthas} गुंठा, मिट्टी: {active_parcel.soil_type}, सिंचाई: {active_parcel.irrigation_source})",
+                "en": f"**Active Parcel**: {active_parcel.name} ({active_parcel.area_acres} acres / {active_parcel.area_gunthas} gunthas, soil: {soil_lbl_val}, irrigation: {irr_lbl_val})",
+                "mr": f"**सध्याचे शेत**: {active_parcel.name} ({active_parcel.area_acres} एकर / {active_parcel.area_gunthas} गुंठे, माती: {soil_lbl_val}, पाणी: {irr_lbl_val})",
+                "hi": f"**सक्रिय खेत**: {active_parcel.name} ({active_parcel.area_acres} एकड़ / {active_parcel.area_gunthas} गुंठा, मिट्टी: {soil_lbl_val}, सिंचाई: {irr_lbl_val})",
             }.get(lang, "")
 
         disclaimer = self.advice_service.IPM_DISCLAIMER.get(lang, self.advice_service.IPM_DISCLAIMER["en"])
+        focus_block = f"{focus_note}\n\n" if focus_note else ""
 
         if lang == "mr":
             return (
                 f"नमस्कार **{farmer.name}** ({farmer.taluka}, {farmer.district}),\n\n"
+                f"{focus_block}"
                 f"{no_parcel_note}\n\n"
                 f"### १. सध्याची हवामान आणि पाणी स्थिती\n"
                 f"- **तापमान**: {temp_disp} | **आर्द्रता**: {hum_disp} | **मातीतील ओलावा**: {sm_disp}\n"
@@ -1343,6 +1624,7 @@ class AssistantService:
         if lang == "hi":
             return (
                 f"नमस्ते **{farmer.name}** ({farmer.taluka}, {farmer.district}),\n\n"
+                f"{focus_block}"
                 f"{no_parcel_note}\n\n"
                 f"### 1. वर्तमान मौसम और जल स्थिति\n"
                 f"- **तापमान**: {temp_disp} | **आर्द्रता**: {hum_disp} | **मिट्टी की नमी**: {sm_disp}\n"
@@ -1356,6 +1638,7 @@ class AssistantService:
             )
         return (
             f"Hello **{farmer.name}** ({farmer.taluka}, {farmer.district}),\n\n"
+            f"{focus_block}"
             f"{no_parcel_note}\n\n"
             f"### 1. Field Telemetry & Water Status\n"
             f"- **Temperature**: {temp_disp} | **Humidity**: {hum_disp} | **Soil Moisture**: {sm_disp}\n"

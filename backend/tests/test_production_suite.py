@@ -663,4 +663,74 @@ def test_human_profile_update_planting_date_and_crop_history(client, admin_token
     assert dash["today_card"]["active_parcel"]["crop_history"][0]["crop_id"] == "onion"
 
 
+def test_assistant_translation_and_trilingual_today_card(client, admin_token):
+    """Verify /assistant/translate between Marathi, Hindi, English and trilingual today_card output."""
+    fa = client.post(
+        "/api/v1/admin/farmers",
+        headers={"Authorization": f"Bearer {admin_token}"},
+        json={"name": "Savita Jadhav", "district": "Ahilya Nagar", "taluka": "Sangamner", "village": "Ashwi"},
+    ).get_json()
+    fid = fa["farmer"]["farmer_id"]
+    tok = client.post(
+        "/api/v1/auth/login",
+        json={"farmer_id": fid, "password": fa["temporary_password"]},
+    ).get_json()["access_token"]
+
+    # 1. Verify trilingual today_card fields (mr, hi, en)
+    dash = client.get("/api/v1/farmer/dashboard?lang=hi", headers={"Authorization": f"Bearer {tok}"}).get_json()
+    today_card = dash["today_card"]
+    assert "greeting_mr" in today_card and "Savita Jadhav" in today_card["greeting_mr"]
+    assert "greeting_hi" in today_card and "Savita Jadhav" in today_card["greeting_hi"]
+    assert "greeting_en" in today_card and "Savita Jadhav" in today_card["greeting_en"]
+    assert today_card.get("one_sentence_hi")
+    assert today_card.get("one_action_hi")
+
+    # 2. Generate Marathi grounded assistant reply and translate it to Hindi & English
+    chat_resp = client.post(
+        "/api/v1/assistant/chat",
+        headers={"Authorization": f"Bearer {tok}"},
+        json={"message": "माझ्या शेतात कोणते पीक घ्यावे?", "language": "mr"},
+    )
+    assert chat_resp.status_code == 200
+    msg_obj = chat_resp.get_json()["message"]
+
+    hi_tr = client.post(
+        "/api/v1/assistant/translate",
+        headers={"Authorization": f"Bearer {tok}"},
+        json={"message_id": msg_obj["id"], "target_lang": "hi"},
+    )
+    assert hi_tr.status_code == 200
+    hi_body = hi_tr.get_json()
+    assert hi_body["target_lang"] == "hi"
+    assert "नमस्ते" in hi_body["translated_text"] or "मौसम" in hi_body["translated_text"]
+
+    en_tr = client.post(
+        "/api/v1/assistant/translate",
+        headers={"Authorization": f"Bearer {tok}"},
+        json={"message_id": msg_obj["id"], "target_lang": "en"},
+    )
+    assert en_tr.status_code == 200
+    en_body = en_tr.get_json()
+    assert en_body["target_lang"] == "en"
+    assert "Temperature" in en_body["translated_text"]
+
+    # 3. Direct text translation (English -> Marathi) + validation guard
+    mr_tr = client.post(
+        "/api/v1/assistant/translate",
+        headers={"Authorization": f"Bearer {tok}"},
+        json={"text": "Hello Farmer, Field Telemetry & Water Status: Soil Moisture 0.25", "target_lang": "mr"},
+    )
+    assert mr_tr.status_code == 200
+    assert "मातीतील ओलावा" in mr_tr.get_json()["translated_text"]
+
+    bad_lang = client.post(
+        "/api/v1/assistant/translate",
+        headers={"Authorization": f"Bearer {tok}"},
+        json={"text": "Test", "target_lang": "fr"},
+    )
+    assert bad_lang.status_code == 400
+    assert bad_lang.get_json()["error"]["code"] == "INVALID_LANGUAGE"
+
+
+
 

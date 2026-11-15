@@ -11,9 +11,9 @@
 |---|---|---|---|
 | **Zero-Demo Guard** | `python scripts/check_no_demo.py` | **PASS (Exit 0)** | `0 demo/sample/mock/placeholder or secret violations in production code.` |
 | **Backend Flask Doctor** | `python -m flask doctor` | **PASS (Exit 0)** | `database_ping`, `crops_catalog`, `districts_geojson`, `talukas_geojson`, `devanagari_font` all `PASS`. |
-| **Backend Test Suite** | `python -m pytest -v` | **PASS (13/13 Passed)** | Covers zero-demo routes, 40-farmer cap (1..40 succeed, 41st rejected 409, delete frees slot), 5-attempt lockout, refresh token reuse revocation, polygon geodesic/UTM-43N validation, overlap rejection, IDOR prevention, Krishi Mitra injection guard & rate limits, human profile updates, planting dates, crop rotation history, PDF cards, and DPDP data export/erasure. |
+| **Backend Test Suite** | `python -m pytest -v` | **PASS (14/14 Passed)** | Covers zero-demo routes, 40-farmer cap (1..40 succeed, 41st rejected 409, delete frees slot), 5-attempt lockout, refresh token reuse revocation, polygon geodesic/UTM-43N validation, overlap rejection, IDOR prevention, Krishi Mitra injection guard & rate limits, `/assistant/translate` Marathi/Hindi/English translation + trilingual `today_card`, human profile updates, planting dates, crop rotation history, PDF cards, and DPDP data export/erasure. |
 | **Frontend Type Check** | `npx tsc --noEmit` | **PASS (Exit 0)** | Zero TypeScript errors across all components and pages. |
-| **Frontend Prod Build** | `npx vite build` | **PASS (Exit 0)** | Built `dist/index.html`, CSS (`14.99 kB` gzipped), and JS (`262.93 kB` gzipped) in `3.17s`. |
+| **Frontend Prod Build** | `npx vite build` | **PASS (Exit 0)** | Built `dist/index.html`, CSS (`15.05 kB` gzipped), and JS (`270.26 kB` gzipped) in `3.18s`. |
 | **Client Bundle Secret Scan** | `Select-String dist/assets/*.js` | **PASS (0 Hits)** | Zero server-side keys (`GEMINI_API_KEY`, `OPENAI_API_KEY`, `JWT_SECRET_KEY`, `AIza`, `sk-`) in client bundle. |
 
 ---

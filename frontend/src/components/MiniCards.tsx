@@ -84,6 +84,8 @@ export const MiniCards: React.FC<MiniCardsProps> = ({
       ? firstAlert.title
       : lang === "mr"
       ? "नियमित IPM पाहणी करा"
+      : lang === "hi"
+      ? "नियमित IPM निगरानी करें"
       : "Routine IPM Scouting";
 
   const toggleExpand = (card: string) => {
@@ -112,7 +114,8 @@ export const MiniCards: React.FC<MiniCardsProps> = ({
               <span className="text-2xl sm:text-3xl font-extrabold text-stone-900">{tempDisplay}</span>
             </div>
             <p className="text-xs text-stone-500 font-medium mt-0.5">
-              पाऊस (Rain): <span className="font-bold text-stone-800">{rainDisplay}</span>
+              {lang === "mr" ? "पाऊस:" : lang === "hi" ? "बारिश:" : "Rain:"}{" "}
+              <span className="font-bold text-stone-800">{rainDisplay}</span>
             </p>
           </div>
         </div>
@@ -129,10 +132,12 @@ export const MiniCards: React.FC<MiniCardsProps> = ({
           {expandedCard === "weather" && (
             <div className="mt-2 pt-2 text-xs space-y-1.5 text-stone-600 bg-stone-50 p-2 rounded-lg">
               <p className="flex justify-between">
-                <span>वारा (Wind):</span> <span className="font-bold">{windDisplay}</span>
+                <span>{lang === "mr" ? "वारा:" : lang === "hi" ? "हवा की गति:" : "Wind:"}</span>{" "}
+                <span className="font-bold">{windDisplay}</span>
               </p>
               <p className="flex justify-between">
-                <span>बाष्पीभवन ताण (VPD):</span> <span className="font-bold">{vpdDisplay}</span>
+                <span>{lang === "mr" ? "बाष्पीभवन ताण (VPD):" : lang === "hi" ? "वाष्पोत्सर्जन दबाव (VPD):" : "VPD Stress:"}</span>{" "}
+                <span className="font-bold">{vpdDisplay}</span>
               </p>
               <p className="text-[10px] text-stone-500 pt-1 border-t border-stone-200">
                 {provLabel}
@@ -164,7 +169,8 @@ export const MiniCards: React.FC<MiniCardsProps> = ({
               </span>
             </div>
             <p className="text-xs text-stone-500 font-medium mt-0.5">
-              ओलावा (0–7cm): <span className="font-bold text-stone-800">{smDisplay}</span>
+              {lang === "mr" ? "ओलावा (0–7cm):" : lang === "hi" ? "नमी (0–7cm):" : "Moisture (0–7cm):"}{" "}
+              <span className="font-bold text-stone-800">{smDisplay}</span>
             </p>
 
             <div className="grid grid-cols-3 gap-1.5 mt-2">
@@ -187,7 +193,13 @@ export const MiniCards: React.FC<MiniCardsProps> = ({
           {expandedCard === "soil" && (
             <div className="mt-2 pt-2 text-xs space-y-1.5 text-stone-600 bg-stone-50 p-2 rounded-lg">
               <p className="flex justify-between">
-                <span>७ दिवसांचा पाऊस अंदाज:</span>
+                <span>
+                  {lang === "mr"
+                    ? "७ दिवसांचा पाऊस अंदाज:"
+                    : lang === "hi"
+                      ? "7 दिनों की बारिश अनुमान:"
+                      : "7-Day Rain Forecast:"}
+                </span>
                 <span className="font-bold">
                   {weather?.summary?.rain_7d_forecast_mm !== null && weather?.summary?.rain_7d_forecast_mm !== undefined
                     ? `${weather.summary.rain_7d_forecast_mm} mm`
@@ -195,7 +207,13 @@ export const MiniCards: React.FC<MiniCardsProps> = ({
                 </span>
               </p>
               <p className="flex justify-between">
-                <span>मागील ३० दिवसांचा पाऊस:</span>
+                <span>
+                  {lang === "mr"
+                    ? "मागील ३० दिवसांचा पाऊस:"
+                    : lang === "hi"
+                      ? "पिछले 30 दिनों की बारिश:"
+                      : "30-Day Past Rain:"}
+                </span>
                 <span className="font-bold">
                   {weather?.summary?.rain_30d_total_mm !== null && weather?.summary?.rain_30d_total_mm !== undefined
                     ? `${weather.summary.rain_30d_total_mm} mm`
@@ -234,6 +252,8 @@ export const MiniCards: React.FC<MiniCardsProps> = ({
                 ? firstAlert.action
                 : lang === "mr"
                 ? "पिवळे व निळे चिकट सापळे लावून किडींचे निरीक्षण करा."
+                : lang === "hi"
+                ? "पीले और नीले चिपचिपे ट्रैप लगाकर कीटों की निगरानी करें।"
                 : "Deploy yellow/blue sticky traps and scout canopy."}
             </p>
           </div>

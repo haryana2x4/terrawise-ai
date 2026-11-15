@@ -182,6 +182,12 @@
         "tags": ["assistant"]
       }
     },
+    "/assistant/translate": {
+      "post": {
+        "summary": "Translate Krishi Mitra advisory message or text between Marathi (mr), Hindi (hi), and English (en)",
+        "tags": ["assistant"]
+      }
+    },
     "/announcements": {
       "get": {
         "summary": "List active taluka/district officer announcements",

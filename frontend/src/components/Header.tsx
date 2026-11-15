@@ -62,7 +62,9 @@ export const Header: React.FC<HeaderProps> = ({
               title={t.assistant_btn}
             >
               <Bot className="w-4 h-4 text-amber-300" />
-              <span className="hidden sm:inline">कृषी मित्र AI</span>
+              <span className="hidden sm:inline">
+                {lang === "mr" ? "कृषी मित्र AI" : lang === "hi" ? "कृषि मित्र AI" : "Krishi Mitra AI"}
+              </span>
             </button>
           )}
 
@@ -70,11 +72,17 @@ export const Header: React.FC<HeaderProps> = ({
             <button
               onClick={onOpenInstallModal}
               className="bg-emerald-900/90 hover:bg-emerald-800 text-emerald-100 px-2.5 py-1.5 rounded-xl text-xs font-bold flex items-center space-x-1 border border-emerald-500/40 shadow-xs transition-all"
-              title={lang === "mr" ? "अ‍ॅप इंस्टॉल किंवा शेअर करा" : "Install or Share App"}
+              title={
+                lang === "mr"
+                  ? "अ‍ॅप इंस्टॉल किंवा शेअर करा"
+                  : lang === "hi"
+                    ? "ऐप इंस्टॉल या शेयर करें"
+                    : "Install or Share App"
+              }
             >
               <Download className="w-3.5 h-3.5 text-emerald-300" />
               <span className="hidden md:inline">
-                {lang === "mr" ? "अ‍ॅप घ्या" : "Install"}
+                {lang === "mr" ? "अ‍ॅप घ्या" : lang === "hi" ? "ऐप पाएं" : "Install"}
               </span>
             </button>
           )}

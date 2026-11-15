@@ -92,16 +92,33 @@ export const PrecisionAnalyticsPanel: React.FC<PrecisionAnalyticsPanelProps> = (
     spray.status === "safe_now"
       ? {
           bg: "bg-emerald-100 text-emerald-900 border-emerald-400",
-          label: lang === "mr" ? "आत्ता फवारणी सुरक्षित (Safe)" : "Optimal Spray Window Now"
+          label:
+            lang === "mr"
+              ? "आत्ता फवारणी सुरक्षित (Safe)"
+              : lang === "hi"
+                ? "अभी छिड़काव सुरक्षित (Safe)"
+                : "Optimal Spray Window Now"
         }
       : spray.status === "wait_for_window"
       ? {
           bg: "bg-amber-100 text-amber-900 border-amber-400",
-          label: lang === "mr" ? "पुढील योग्य वेळेची प्रतीक्षा करा" : "Wait for Next Calm Window"
+          label:
+            lang === "mr"
+              ? "पुढील योग्य वेळेची प्रतीक्षा करा"
+              : lang === "hi"
+                ? "अगले शांत समय की प्रतीक्षा करें"
+                : "Wait for Next Calm Window"
         }
       : {
           bg: "bg-rose-100 text-rose-900 border-rose-400",
-          label: spray.status === "no_data" ? t.no_data : lang === "mr" ? "फवारणी टाळा (वारा/पाऊस)" : "Avoid Spraying (48h Risk)"
+          label:
+            spray.status === "no_data"
+              ? t.no_data
+              : lang === "mr"
+                ? "फवारणी टाळा (वारा/पाऊस)"
+                : lang === "hi"
+                  ? "छिड़काव टालें (तेज हवा/बारिश)"
+                  : "Avoid Spraying (48h Risk)"
         };
 
   return (
@@ -117,10 +134,16 @@ export const PrecisionAnalyticsPanel: React.FC<PrecisionAnalyticsPanelProps> = (
               <h3 className="font-extrabold text-sm sm:text-base text-stone-900">
                 {lang === "mr"
                   ? "FAO-56 अचूक पाणी व सिंचन अंदाज (७ दिवस)"
-                  : "FAO-56 Precision Water Balance (7-Day)"}
+                  : lang === "hi"
+                    ? "FAO-56 सटीक जल एवं सिंचाई संतुलन (7 दिन)"
+                    : "FAO-56 Precision Water Balance (7-Day)"}
               </h3>
               <p className="text-[11px] text-stone-500">
-                ET₀ बाष्पीभवन व प्रत्यक्ष क्षेत्रफळानुसार पाणी गरज (1 mm = 10,000 L/ha)
+                {lang === "mr"
+                  ? "ET₀ बाष्पीभवन व प्रत्यक्ष क्षेत्रफळानुसार पाणी गरज (1 mm = 10,000 L/ha)"
+                  : lang === "hi"
+                    ? "ET₀ वाष्पीकरण और खेत क्षेत्रफल अनुसार जल आवश्यकता (1 mm = 10,000 L/ha)"
+                    : "Net crop water volume from ET₀ & mapped hectares (1 mm = 10,000 L/ha)"}
               </p>
             </div>
           </div>
@@ -134,26 +157,32 @@ export const PrecisionAnalyticsPanel: React.FC<PrecisionAnalyticsPanelProps> = (
 
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5 tabular-nums">
           <div className="bg-stone-50 rounded-2xl p-3 border border-stone-200">
-            <span className="block text-[11px] text-stone-500 font-semibold">७ दिवसांचा ET₀</span>
+            <span className="block text-[11px] text-stone-500 font-semibold">
+              {lang === "mr" ? "७ दिवसांचा ET₀" : lang === "hi" ? "7 दिनों का ET₀" : "7-Day ET₀"}
+            </span>
             <span className="text-lg font-black text-stone-900">
               {wb.et0_7d_mm?.display || t.no_data}
             </span>
           </div>
           <div className="bg-stone-50 rounded-2xl p-3 border border-stone-200">
-            <span className="block text-[11px] text-stone-500 font-semibold">अपेक्षित पाऊस</span>
+            <span className="block text-[11px] text-stone-500 font-semibold">
+              {lang === "mr" ? "अपेक्षित पाऊस" : lang === "hi" ? "संभावित बारिश" : "Forecast Rain"}
+            </span>
             <span className="text-lg font-black text-sky-800">
               {wb.rain_7d_mm?.display || t.no_data}
             </span>
           </div>
           <div className="bg-amber-50/70 rounded-2xl p-3 border border-amber-200">
-            <span className="block text-[11px] text-amber-800 font-semibold">निव्वळ पाणी तूट</span>
+            <span className="block text-[11px] text-amber-800 font-semibold">
+              {lang === "mr" ? "निव्वळ पाणी तूट" : lang === "hi" ? "शुद्ध सिंचाई कमी" : "Net Water Deficit"}
+            </span>
             <span className="text-lg font-black text-amber-950">
               {wb.net_irrigation_deficit_mm?.display || t.no_data}
             </span>
           </div>
           <div className="bg-emerald-900 text-white rounded-2xl p-3">
             <span className="block text-[11px] text-emerald-200 font-semibold">
-              {lang === "mr" ? "शेतासाठी दररोज पाणी" : "Daily Plot Volume"}
+              {lang === "mr" ? "शेतासाठी दररोज पाणी" : lang === "hi" ? "खेत हेतु दैनिक पानी" : "Daily Plot Volume"}
             </span>
             <span className="text-lg font-black">
               {wb.parcel_liters_per_day !== null && wb.parcel_liters_per_day !== undefined
@@ -162,6 +191,8 @@ export const PrecisionAnalyticsPanel: React.FC<PrecisionAnalyticsPanelProps> = (
                 ? t.no_data
                 : lang === "mr"
                 ? "शेत आखा"
+                : lang === "hi"
+                ? "खेत जोड़ें"
                 : "Map parcel"}
             </span>
           </div>
@@ -174,7 +205,9 @@ export const PrecisionAnalyticsPanel: React.FC<PrecisionAnalyticsPanelProps> = (
           <h3 className="font-extrabold text-sm sm:text-base text-stone-900">
             {lang === "mr"
               ? "७ दिवसांचा पाऊस, बाष्पीभवन (ET₀) व तापमान आलेख"
-              : "7-Day Rain vs ET₀ Evapotranspiration & Thermal Curve"}
+              : lang === "hi"
+                ? "7 दिनों की बारिश, वाष्पीकरण (ET₀) व तापमान चार्ट"
+                : "7-Day Rain vs ET₀ Evapotranspiration & Thermal Curve"}
           </h3>
           <span className="text-[10px] text-stone-500 font-medium">Open-Meteo IFS/GFS</span>
         </div>
@@ -198,14 +231,14 @@ export const PrecisionAnalyticsPanel: React.FC<PrecisionAnalyticsPanelProps> = (
                 <Bar
                   yAxisId="mm"
                   dataKey="rain_mm"
-                  name={lang === "mr" ? "पाऊस (mm)" : "Rain (mm)"}
+                  name={lang === "mr" ? "पाऊस (mm)" : lang === "hi" ? "बारिश (mm)" : "Rain (mm)"}
                   fill="#0284c7"
                   radius={[4, 4, 0, 0]}
                 />
                 <Bar
                   yAxisId="mm"
                   dataKey="et0_mm"
-                  name={lang === "mr" ? "ET₀ (mm)" : "ET₀ (mm)"}
+                  name="ET₀ (mm)"
                   fill="#10b981"
                   radius={[4, 4, 0, 0]}
                 />
@@ -213,7 +246,7 @@ export const PrecisionAnalyticsPanel: React.FC<PrecisionAnalyticsPanelProps> = (
                   yAxisId="temp"
                   type="monotone"
                   dataKey="temp_max_c"
-                  name={lang === "mr" ? "कमाल °C" : "Tmax °C"}
+                  name={lang === "mr" ? "कमाल °C" : lang === "hi" ? "अधिकतम °C" : "Tmax °C"}
                   stroke="#d97706"
                   strokeWidth={2.5}
                   dot={{ r: 3 }}
@@ -237,10 +270,16 @@ export const PrecisionAnalyticsPanel: React.FC<PrecisionAnalyticsPanelProps> = (
               <h3 className="font-extrabold text-sm sm:text-base text-stone-900">
                 {lang === "mr"
                   ? "४८ तास फवारणी अचूक वेळ (Precision Spray Window)"
-                  : "48-Hour Precision Spray Window & Dew Point"}
+                  : lang === "hi"
+                    ? "48 घंटे का सटीक छिड़काव समय (Precision Spray Window)"
+                    : "48-Hour Precision Spray Window & Dew Point"}
               </h3>
               <p className="text-[11px] text-stone-500">
-                वारा &lt; 12 km/h • पाऊस 0 mm • तापमान 14–33.5°C वर आधारित
+                {lang === "mr"
+                  ? "वारा < 12 km/h • पाऊस 0 mm • तापमान 14–33.5°C वर आधारित"
+                  : lang === "hi"
+                    ? "हवा < 12 km/h • बारिश 0 mm • तापमान 14–33.5°C पर आधारित"
+                    : "Based on wind < 12 km/h, 0 mm rain, and 14–33.5°C"}
               </p>
             </div>
           </div>
@@ -358,7 +397,11 @@ export const PrecisionAnalyticsPanel: React.FC<PrecisionAnalyticsPanelProps> = (
           <div className="flex items-center space-x-2 mb-3">
             <TrendingUp className="w-5 h-5 text-amber-700" />
             <h3 className="font-extrabold text-sm text-stone-900">
-              {lang === "mr" ? "शेत उत्पादन व संदर्भ बाजार अंदाज" : "Parcel Harvest & Reference Band"}
+              {lang === "mr"
+                ? "शेत उत्पादन व संदर्भ बाजार अंदाज"
+                : lang === "hi"
+                  ? "खेत उपज एवं संदर्भ बाजार अनुमान"
+                  : "Parcel Harvest & Reference Band"}
             </h3>
           </div>
 
@@ -384,7 +427,9 @@ export const PrecisionAnalyticsPanel: React.FC<PrecisionAnalyticsPanelProps> = (
                     </span>
                   </div>
                   <div className="bg-amber-50 p-2.5 rounded-xl border border-amber-200">
-                    <span className="block text-[10px] text-amber-800">अंदाजित संदर्भ उत्पन्न</span>
+                    <span className="block text-[10px] text-amber-800">
+                      {lang === "mr" ? "अंदाजित संदर्भ उत्पन्न" : lang === "hi" ? "अनुमानित आय" : "Est. Gross Revenue"}
+                    </span>
                     <span className="font-black text-amber-950">
                       {proj.estimated_gross_modal_inr
                         ? `₹${proj.estimated_gross_modal_inr.toLocaleString("en-IN")}`
@@ -416,7 +461,9 @@ export const PrecisionAnalyticsPanel: React.FC<PrecisionAnalyticsPanelProps> = (
             <div className="p-4 text-center text-xs text-stone-500 font-semibold bg-stone-50 rounded-2xl border border-stone-200">
               {lang === "mr"
                 ? "अचूक उत्पादन व पाणी हिशोबासाठी प्रथम 'माझा शेत नकाशा' मधून तुमचे शेत आखा."
-                : "Map your field parcel on 'My Field Map' to unlock area-scaled yield and water projections."}
+                : lang === "hi"
+                  ? "सटीक उपज और सिंचाई गणना के लिए पहले 'खेत का नक्शा' से अपना खेत जोड़ें।"
+                  : "Map your field parcel on 'My Field Map' to unlock area-scaled yield and water projections."}
             </div>
           )}
         </section>

@@ -756,18 +756,27 @@ def get_farmer_dashboard():
         traffic_light = "red" if any(a["severity"] == "high" for a in alerts) else ("yellow" if alerts else "green")
         if weather.get("status") == "unavailable":
             one_sentence_mr = "सध्या थेट हवामान डेटा उपलब्ध नाही (माहिती नाही)."
+            one_sentence_hi = "वर्तमान में लाइव मौसम डेटा उपलब्ध नहीं है (कोई जानकारी नहीं)।"
             one_sentence_en = "Live weather telemetry is currently unavailable (No data)."
             one_action_mr = "आजच्या पावसाची किंवा निरीक्षणाची नोंद खालील फॉर्ममध्ये करा."
+            one_action_hi = "आज की बारिश या खेत का अवलोकन नीचे दिए फॉर्म में दर्ज करें।"
             one_action_en = "Log today's field rainfall or observation below."
         elif alerts:
-            one_sentence_mr = alerts[0]["title"]
-            one_sentence_en = alerts[0]["title"]
-            one_action_mr = alerts[0]["action"]
-            one_action_en = alerts[0]["action"]
+            top_alert = alerts[0]
+            t_i18n = top_alert.get("title_i18n") or {}
+            a_i18n = top_alert.get("action_i18n") or {}
+            one_sentence_mr = t_i18n.get("mr") or top_alert["title"]
+            one_sentence_hi = t_i18n.get("hi") or top_alert["title"]
+            one_sentence_en = t_i18n.get("en") or top_alert["title"]
+            one_action_mr = a_i18n.get("mr") or top_alert["action"]
+            one_action_hi = a_i18n.get("hi") or top_alert["action"]
+            one_action_en = a_i18n.get("en") or top_alert["action"]
         else:
             one_sentence_mr = "पुढील ७ दिवसांत गंभीर हवामान धोका नाही."
+            one_sentence_hi = "अगले 7 दिनों में कोई गंभीर मौसम खतरा नहीं है।"
             one_sentence_en = "No severe weather risk detected for the next 7 days."
             one_action_mr = "मातीतील ओलावा तपासून गरजेनुसार सिंचन व चिकट सापळ्यांची पाहणी करा."
+            one_action_hi = "मिट्टी की नमी जांचकर आवश्यकतानुसार सिंचाई करें और पीले चिपचिपे ट्रैप देखें।"
             one_action_en = "Inspect soil moisture before irrigating and check IPM sticky traps."
 
         profile = _serialize_farmer(farmer, include_parcels=True)
@@ -787,9 +796,13 @@ def get_farmer_dashboard():
                 "observations": observations,
                 "today_card": {
                     "greeting_mr": f"राम राम, {farmer.name}!",
+                    "greeting_hi": f"राम राम, {farmer.name} जी!",
+                    "greeting_en": f"Welcome, {farmer.name}!",
                     "one_sentence_mr": one_sentence_mr,
+                    "one_sentence_hi": one_sentence_hi,
                     "one_sentence_en": one_sentence_en,
                     "one_action_mr": one_action_mr,
+                    "one_action_hi": one_action_hi,
                     "one_action_en": one_action_en,
                     "traffic_light": traffic_light,
                     "active_parcel": active_parcel,
@@ -1018,6 +1031,48 @@ def assistant_feedback():
         msg.feedback_rating = rating
         session.commit()
         return jsonify({"message": msg.to_dict()}), 200
+
+
+@api_v1.route("/assistant/translate", methods=["POST"])
+@require_auth()
+def assistant_translate():
+    """Translate assistant guidance or field advisory text into Marathi, Hindi, or English."""
+    _, _, _, assistant_service = _get_services()
+    body = require_json_body(request.get_json(silent=True))
+    target_lang = str(body.get("target_lang") or body.get("language") or "").strip().lower()
+    if target_lang not in ("mr", "hi", "en"):
+        raise AppError("INVALID_LANGUAGE", "target_lang must be 'mr', 'hi', or 'en'.", 400)
+
+    source_lang = str(body.get("source_lang") or "").strip().lower() or None
+    text = str(body.get("text") or "").strip()
+    message_id = body.get("message_id")
+    skip_net = bool(current_app.config.get("TESTING", False))
+
+    if not text and message_id is not None:
+        with db_manager.session_scope() as session:
+            msg = (
+                session.query(AssistantMessage)
+                .filter(
+                    AssistantMessage.id == int(message_id),
+                    AssistantMessage.farmer_id == g.current_farmer_id,
+                )
+                .first()
+            )
+            if not msg:
+                raise AppError("MESSAGE_NOT_FOUND", "Assistant message not found.", 404)
+            text = msg.content or ""
+            source_lang = source_lang or msg.language
+
+    if not text:
+        raise AppError("EMPTY_TEXT", "Text to translate cannot be empty.", 400)
+
+    result = assistant_service.translate_text(
+        text=text,
+        target_lang=target_lang,
+        source_lang=source_lang,
+        skip_network=skip_net,
+    )
+    return jsonify({"success": True, **result}), 200
 
 
 # ============================================================================

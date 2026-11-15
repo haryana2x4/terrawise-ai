@@ -757,10 +757,14 @@ export const FarmMap: React.FC<FarmMapProps> = ({
                 {isDrawing
                   ? lang === "mr"
                     ? "आखणी बंद करा"
-                    : "Exit Draw"
+                    : lang === "hi"
+                      ? "चित्रण बंद करें"
+                      : "Exit Draw"
                   : lang === "mr"
                   ? "नवीन शेत आखा (Draw)"
-                  : "Mark Land"}
+                  : lang === "hi"
+                    ? "नया खेत बनाएं (Draw)"
+                    : "Mark Land"}
               </span>
             </button>
           )}
@@ -772,7 +776,7 @@ export const FarmMap: React.FC<FarmMapProps> = ({
           >
             <Square className="w-3.5 h-3.5" />
             <span className="hidden sm:inline">
-              {lang === "mr" ? "१-एकर चौकोन ठेवा" : "Drop Quick Plot"}
+              {lang === "mr" ? "१-एकर चौकोन ठेवा" : lang === "hi" ? "1-एकड़ प्लॉट रखें" : "Drop Quick Plot"}
             </span>
           </button>
 
@@ -800,7 +804,7 @@ export const FarmMap: React.FC<FarmMapProps> = ({
                 aria-label="Jump to Taluka"
               >
                 <option value="" className="text-stone-900">
-                  {lang === "mr" ? "तालुका निवडा..." : "Jump to Taluka..."}
+                  {lang === "mr" ? "तालुका निवडा..." : lang === "hi" ? "तहसील चुनें..." : "Jump to Taluka..."}
                 </option>
                 {talukas.map(opt => (
                   <option key={`${opt.district}-${opt.name}`} value={opt.name} className="text-stone-900">
@@ -873,12 +877,16 @@ export const FarmMap: React.FC<FarmMapProps> = ({
               <h3 className="font-extrabold text-sm sm:text-base text-stone-900">
                 {lang === "mr"
                   ? `बांधाचे कोपरे क्लिक करा (${drawVertices.length} बिंदू)`
-                  : `Tap field corners (${drawVertices.length} points)`}
+                  : lang === "hi"
+                    ? `खेत के कोनों पर क्लिक करें (${drawVertices.length} बिंदु)`
+                    : `Tap field corners (${drawVertices.length} points)`}
               </h3>
               <p className="text-[11px] text-stone-500 font-medium">
                 {lang === "mr"
                   ? "पिवळे क्रमांक (1, 2, 3...) ओढून तुमची अचूक सीमा जुळवा"
-                  : "Drag numbered pins to align precisely with field bunds"}
+                  : lang === "hi"
+                    ? "पीले पिन (1, 2, 3...) खींचकर अपनी सटीक मेड़ मिलाएं"
+                    : "Drag numbered pins to align precisely with field bunds"}
               </p>
             </div>
 

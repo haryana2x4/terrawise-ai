@@ -22,9 +22,10 @@
    - Computes **FAO-56 Parcel Irrigation Water Budget** (Liters/day & Liters/week), **48-Hour Optimal Spray Safety Window**, **Magnus-Tetens Dew Point**, **VPD** (Vapor Pressure Deficit), **GDD** (Growing Degree Days), **RSHI** (Regional Soil-Hydration Index 0–100), and **0–100 crop suitability scores** across 5 transparent factors (`water_match`, `soil_match`, `season_temp_match`, `duration_efficiency`, `rotation_health`) with interactive Recharts hydro-thermal telemetry charts.
    - Prioritizes **Integrated Pest Management (IPM)** with mandatory Krishi Vigyan Kendra (KVK) safety disclaimers.
 
-4. **Krishi Mitra AI Assistant (Marathi / Hindi / English + Voice)**:
+4. **Krishi Mitra AI Assistant (Marathi / Hindi / English + Natural Voice v2)**:
    - Grounded in each farmer's real parcel geometry, soil type, irrigation source, live weather, and crop suitability scores.
-   - Pluggable provider adapter (`gemini`, `openai`, or deterministic grounded agronomic engine) with prompt-injection sanitization, per-farmer hourly message limits (`30/hr`), daily token budgets, thumbs up/down feedback, and 90-day retention.
+   - Pluggable provider adapter (`gemini`, `openai`, or deterministic grounded agronomic engine), plus `POST /api/v1/assistant/translate` for instant Marathi, Hindi, and English message translation, prompt-injection sanitization, per-farmer hourly message limits (`30/hr`), daily token budgets, thumbs up/down feedback, and 90-day retention.
+   - Upgraded **Web Speech Engine v2** with Neural/Online Indian voice ranking (`Aarohi`/`Swara`/`Madhur`/`Google हिन्दी`), cross-Devanagari fallback, sentence-chunked natural cadence, agronomic unit normalization, Auto-Speak AI replies, and speed/voice controls.
 
 5. **India DPDP Act 2023 Compliance**:
    - First-login Marathi/Hindi/English privacy consent flow, field-level PII encryption (`mobile_encrypted`, `survey_number_encrypted`), one-click **Export My Data (JSON)**, and self-service **Delete My Data**.
