@@ -36,6 +36,125 @@ def _is_port_in_use(host: str, port: int) -> bool:
         return sock.connect_ex((host, port)) == 0
 
 
+def _find_listening_pids(port: int) -> List[int]:
+    """Return PIDs currently listening on TCP `port` without external Python dependencies."""
+    pids: List[int] = []
+    if sys.platform == "win32":
+        try:
+            res = subprocess.run(
+                ["netstat", "-ano", "-p", "TCP"],
+                capture_output=True,
+                text=True,
+                timeout=5,
+                check=False,
+            )
+            suffix = f":{port}"
+            for line in res.stdout.splitlines():
+                parts = line.split()
+                if len(parts) >= 5 and parts[0].upper() == "TCP" and parts[3].upper() == "LISTENING":
+                    if parts[1].endswith(suffix) and parts[4].isdigit():
+                        pid = int(parts[4])
+                        if pid > 0 and pid not in pids:
+                            pids.append(pid)
+        except Exception:
+            pass
+    else:
+        try:
+            res = subprocess.run(
+                ["lsof", "-t", f"-iTCP:{port}", "-sTCP:LISTEN"],
+                capture_output=True,
+                text=True,
+                timeout=5,
+                check=False,
+            )
+            for token in res.stdout.split():
+                if token.isdigit():
+                    pid = int(token)
+                    if pid > 0 and pid not in pids:
+                        pids.append(pid)
+        except Exception:
+            pass
+    return pids
+
+
+def _get_process_cmdline(pid: int) -> str:
+    if sys.platform == "win32":
+        try:
+            res = subprocess.run(
+                [
+                    "powershell",
+                    "-NoProfile",
+                    "-Command",
+                    f"(Get-CimInstance Win32_Process -Filter 'ProcessId={pid}').CommandLine",
+                ],
+                capture_output=True,
+                text=True,
+                timeout=5,
+                check=False,
+            )
+            return res.stdout.strip()
+        except Exception:
+            return ""
+    try:
+        cmdline_file = Path(f"/proc/{pid}/cmdline")
+        if cmdline_file.is_file():
+            return cmdline_file.read_bytes().replace(b"\x00", b" ").decode("utf-8", errors="ignore")
+    except Exception:
+        pass
+    return ""
+
+
+def _is_kshetra_port_process(host: str, port: int, pid: int) -> bool:
+    """Confirm TCP listener on `port` belongs to Kshetra backend/frontend before auto-reclaiming."""
+    cmdline = _get_process_cmdline(pid).lower()
+    markers = ("terrawise-ai", "kshetra", "wsgi.py", "start.py", "vite")
+    if any(m in cmdline for m in markers):
+        return True
+    try:
+        with urllib.request.urlopen(f"http://{host}:{port}/api/v1/meta/version", timeout=1.0) as resp:
+            if 200 <= resp.status < 500 and b"kshetra" in resp.read().lower():
+                return True
+    except Exception:
+        pass
+    return False
+
+
+def _ensure_port_available(host: str, port: int) -> bool:
+    """Ensure `port` is free, automatically stopping an older Kshetra server instance if present."""
+    if not _is_port_in_use(host, port):
+        return True
+
+    pids = _find_listening_pids(port)
+    reclaimed = False
+    for pid in pids:
+        if pid == os.getpid():
+            continue
+        if _is_kshetra_port_process(host, port, pid):
+            _log("RECLAIM", f"Stopping previous Kshetra process on port {port} (PID {pid})...")
+            if sys.platform == "win32":
+                subprocess.run(
+                    ["taskkill", "/F", "/T", "/PID", str(pid)],
+                    stdout=subprocess.DEVNULL,
+                    stderr=subprocess.DEVNULL,
+                    check=False,
+                )
+            else:
+                try:
+                    os.kill(pid, signal.SIGTERM)
+                except OSError:
+                    pass
+            reclaimed = True
+
+    if reclaimed:
+        deadline = time.monotonic() + 4.0
+        while time.monotonic() < deadline:
+            if not _is_port_in_use(host, port):
+                return True
+            time.sleep(0.2)
+
+    return not _is_port_in_use(host, port)
+
+
 def ensure_env_file() -> None:
     """Create root .env from .env.example with fresh cryptographic keys if missing."""
     env_path = ROOT_DIR / ".env"
@@ -237,17 +356,17 @@ def main(argv: List[str] | None = None) -> int:
 
     probe_host = "127.0.0.1" if args.host in ("0.0.0.0", "::") else args.host
 
-    if _is_port_in_use(probe_host, args.backend_port):
+    if not _ensure_port_available(probe_host, args.backend_port):
         _log(
             "ERROR",
-            f"Port {args.backend_port} is already in use on {probe_host}. Stop the existing server first.",
+            f"Port {args.backend_port} is in use by another application on {probe_host}. Close it and retry.",
         )
         return 1
 
-    if not args.prod and _is_port_in_use(probe_host, args.frontend_port):
+    if not args.prod and not _ensure_port_available(probe_host, args.frontend_port):
         _log(
             "ERROR",
-            f"Port {args.frontend_port} is already in use on {probe_host}. Stop the existing server first.",
+            f"Port {args.frontend_port} is in use by another application on {probe_host}. Close it and retry.",
         )
         return 1
 
