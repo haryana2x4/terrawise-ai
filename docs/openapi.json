@@ -1,0 +1,254 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "Kshetra Agricultural Decision Support API",
+    "version": "2.0.0",
+    "description": "Zero-demo, production-grade API for smallholder farmers and agricultural officers in Ahilya Nagar & Nashik, Maharashtra."
+  },
+  "servers": [
+    {
+      "url": "/api/v1",
+      "description": "Primary Versioned API v1"
+    }
+  ],
+  "paths": {
+    "/auth/login": {
+      "post": {
+        "summary": "Authenticate farmer or administrator and issue JWT access + rotating refresh token",
+        "tags": ["auth"]
+      }
+    },
+    "/auth/refresh": {
+      "post": {
+        "summary": "Rotate refresh token with token-family reuse detection",
+        "tags": ["auth"]
+      }
+    },
+    "/auth/logout": {
+      "post": {
+        "summary": "Revoke active refresh tokens for current account",
+        "tags": ["auth"]
+      }
+    },
+    "/auth/change-password": {
+      "post": {
+        "summary": "Update password and clear must_change_password flag",
+        "tags": ["auth"]
+      }
+    },
+    "/auth/consent": {
+      "post": {
+        "summary": "Record DPDP Act 2023 privacy consent timestamp",
+        "tags": ["auth"]
+      }
+    },
+    "/auth/me": {
+      "get": {
+        "summary": "Get current authenticated farmer profile and parcels",
+        "tags": ["auth"]
+      }
+    },
+    "/farmers/me": {
+      "patch": {
+        "summary": "Update language, village, or encrypted mobile number",
+        "tags": ["farmers"]
+      },
+      "delete": {
+        "summary": "DPDP Act 2023 Right to Erasure: permanently delete account and all parcels",
+        "tags": ["farmers"]
+      }
+    },
+    "/farmers/me/export": {
+      "get": {
+        "summary": "DPDP Act 2023 Right to Data Portability: export all personal and parcel records as JSON",
+        "tags": ["farmers"]
+      }
+    },
+    "/farmer/dashboard": {
+      "get": {
+        "summary": "Unified farmer dashboard payload with real parcels, weather, suitability, announcements, and observations",
+        "tags": ["farmers"]
+      }
+    },
+    "/parcels": {
+      "get": {
+        "summary": "List parcels belonging to authenticated farmer",
+        "tags": ["parcels"]
+      },
+      "post": {
+        "summary": "Validate RFC 7946 polygon, enforce <=2% overlap & 4-parcel cap, and save parcel",
+        "tags": ["parcels"]
+      }
+    },
+    "/parcels/validate": {
+      "post": {
+        "summary": "Dry-run WGS84 geodesic + UTM-43N area and overlap check",
+        "tags": ["parcels"]
+      }
+    },
+    "/parcels/import": {
+      "post": {
+        "summary": "Import KML or GeoJSON boundary file (max 2 MB, XXE-safe)",
+        "tags": ["parcels"]
+      }
+    },
+    "/parcels/{parcel_id}": {
+      "delete": {
+        "summary": "Delete parcel (owner or admin only)",
+        "tags": ["parcels"]
+      }
+    },
+    "/parcels/{parcel_id}/history": {
+      "get": {
+        "summary": "List crop rotation history for parcel",
+        "tags": ["parcels"]
+      },
+      "post": {
+        "summary": "Add crop rotation entry for parcel",
+        "tags": ["parcels"]
+      }
+    },
+    "/parcels/{parcel_id}/observations": {
+      "get": {
+        "summary": "List farmer-logged rainfall and field observations",
+        "tags": ["parcels"]
+      },
+      "post": {
+        "summary": "Record daily rainfall (mm) or pest observation",
+        "tags": ["parcels"]
+      }
+    },
+    "/climate": {
+      "get": {
+        "summary": "Fetch 7-day forecast and 30-day history from Open-Meteo with DB snapshot fallback",
+        "tags": ["telemetry"]
+      }
+    },
+    "/soil": {
+      "get": {
+        "summary": "Fetch soil profile from ISRIC SoilGrids v2.0 and farmer declaration",
+        "tags": ["telemetry"]
+      }
+    },
+    "/water": {
+      "get": {
+        "summary": "Fetch soil moisture, ET0, VPD, and RSHI (0-100) hydration index",
+        "tags": ["telemetry"]
+      }
+    },
+    "/crops": {
+      "get": {
+        "summary": "Get full Maharashtra crop catalog and multilingual glossary",
+        "tags": ["advice"]
+      }
+    },
+    "/advice": {
+      "get": {
+        "summary": "Compute 0-100 crop suitability scores and 5-factor breakdown",
+        "tags": ["advice"]
+      }
+    },
+    "/risk": {
+      "get": {
+        "summary": "Evaluate weather-triggered risk alerts and IPM-first pest precautions",
+        "tags": ["advice"]
+      }
+    },
+    "/markets": {
+      "get": {
+        "summary": "Query Agmarknet (data.gov.in) mandi prices or return honest unconfigured status",
+        "tags": ["markets"]
+      }
+    },
+    "/assistant/chat": {
+      "post": {
+        "summary": "Send message to Krishi Mitra AI Advisor grounded in farmer's real parcels and weather",
+        "tags": ["assistant"]
+      }
+    },
+    "/assistant/history": {
+      "get": {
+        "summary": "Retrieve farmer's 90-day assistant chat history",
+        "tags": ["assistant"]
+      },
+      "delete": {
+        "summary": "Clear farmer's assistant chat history",
+        "tags": ["assistant"]
+      }
+    },
+    "/assistant/feedback": {
+      "post": {
+        "summary": "Submit thumbs up/down rating on an assistant message",
+        "tags": ["assistant"]
+      }
+    },
+    "/announcements": {
+      "get": {
+        "summary": "List active taluka/district officer announcements",
+        "tags": ["community"]
+      },
+      "post": {
+        "summary": "Publish new taluka/district announcement (Admin only)",
+        "tags": ["admin"]
+      }
+    },
+    "/feedback": {
+      "post": {
+        "summary": "Submit recommendation rating or problem report",
+        "tags": ["community"]
+      }
+    },
+    "/reports/credential-card/{farmer_id}": {
+      "get": {
+        "summary": "Generate printable A6 PDF credential card with Devanagari typography",
+        "tags": ["reports"]
+      }
+    },
+    "/reports/credential-cards/batch": {
+      "post": {
+        "summary": "Generate A4 batch sheet of farmer credential cards (Admin only)",
+        "tags": ["admin"]
+      }
+    },
+    "/admin/overview": {
+      "get": {
+        "summary": "Get 20-farmer capacity meter, farmers list, source health, feedback, and audit logs",
+        "tags": ["admin"]
+      }
+    },
+    "/admin/farmers": {
+      "get": {
+        "summary": "List active farmers (Admin only)",
+        "tags": ["admin"]
+      },
+      "post": {
+        "summary": "Atomically create farmer account enforcing MAX_FARMERS=20 hard cap",
+        "tags": ["admin"]
+      }
+    },
+    "/admin/parcels/{parcel_id}/verify": {
+      "post": {
+        "summary": "Toggle 7/12 / AgriStack land verification badge on a parcel",
+        "tags": ["admin"]
+      }
+    },
+    "/admin/export/farmers.csv": {
+      "get": {
+        "summary": "Export registered farmer roster as UTF-8 CSV",
+        "tags": ["admin"]
+      }
+    },
+    "/meta/version": {
+      "get": {
+        "summary": "Return application version, commit SHA, and operational limits",
+        "tags": ["meta"]
+      }
+    },
+    "/meta/status": {
+      "get": {
+        "summary": "Public health status of database and upstream telemetry sources",
+        "tags": ["meta"]
+      }
+    }
+  }
+}

@@ -1,0 +1,284 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Kshetra Smart Farming AI</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800&display=swap">
+<style>
+:root{--cream:#fbf6ee;--card:#fffaf2;--ink:#1d2a1f;--mute:#6b7466;--green:#2f8f3a;--leaf:#e6f3dc;--orange:#f08a24;--navy:#1f3a7a;--sky1:#2f7be0;--sky2:#7fb8f5;--line:#eadfcf;--bad:#b3402a}
+*{box-sizing:border-box;margin:0;-webkit-tap-highlight-color:transparent}
+html,body{height:100%}
+body{font-family:Nunito,system-ui,sans-serif;color:var(--ink);background:linear-gradient(180deg,#cfe6fb 0%,#f3ecd6 45%,#cfe3a8 100%);display:flex;justify-content:center}
+#app{width:100%;max-width:430px;height:100%;background:var(--cream);position:relative;display:flex;flex-direction:column;overflow:hidden;box-shadow:0 0 60px rgba(40,60,30,.25)}
+@media(min-width:500px){#app{height:min(900px,96vh);margin:auto;border-radius:36px}body{align-items:center}}
+#view{flex:1;overflow-y:auto;padding:calc(14px + env(safe-area-inset-top,0px)) 16px 16px;background:linear-gradient(180deg,#d9ebfb 0,var(--cream) 220px)}
+h1{font-size:22px;font-weight:800}h2{font-size:18px;font-weight:800;margin:18px 0 10px}h3{font-size:15px;font-weight:700}
+.sub{color:var(--mute);font-size:13px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:22px;padding:14px;margin-bottom:12px;box-shadow:0 6px 18px rgba(90,70,30,.07)}
+.row{display:flex;align-items:center;gap:10px}.sp{justify-content:space-between}.grow{flex:1}
+.top{display:flex;align-items:center;gap:12px;margin-bottom:12px}
+.logo,.avatar{width:48px;height:48px;border-radius:50%;display:grid;place-items:center;font-size:26px;background:var(--leaf);flex:none}
+.avatar{background:var(--navy);color:#fff;font-weight:800;font-size:18px}
+.back{width:38px;height:38px;border:0;border-radius:50%;background:#fff;font-size:20px;box-shadow:0 2px 8px #0002}
+.search{display:flex;gap:8px;background:#fff;border-radius:999px;padding:6px 6px 6px 16px;margin-bottom:12px;box-shadow:0 3px 12px #0001}
+.search input{flex:1;border:0;outline:0;font:inherit;background:none;min-width:0}
+.btn{border:0;border-radius:999px;padding:11px 18px;font:inherit;font-weight:700;color:#fff;background:var(--orange);cursor:pointer}
+.btn.navy{background:var(--navy);width:100%;padding:15px;font-size:16px}.btn.sm{padding:8px 14px;font-size:13px}.btn.ghost{background:#fff;color:var(--navy);border:1px solid var(--line)}
+.temp{font-size:44px;font-weight:800;line-height:1}
+.chip{display:inline-block;font-size:12px;font-weight:700;border-radius:999px;padding:4px 10px;background:var(--leaf);color:var(--green)}
+.chip.off{background:#f7e1da;color:var(--bad)}.chip.or{background:#fde9d2;color:#b25b0b}
+.next{background:linear-gradient(135deg,#fdecd0,#fbf1df);border-color:#f3d9ae}
+.quick{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
+.quick button{border:1px solid var(--line);background:var(--card);border-radius:18px;padding:12px 2px;font:inherit;font-size:12px;font-weight:700;color:var(--ink);display:grid;gap:6px;justify-items:center;cursor:pointer}
+.quick i{font-style:normal;font-size:26px}
+.stats{display:grid;grid-template-columns:repeat(3,1fr);text-align:center}
+.stats div+div{border-left:1px solid var(--line)}.stats b{display:block;font-size:17px}.stats i{font-style:normal;font-size:22px}
+.hero{background:linear-gradient(160deg,var(--sky1),var(--sky2));color:#fff;border-radius:26px;padding:18px;margin-bottom:12px}
+.hero .temp{font-size:64px}.hero .stats{background:#ffffff26;border-radius:16px;padding:10px;margin-top:14px}.hero .stats div+div{border-color:#fff5}
+.bar{height:10px;background:#e3e8dc;border-radius:99px;overflow:hidden}.bar span{display:block;height:100%;background:var(--green);border-radius:99px}
+.days{display:flex;gap:8px;overflow-x:auto;padding-bottom:6px}
+.day{flex:none;width:72px;text-align:center;background:var(--card);border:1px solid var(--line);border-radius:18px;padding:10px 4px;font-size:12px}
+.day b{display:block;font-size:13px}
+.tiles{display:flex;gap:8px;overflow-x:auto}.tile{flex:none;width:68px;height:68px;border-radius:16px;background:var(--leaf);display:grid;place-items:center;font-size:32px;border:0;cursor:pointer}
+.nav{display:flex;background:#fff;border-top:1px solid var(--line);padding:8px 6px calc(10px + env(safe-area-inset-bottom,0px))}
+.nav button{flex:1;border:0;background:none;font:inherit;font-size:11px;font-weight:700;color:var(--mute);display:grid;justify-items:center;gap:2px;padding-bottom:4px;border-bottom:3px solid transparent;cursor:pointer}
+.nav button i{font-style:normal;font-size:21px}.nav button.on{color:var(--navy);border-color:var(--navy)}
+.err{border-color:#e7b9ad;background:#fdf0ec}.err p{font-size:13px;margin:6px 0 10px}
+.kv{display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px dashed var(--line);font-size:14px}.kv:last-child{border:0}
+.tex{display:flex;height:18px;border-radius:99px;overflow:hidden;margin:8px 0}
+.msgs{display:flex;flex-direction:column;gap:8px;margin-bottom:10px}
+.m{padding:10px 14px;border-radius:18px;max-width:88%;font-size:14px;white-space:pre-wrap}
+.m.u{align-self:flex-end;background:var(--navy);color:#fff}.m.a{align-self:flex-start;background:#fff;border:1px solid var(--line)}
+label{display:block;font-size:12px;font-weight:700;color:var(--mute);margin:10px 0 4px}
+input,select{width:100%;padding:11px 12px;border:1px solid var(--line);border-radius:12px;font:inherit;background:#fff}
+.score{font-size:22px;font-weight:800;color:var(--green)}
+.skel{color:var(--mute);font-size:14px;padding:10px 0}
+button:focus-visible,input:focus-visible,select:focus-visible{outline:3px solid var(--orange);outline-offset:2px}
+.pills{display:inline-flex;background:#ffffffd9;border-radius:99px;padding:3px;gap:2px;margin-bottom:10px;box-shadow:0 2px 8px #0002}.pills button{border:0;background:none;padding:5px 11px;border-radius:99px;font:inherit;font-size:12px;font-weight:800;color:var(--navy);cursor:pointer}.pills button.on{background:var(--navy);color:#fff}
+img.avatar{object-fit:cover;width:48px;height:48px}.avatar{cursor:pointer;overflow:hidden}.avatar.big{width:96px;height:96px;font-size:36px;margin:0 auto 10px}
+.lg{margin:calc(-14px - env(safe-area-inset-top,0px)) -16px -16px;min-height:100%;display:flex;flex-direction:column;background:var(--cream)}
+.lgtop{position:relative;overflow:hidden;background:linear-gradient(180deg,#2f7be0,#8cc4f7 65%,#d6e8a8);padding:calc(18px + env(safe-area-inset-top,0px)) 20px 100px;text-align:center;color:#fff}
+.lgc{position:relative;z-index:1}.lgtop .sun{position:absolute;top:34px;right:28px;width:62px;height:62px;border-radius:50%;background:#ffd66b;box-shadow:0 0 0 14px #ffd66b55,0 0 0 30px #ffd66b33}
+.lgtop .hill{position:absolute;border-radius:50%;bottom:-80px}.hill.a{left:-70px;width:340px;height:170px;background:#7bb844}.hill.b{right:-90px;width:360px;height:150px;background:#4f9a37}
+.lglogo{width:76px;height:76px;border-radius:50%;background:#fff;display:grid;place-items:center;font-size:42px;margin:6px auto 10px;box-shadow:0 8px 20px #0003}
+.lgsheet{flex:1;margin-top:-40px;background:var(--cream);border-radius:30px 30px 0 0;padding:22px 20px;position:relative;z-index:2}
+</style>
+</head>
+<body>
+<div id="app"><div id="view"></div>
+<nav class="nav" id="nav"></nav></div>
+<script>
+/* ---------- helpers ---------- */
+const esc=s=>String(s==null?'':s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const num=(v,d=1)=>(v==null||v===''||isNaN(v))?'—':(+v).toFixed(d);
+const pick=(o,ks)=>{if(o)for(const k of ks)if(o[k]!=null)return o[k];return null};
+const store={get(k,d){try{const v=localStorage.getItem(k);return v?JSON.parse(v):d}catch(e){return d}},set(k,v){try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}}};
+
+/* Farm profile = what the farmer types in (Profile tab). Preset: Kalmeshwar, Nagpur, from verify_e2e.py */
+const DEF={name:'Kalmeshwar Farm',latitude:21.23,longitude:78.92,area:5,area_unit:'acres',soil_type:'Black Cotton Soil (Regur)',irrigation_type:'Rainfed',current_crop:'Cotton',previous_crop:'Soybean',season:'Kharif',priorities:['water_conservation','soil_health','nitrogen_improvement']};
+const S={farm:store.get('fw_farm',DEF),api:store.get('fw_api',location.port==='8000'?'':'http://localhost:8000'),lang:store.get('fw_lang','en'),user:store.get('fw_user',null),pic:store.get('fw_pic',null),tab:'home',data:null,rot:null,err:{},busy:false,chat:[]};
+const CROPS={Cotton:'🌿',Soybean:'🫘','Pigeon Pea':'🫛',Chickpea:'🟤',Wheat:'🌾','Green Gram':'🌱','Nagpur Mandarin':'🍊'};
+
+function range(){const e=new Date(Date.now()-4*864e5),s=new Date(e-13*864e5),f=d=>d.toISOString().slice(0,10);return[f(s),f(e)]}
+async function call(path,opt){const r=await fetch(S.api+path,opt);if(!r.ok)throw new Error('HTTP '+r.status+' '+(await r.text()).slice(0,140));return r}
+const post=(p,b)=>call(p,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(b)}).then(r=>r.json());
+
+async function refresh(){
+  S.busy=true;S.err={};render();
+  const[s,e]=range(),f=S.farm;
+  await Promise.all([
+    call(`/api/data/overview?latitude=${f.latitude}&longitude=${f.longitude}&start_date=${s}&end_date=${e}`).then(r=>r.json()).then(d=>S.data=d).catch(x=>{S.data=null;S.err.data=x.message}),
+    post('/api/rotation/evaluate',{farm_data:f,start_date:s,end_date:e}).then(d=>S.rot=d).catch(x=>{S.rot=null;S.err.rot=x.message})
+  ]);
+  S.busy=false;render();
+}
+
+/* ---------- derived real values ---------- */
+const src=()=>(S.data&&S.data.sources)||{};
+const power=()=>src().nasa_power||null;
+const psum=()=>(power()&&power().summary)||{};
+const soil=()=>src().soilgrids||null;
+function daily(){const p=power();if(!p)return[];for(const k of Object.keys(p)){if(Array.isArray(p[k])&&p[k].length&&typeof p[k][0]==='object')return p[k]}return[]}
+function dstr(d){let s=String(pick(d,['date','day','time'])||'');if(/^\d{8}$/.test(s))s=s.slice(0,4)+'-'+s.slice(4,6)+'-'+s.slice(6);const t=new Date(s);return isNaN(t)?'—':t.toLocaleDateString('en-IN',{weekday:'short',day:'numeric'})}
+const status=o=>((o&&o.provenance&&o.provenance.status)||'unknown');
+const badge=o=>{const s=status(o);return `<span class="chip ${s==='live'||s==='ok'||s==='cached'?'':'off'}">${esc(s)}</span>`};
+const errCard=(m,t)=>`<div class="card err"><h3>${t} unavailable</h3><p>${esc(m)}</p><p>Check that the backend is running (python backend/run.py) and the API address in Profile is correct.</p><button class="btn sm" onclick="refresh()">Retry</button></div>`;
+
+/* ---------- views ---------- */
+function home(){
+  const h=new Date().getHours(),g=h<12?'Good morning':h<17?'Good afternoon':'Good evening',f=S.farm,sm=psum();
+  const top=S.rot&&S.rot.strategies&&S.rot.strategies[0];
+  return `<div style="text-align:right">${pills()}</div><div class="top"><div class="logo">🌾</div><div class="grow"><h1><span>${g}</span>, ${esc((S.user&&S.user.name||'Farmer').split(' ')[0])}</h1><div class="sub">Know your soil. Plan your next harvest.</div></div>${avatarHTML()}</div>
+  <div class="search"><input id="q" placeholder="Ask the assistant anything…" onkeydown="if(event.key==='Enter')askFromHome()"><button class="btn sm" onclick="askFromHome()">Ask</button></div>
+  <div class="card" onclick="go('weather')">${S.err.data?errCard(S.err.data,'Weather data'):`<div class="row sp"><div class="temp">${num(sm.mean_temp_c)}°C</div><div class="sub" style="text-align:right">Mean, last 14 days<br>Rain ${num(sm.total_precipitation_mm,0)} mm<br>Dry spell ${num(sm.longest_dry_spell_days,0)} days</div></div><div class="row sp" style="margin-top:10px"><span class="sub">📍 ${esc(f.name)}</span><span class="chip">NASA POWER</span></div>`}</div>
+  <div class="card"><div class="row sp"><h3>🌱 Your current crop</h3><span class="chip"><span>${esc(f.season)}</span> <span>baseline</span></span></div>
+    <div class="row" style="margin-top:10px"><div class="tile" style="width:84px;height:70px;font-size:40px;cursor:default">${CROPS[f.current_crop]||'🌾'}</div><div><h1>${esc(f.current_crop)}</h1><div class="sub">Previous crop: <span>${esc(f.previous_crop)}</span> · ${esc(f.area)} <span>${esc(f.area_unit)}</span></div></div></div></div>
+  <div class="card next"><div class="sub">Suggested next step</div><h2 style="margin:2px 0 4px">${top?esc(top.title):'Plan your next crop'}</h2>
+    <div class="row sp"><span class="sub">${top?`Top-ranked rotation · score ${num(top.total_composite_score,0)}/100`:(S.busy?'Evaluating rotations…':'Compare rotation options for next season.')}</span><button class="btn" onclick="go('planner')">Open Planner</button></div></div>
+  <h2>Quick access</h2>
+  <div class="quick"><button onclick="go('soil')"><i>🌱</i>Soil Health</button><button onclick="go('planner')"><i>📅</i>Season Planner</button><button onclick="go('weather')"><i>⛅</i>Weather</button><button onclick="go('assistant')"><i>🤖</i>AI Assistant</button></div>`}
+
+function head(t,back){return `<div class="row sp" style="margin-bottom:12px"><button class="back" onclick="go('${back||'home'}')" aria-label="Back">‹</button><h1>${t}</h1><span style="width:38px"></span></div>`}
+
+function crops(){
+  const f=S.farm,s=soil(),sm=psum(),wet=pick(sm,['mean_root_zone_wetness','mean_surface_soil_wetness']);
+  return head('Farm Details')+`
+  <div class="card"><div class="stats"><div><i>🌾</i><b>${esc(f.area)} <span>${esc(f.area_unit)}</span></b><span class="sub">Land size</span></div><div><i>🟤</i><b>${s&&s.usda_texture_class?esc(s.usda_texture_class):'—'}</b><span class="sub">Texture (SoilGrids)</span></div><div><i>💧</i><b>${esc(f.irrigation_type)}</b><span class="sub">Irrigation</span></div></div></div>
+  <div class="row sp"><h2 style="margin-top:6px">Live soil moisture</h2><a class="sub" href="#" onclick="go('soil');return false">Soil details ›</a></div>
+  <div class="card"><div class="row sp"><h3>${esc(f.current_crop)}</h3><span class="chip">${wet==null?'unavailable':'observed'}</span></div>
+    <div class="sub" style="margin:4px 0 8px">Surface wetness from NASA POWER (GWETTOP), 0–100%</div>
+    <div class="row"><div class="bar grow"><span style="width:${wet==null?0:Math.round(wet*100)}%"></span></div><b>${wet==null?'—':Math.round(wet*100)+'%'}</b></div></div>
+  <h2>Crop details</h2><div class="card"><b>${esc(f.current_crop)}</b> · <span>${esc(f.soil_type)}</span> · <span>${esc(f.season)}</span><div class="sub" style="margin-top:6px">Water demand and rotation fit are scored in the Planner using PDKV and ICAR knowledge. Validate with your local KVK.</div></div>
+  <h2>Rotation options</h2><div class="tiles">${Object.keys(CROPS).map(c=>`<button class="tile" title="${c}" onclick="go('planner')">${CROPS[c]}</button>`).join('')}</div>
+  <div style="margin-top:16px"><button class="btn navy" onclick="go('planner')">Evaluate rotation plan</button></div>`}
+
+function soilView(){
+  const s=soil();
+  if(S.err.data)return head('Soil Health','crops')+errCard(S.err.data,'Soil data');
+  if(!s)return head('Soil Health','crops')+'<div class="skel">Loading soil data…</div>';
+  const c=+s.clay_pct||0,sa=+s.sand_pct||0,si=+s.silt_pct||0;
+  const kv=(a,b)=>`<div class="kv"><span>${a}</span><b>${b}</b></div>`;
+  return head('Soil Health','crops')+`<div class="card"><div class="row sp"><h3>ISRIC SoilGrids 250 m</h3>${badge(s)}</div>
+  <div class="tex"><span style="width:${c}%;background:#a2593a"></span><span style="width:${si}%;background:#d9b66e"></span><span style="width:${sa}%;background:#efe3b8"></span></div>
+  <div class="sub"><span>Clay</span> ${num(c,0)}% · <span>Silt</span> ${num(si,0)}% · <span>Sand</span> ${num(sa,0)}%</div></div>
+  <div class="card">${kv('USDA texture',esc(s.usda_texture_class||'—'))}${kv('Soil pH (H₂O)',num(s.ph_h2o,1))}${kv('Organic carbon',num(s.soil_organic_carbon_g_kg,1)+' g/kg')}${kv('Vertisol candidate',s.is_vertisol_candidate==null?'—':(s.is_vertisol_candidate?'Yes':'No'))}</div>
+  <p class="sub">${esc(pick(s,['land_mask_notice','notice','message'])||'Digital soil map, not a lab test. Zinc, iron and boron need field testing.')}</p>`}
+
+function planner(){
+  const st=(S.rot&&S.rot.strategies)||[];
+  return head('Season Planner')+(S.err.rot?errCard(S.err.rot,'Rotation engine'):S.busy&&!st.length?'<div class="skel">Scoring rotations against live NASA data…</div>':
+  st.map((x,i)=>`<div class="card"><div class="row sp"><h3>${i+1}. ${esc(x.title)}</h3><span class="score">${num(x.total_composite_score,0)}</span></div>
+   ${x.is_current_baseline?'<span class="chip or">Your current baseline</span>':''}
+   <div class="bar" style="margin:10px 0"><span style="width:${Math.max(0,Math.min(100,x.total_composite_score))}%"></span></div>
+   <div class="kv"><span>Confidence</span><b>${num(x.confidence_score,0)}%</b></div><div class="kv"><span>Water demand</span><b>${esc(x.water_demand_category)}</b></div><div class="kv"><span>Nitrogen</span><b style="text-align:right;max-width:60%">${esc(x.nitrogen_potential)}</b></div></div>`).join('')
+  +`<p class="sub">Decision support only. No yield or price guarantee. Confirm with your KVK.</p>
+  <div class="row" style="margin-top:12px"><a class="btn navy" style="text-align:center;text-decoration:none" href="${esc(S.api)}/api/reports/pdf?latitude=${S.farm.latitude}&longitude=${S.farm.longitude}&start_date=${range()[0]}&end_date=${range()[1]}" target="_blank" rel="noopener">Download PDF report</a></div>`)}
+
+function weather(){
+  const sm=psum(),p=power(),d=daily().slice(-7);
+  if(S.err.data)return head('Weather','home')+errCard(S.err.data,'Weather data');
+  const hum=pick(sm,['mean_humidity_pct','mean_rh_pct','mean_relative_humidity','mean_rh2m']),wind=pick(sm,['mean_wind_speed_ms','mean_wind_ms','mean_ws2m']);
+  const dry=+sm.longest_dry_spell_days;
+  return head('Weather','home')+`<div class="hero"><div class="temp">${num(sm.mean_temp_c)}°C</div><div style="font-weight:700;margin-top:4px">Mean temperature, last 14 days</div><div style="margin-top:6px">📍 ${esc(S.farm.name)} · NASA POWER ${p?badge(p).replace('chip','chip'):''}</div>
+  <div class="stats"><div><i>💧</i><b>${hum==null?'—':num(hum,0)+'%'}</b>Humidity</div><div><i>🌬️</i><b>${wind==null?'—':num(wind,1)+' m/s'}</b>Wind</div><div><i>☔</i><b>${num(sm.total_precipitation_mm,0)} mm</b>Rain</div></div></div>
+  <div class="row sp"><h2 style="margin-top:6px">Last 7 days observed</h2><span class="sub">not a forecast</span></div>
+  ${d.length?`<div class="days">${d.map(x=>`<div class="day"><b>${dstr(x)}</b>☔ ${num(pick(x,['precipitation_mm','precip_mm','prectotcorr','precipitation']),1)}<br>${num(pick(x,['t2m_max','temp_max_c','tmax','max_temp_c']),0)}° / ${num(pick(x,['t2m_min','temp_min_c','tmin','min_temp_c']),0)}°</div>`).join('')}</div>`:'<div class="card sub">Daily values are not included in the overview response. Period totals are shown above.</div>'}
+  <h2>Field insights</h2><div class="card"><div class="kv"><span>Longest dry spell</span><b>${num(dry,0)} days</b></div><div class="kv"><span>Data coverage</span><b>${sm.valid_days==null?'—':sm.valid_days+'/'+sm.total_days+' days'}</b></div>
+  <p class="sub" style="margin-top:8px">${isNaN(dry)?'':dry>=14?'Long dry spell. Moisture-saving crops need priority.':dry>=7?'A week or more without rain. Watch soil moisture.':'No extended dry spell in this window.'}</p></div>`}
+
+function assistant(){
+  return head('AI Assistant')+`<div class="msgs">${S.chat.length?S.chat.map(m=>`<div class="m ${m.r}">${esc(m.t)}</div>`).join(''):'<div class="sub">Ask about your soil, rainfall or rotation. Answers are grounded in the data above.</div>'}</div>
+  <div class="search"><input id="q" placeholder="मातीचा पोत समजावून सांगा / Explain my soil" onkeydown="if(event.key==='Enter')ask()"><button class="btn sm" onclick="ask()">Send</button></div>`}
+async function ask(txt){
+  const el=document.getElementById('q'),t=(txt||(el&&el.value)||'').trim();if(!t)return;
+  S.chat.push({r:'u',t});S.chat.push({r:'a',t:'…'});render();
+  const[s,e]=range();
+  try{const r=await post('/api/assistant/chat',{message:t,language:S.lang,start_date:s,end_date:e});S.chat[S.chat.length-1].t=r.message+(r.mode?`\n\n(${r.mode})`:'')}
+  catch(x){S.chat[S.chat.length-1].t='Assistant unavailable: '+x.message}
+  render();
+}
+function askFromHome(){const v=document.getElementById('q').value;if(!v.trim())return;S.tab='assistant';ask(v)}
+
+function profile(){
+  const f=S.farm,o=(a,v)=>a.map(x=>`<option${x===v?' selected':''}>${x}</option>`).join('');
+  return head('Profile')+`<div class="card" style="text-align:center">${avatarHTML(1)}<h3>${esc(S.user.name)}</h3><div class="sub">${esc(S.user.mobile||'')}</div><input id="pic" type="file" accept="image/*" hidden onchange="onPic(event)"><button class="btn sm ghost" style="margin-top:10px" onclick="document.getElementById('pic').click()">Change photo</button></div><div class="card"><h3>Farm</h3>
+  <label>Name</label><input id="f_name" value="${esc(f.name)}">
+  <div class="row"><div class="grow"><label>Latitude</label><input id="f_lat" type="number" step="0.0001" value="${f.latitude}"></div><div class="grow"><label>Longitude</label><input id="f_lon" type="number" step="0.0001" value="${f.longitude}"></div></div>
+  <div class="row"><div class="grow"><label>Area</label><input id="f_area" type="number" step="0.1" value="${f.area}"></div><div class="grow"><label>Unit</label><select id="f_unit">${o(['acres','hectares'],f.area_unit)}</select></div></div>
+  <label>Soil type</label><input id="f_soil" value="${esc(f.soil_type)}">
+  <label>Irrigation</label><select id="f_irr">${o(['Rainfed','Drip','Canal','Borewell'],f.irrigation_type)}</select>
+  <div class="row"><div class="grow"><label>Current crop</label><select id="f_cur">${o(Object.keys(CROPS),f.current_crop)}</select></div><div class="grow"><label>Previous crop</label><select id="f_prev">${o(Object.keys(CROPS),f.previous_crop)}</select></div></div>
+  <label>Season</label><select id="f_season">${o(['Kharif','Rabi','Summer'],f.season)}</select></div>
+  <div class="card"><h3>App</h3><label>Language (assistant)</label><select id="f_lang" onchange="setLang(this.value)"><option value="en"${S.lang==='en'?' selected':''}>English</option><option value="mr"${S.lang==='mr'?' selected':''}>मराठी</option><option value="hi"${S.lang==='hi'?' selected':''}>हिंदी</option></select>
+  <label>Backend address</label><input id="f_api" value="${esc(S.api)}" placeholder="http://localhost:8000"></div>
+  <button class="btn navy" onclick="saveProfile()">Save and refresh data</button><button class="btn ghost" style="width:100%;margin-top:8px" onclick="logout()">Log out</button>`}
+function saveProfile(){
+  const v=id=>document.getElementById(id).value;
+  S.farm={...S.farm,name:v('f_name'),latitude:+v('f_lat'),longitude:+v('f_lon'),area:+v('f_area'),area_unit:v('f_unit'),soil_type:v('f_soil'),irrigation_type:v('f_irr'),current_crop:v('f_cur'),previous_crop:v('f_prev'),season:v('f_season')};
+  S.lang=v('f_lang');S.api=v('f_api').replace(/\/$/,'');
+  store.set('fw_farm',S.farm);store.set('fw_lang',S.lang);store.set('fw_api',S.api);
+  S.tab='home';refresh();
+}
+
+
+/* ---------- language, login, photo ---------- */
+const X={'Home':['होम','मुख्यपृष्ठ'],'Crops':['फसलें','पिके'],'Planner':['योजना','नियोजक'],'Weather':['मौसम','हवामान'],'Profile':['प्रोफाइल','प्रोफाइल'],
+'Know your soil. Plan your next harvest.':['अपनी मिट्टी जानें। अगली फसल की योजना बनाएँ।','तुमची माती ओळखा. पुढच्या हंगामाचे नियोजन करा.'],
+'Good morning':['सुप्रभात','शुभ प्रभात'],'Good afternoon':['शुभ दोपहर','शुभ दुपार'],'Good evening':['शुभ संध्या','शुभ संध्याकाळ'],
+'Ask the assistant anything…':['सहायक से कुछ भी पूछें…','सहाय्यकाला काहीही विचारा…'],'Ask':['पूछें','विचारा'],'Send':['भेजें','पाठवा'],
+'Mean, last 14 days':['औसत, पिछले 14 दिन','सरासरी, गेले 14 दिवस'],'Your current crop':['आपकी मौजूदा फसल','तुमचे सध्याचे पीक'],'baseline':['आधार','आधार'],'Previous crop:':['पिछली फसल:','मागील पीक:'],
+'Suggested next step':['सुझाया अगला कदम','सुचवलेले पुढचे पाऊल'],'Plan your next crop':['अगली फसल की योजना बनाएँ','पुढील पिकाचे नियोजन करा'],'Open Planner':['प्लानर खोलें','नियोजक उघडा'],
+'Evaluating rotations…':['फसल चक्र जाँचे जा रहे हैं…','पीक फेरपालट तपासत आहे…'],'Compare rotation options for next season.':['अगले मौसम के फसल चक्र विकल्पों की तुलना करें।','पुढील हंगामाच्या फेरपालट पर्यायांची तुलना करा.'],
+'Quick access':['त्वरित पहुँच','झटपट प्रवेश'],'Soil Health':['मिट्टी की सेहत','मातीचे आरोग्य'],'Season Planner':['मौसम योजना','हंगाम नियोजक'],'AI Assistant':['एआई सहायक','एआय सहाय्यक'],
+'Farm Details':['खेत का विवरण','शेताचा तपशील'],'Land size':['ज़मीन का आकार','जमिनीचे क्षेत्र'],'Texture (SoilGrids)':['बनावट (SoilGrids)','पोत (SoilGrids)'],'Irrigation':['सिंचाई','सिंचन'],
+'Live soil moisture':['मिट्टी की नमी (लाइव)','मातीतील ओलावा (लाइव्ह)'],'Soil details ›':['मिट्टी विवरण ›','माती तपशील ›'],'observed':['मापा गया','मोजलेले'],'unavailable':['अनुपलब्ध','उपलब्ध नाही'],
+'Surface wetness from NASA POWER (GWETTOP), 0–100%':['NASA POWER से सतही नमी (GWETTOP), 0–100%','NASA POWER कडून पृष्ठभागावरील ओलावा (GWETTOP), 0–100%'],
+'Crop details':['फसल की जानकारी','पिकाची माहिती'],'Water demand and rotation fit are scored in the Planner using PDKV and ICAR knowledge. Validate with your local KVK.':['पानी की माँग और फसल चक्र की उपयुक्तता PDKV व ICAR ज्ञान से प्लानर में आँकी जाती है। अपने KVK से पुष्टि करें।','पाण्याची मागणी आणि फेरपालटीची योग्यता PDKV व ICAR ज्ञानाने नियोजकात मोजली जाते. तुमच्या KVK कडून खात्री करा.'],
+'Rotation options':['फसल चक्र विकल्प','पीक फेरपालट पर्याय'],'Evaluate rotation plan':['फसल चक्र योजना जाँचें','पीक फेरपालट योजना तपासा'],
+'USDA texture':['USDA बनावट','USDA पोत'],'Soil pH (H₂O)':['मिट्टी pH (H₂O)','माती pH (H₂O)'],'Organic carbon':['जैविक कार्बन','सेंद्रिय कार्बन'],'Vertisol candidate':['वर्टिसोल संभावित','व्हर्टिसोल शक्यता'],'Yes':['हाँ','होय'],'No':['नहीं','नाही'],
+'Clay':['चिकनी मिट्टी','चिकणमाती'],'Silt':['गाद','गाळ'],'Sand':['रेत','वाळू'],'Digital soil map, not a lab test. Zinc, iron and boron need field testing.':['यह डिजिटल मिट्टी नक्शा है, लैब जाँच नहीं। जिंक, आयरन और बोरॉन की खेत में जाँच ज़रूरी है।','हा डिजिटल माती नकाशा आहे, प्रयोगशाळा चाचणी नाही. झिंक, लोह आणि बोरॉनची शेतात चाचणी आवश्यक आहे.'],
+'Loading soil data…':['मिट्टी का डेटा लोड हो रहा है…','मातीचा डेटा लोड होत आहे…'],'Scoring rotations against live NASA data…':['लाइव NASA डेटा से फसल चक्र आँके जा रहे हैं…','लाइव्ह NASA डेटावरून फेरपालट मोजत आहे…'],
+'Your current baseline':['आपकी मौजूदा आधार फसल','तुमचे सध्याचे आधार पीक'],'Confidence':['विश्वसनीयता','विश्वासार्हता'],'Water demand':['पानी की माँग','पाण्याची मागणी'],'Nitrogen':['नाइट्रोजन','नायट्रोजन'],
+'Decision support only. No yield or price guarantee. Confirm with your KVK.':['यह केवल निर्णय सहायता है। उपज या भाव की गारंटी नहीं। अपने KVK से पुष्टि करें।','हे केवळ निर्णय सहाय्य आहे. उत्पादन किंवा भावाची हमी नाही. तुमच्या KVK कडून खात्री करा.'],'Download PDF report':['PDF रिपोर्ट डाउनलोड करें','PDF अहवाल डाउनलोड करा'],
+'Mean temperature, last 14 days':['औसत तापमान, पिछले 14 दिन','सरासरी तापमान, गेले 14 दिवस'],'Humidity':['नमी','आर्द्रता'],'Wind':['हवा','वारा'],'Last 7 days observed':['पिछले 7 दिन (मापित)','गेले 7 दिवस (मोजलेले)'],'not a forecast':['पूर्वानुमान नहीं','अंदाज नाही'],
+'Field insights':['खेत की जानकारी','शेतीविषयी माहिती'],'Longest dry spell':['सबसे लंबा सूखा दौर','सर्वात मोठा कोरडा कालखंड'],'Data coverage':['डेटा कवरेज','डेटा व्याप्ती'],
+'Long dry spell. Moisture-saving crops need priority.':['लंबा सूखा दौर। नमी बचाने वाली फसलों को प्राथमिकता दें।','मोठा कोरडा कालखंड. ओलावा टिकवणाऱ्या पिकांना प्राधान्य द्या.'],'A week or more without rain. Watch soil moisture.':['एक हफ्ते या अधिक बिना बारिश। मिट्टी की नमी पर नज़र रखें।','आठवडाभर किंवा अधिक पाऊस नाही. मातीतील ओलावा पाहा.'],'No extended dry spell in this window.':['इस अवधि में लंबा सूखा दौर नहीं है।','या कालावधीत मोठा कोरडा कालखंड नाही.'],
+'Daily values are not included in the overview response. Period totals are shown above.':['दैनिक मान ओवरव्यू में शामिल नहीं हैं। अवधि का कुल ऊपर दिखाया है।','दैनिक मूल्ये ओव्हरव्यूमध्ये नाहीत. कालावधीची एकूण बेरीज वर दाखवली आहे.'],
+'Retry':['फिर कोशिश करें','पुन्हा प्रयत्न करा'],'Check that the backend is running (python backend/run.py) and the API address in Profile is correct.':['जाँचें कि बैकएंड चल रहा है (python backend/run.py) और प्रोफाइल में API पता सही है।','बॅकएंड सुरू आहे (python backend/run.py) आणि प्रोफाइलमधील API पत्ता बरोबर आहे का ते तपासा.'],
+'Ask about your soil, rainfall or rotation. Answers are grounded in the data above.':['अपनी मिट्टी, बारिश या फसल चक्र के बारे में पूछें। जवाब ऊपर के डेटा पर आधारित हैं।','तुमची माती, पाऊस किंवा फेरपालटीबद्दल विचारा. उत्तरे वरील डेटावर आधारित आहेत.'],
+'Farm':['खेत','शेत'],'Name':['नाम','नाव'],'Latitude':['अक्षांश','अक्षांश'],'Longitude':['देशांतर','रेखांश'],'Area':['क्षेत्रफल','क्षेत्र'],'Unit':['इकाई','एकक'],'Soil type':['मिट्टी का प्रकार','मातीचा प्रकार'],'Current crop':['मौजूदा फसल','सध्याचे पीक'],'Previous crop':['पिछली फसल','मागील पीक'],'Season':['मौसम','हंगाम'],
+'App':['ऐप','अ‍ॅप'],'Language (assistant)':['भाषा (सहायक)','भाषा (सहाय्यक)'],'Backend address':['बैकएंड पता','बॅकएंड पत्ता'],'Irrigation ':['सिंचाई','सिंचन'],'Save and refresh data':['सेव करें और डेटा रिफ्रेश करें','सेव्ह करा आणि डेटा रिफ्रेश करा'],'Change photo':['फोटो बदलें','फोटो बदला'],'Log out':['लॉग आउट','लॉग आउट'],'Farmer':['किसान','शेतकरी'],
+'Welcome, farmer':['स्वागत है, किसान भाई','स्वागत, शेतकरी बंधू'],'Sign in to see live NASA data for your farm.':['अपने खेत का लाइव NASA डेटा देखने के लिए साइन इन करें।','तुमच्या शेतासाठी लाइव्ह NASA डेटा पाहण्यासाठी साइन इन करा.'],'Your name':['आपका नाम','तुमचे नाव'],'Mobile number':['मोबाइल नंबर','मोबाइल नंबर'],'Continue':['आगे बढ़ें','पुढे जा'],'Continue as guest':['अतिथि के रूप में जारी रखें','पाहुणा म्हणून सुरू ठेवा'],
+'Your details stay on this device. No password is needed yet.':['आपकी जानकारी इसी डिवाइस पर रहती है। अभी पासवर्ड की ज़रूरत नहीं।','तुमची माहिती याच डिव्हाइसवर राहते. सध्या पासवर्डची गरज नाही.'],
+'Enter your name.':['अपना नाम लिखें।','तुमचे नाव लिहा.'],'Enter a 10-digit mobile number.':['10 अंकों का मोबाइल नंबर लिखें।','१० अंकी मोबाइल नंबर लिहा.'],
+'Rainfed':['वर्षा-आधारित','कोरडवाहू'],'Drip':['ड्रिप','ठिबक'],'Canal':['नहर','कालवा'],'Borewell':['बोरवेल','बोअरवेल'],'acres':['एकड़','एकर'],'hectares':['हेक्टेयर','हेक्टर'],'Kharif':['खरीफ','खरीप'],'Rabi':['रबी','रब्बी'],'Summer':['ग्रीष्म','उन्हाळी'],
+'Cotton':['कपास','कापूस'],'Soybean':['सोयाबीन','सोयाबीन'],'Pigeon Pea':['अरहर (तूर)','तूर'],'Chickpea':['चना','हरभरा'],'Wheat':['गेहूँ','गहू'],'Green Gram':['मूंग','मूग'],'Nagpur Mandarin':['नागपुरी संतरा','नागपुरी संत्रा']};
+const D={'Rain':['बारिश','पाऊस'],'Dry spell':['सूखा दौर','कोरडा कालखंड'],'days':['दिन','दिवस'],'score':['स्कोर','गुण'],'Top-ranked rotation':['शीर्ष फसल चक्र','सर्वोत्तम फेरपालट'],'Farmer':['किसान','शेतकरी'],'unavailable':['अनुपलब्ध','उपलब्ध नाही'],'Weather data':['मौसम डेटा','हवामान डेटा'],'Soil data':['मिट्टी डेटा','माती डेटा'],'Rotation engine':['फसल चक्र इंजन','फेरपालट इंजिन']};
+function setLang(l){S.lang=l;store.set('fw_lang',l);render()}
+function pills(){return `<div class="pills">${[['en','English'],['hi','हिंदी'],['mr','मराठी']].map(a=>`<button class="${S.lang===a[0]?'on':''}" onclick="setLang('${a[0]}')">${a[1]}</button>`).join('')}</div>`}
+function applyLang(){
+  const L=S.lang==='hi'?0:S.lang==='mr'?1:-1;if(L<0)return;
+  const rx=new RegExp(Object.keys(D).sort((a,b)=>b.length-a.length).map(k=>k.replace(/[.*+?^${}()|[\]\\]/g,'\\$&')).join('|'),'g');
+  const w=document.createTreeWalker(document.getElementById('app'),NodeFilter.SHOW_TEXT),ns=[];
+  while(w.nextNode())ns.push(w.currentNode);
+  ns.forEach(n=>{const tg=n.parentNode.tagName;if(tg==='OPTION'||tg==='SCRIPT'||tg==='STYLE')return;const v=n.nodeValue,t=v.trim();if(!t)return;
+    n.nodeValue=X[t]?v.replace(t,X[t][L]):v.replace(rx,k=>D[k][L])});
+  document.querySelectorAll('[placeholder]').forEach(e=>{const x=X[e.placeholder];if(x)e.placeholder=x[L]});
+}
+function avatarHTML(big){const c=big?'avatar big':'avatar';return S.pic?`<img class="${c}" src="${S.pic}" alt="Profile photo" onclick="go('profile')">`:`<div class="${c}" onclick="go('profile')">${esc((S.user&&S.user.name||'F')[0].toUpperCase())}</div>`}
+function onPic(ev){const f=ev.target.files[0];if(!f)return;const r=new FileReader();r.onload=()=>{const im=new Image();im.onload=()=>{const c=document.createElement('canvas'),z=256,m=Math.min(im.width,im.height);c.width=c.height=z;c.getContext('2d').drawImage(im,(im.width-m)/2,(im.height-m)/2,m,m,0,0,z,z);S.pic=c.toDataURL('image/jpeg',.85);store.set('fw_pic',S.pic);render()};im.src=r.result};r.readAsDataURL(f)}
+function login(){return `<div class="lg"><div class="lgtop"><div class="sun"></div><div class="hill a"></div><div class="hill b"></div><div class="lgc">${pills()}<div class="lglogo">🌾</div><h1 style="font-size:30px">Kshetra Smart Farming AI</h1><div style="margin-top:4px;font-weight:600">Know your soil. Plan your next harvest.</div></div></div>
+<div class="lgsheet"><h2 style="margin-top:0">Welcome, farmer</h2><div class="sub">Sign in to see live NASA data for your farm.</div>
+<label>Your name</label><input id="l_name" autocomplete="name"><label>Mobile number</label><input id="l_mob" inputmode="numeric" maxlength="10" autocomplete="tel">
+<div id="l_err" class="sub" style="color:var(--bad);min-height:20px;margin:6px 0"></div>
+<button class="btn navy" onclick="doLogin()">Continue</button><button class="btn ghost" style="width:100%;margin-top:8px" onclick="doLogin(1)">Continue as guest</button>
+<p class="sub" style="margin-top:14px;text-align:center">Your details stay on this device. No password is needed yet.</p></div></div>`}
+function doLogin(guest){
+  let n='Farmer',m='';
+  if(!guest){n=document.getElementById('l_name').value.trim();m=document.getElementById('l_mob').value.trim();
+    const e=document.getElementById('l_err'),x=k=>(S.lang==='en'?k:X[k][S.lang==='hi'?0:1]);
+    if(!n){e.textContent=x('Enter your name.');return}
+    if(!/^\d{10}$/.test(m)){e.textContent=x('Enter a 10-digit mobile number.');return}}
+  S.user={name:n,mobile:m};store.set('fw_user',S.user);S.tab='home';refresh();
+}
+function logout(){S.user=null;store.set('fw_user',null);render()}
+
+/* ---------- shell ---------- */
+const NAV=[['home','🏠','Home'],['crops','🌱','Crops'],['planner','📅','Planner'],['weather','⛅','Weather'],['profile','👤','Profile']];
+const VIEWS={home,crops,soil:soilView,planner,weather,assistant,profile};
+const PARENT={soil:'crops',assistant:'home'};
+function go(t){S.tab=t;render();document.getElementById('view').scrollTop=0}
+function render(){
+  const nv=document.getElementById('nav');
+  if(!S.user){document.getElementById('view').innerHTML=login();nv.style.display='none';applyLang();return}
+  nv.style.display='';
+  document.getElementById('view').innerHTML=VIEWS[S.tab]();
+  const act=PARENT[S.tab]||S.tab;
+  document.getElementById('nav').innerHTML=NAV.map(n=>`<button class="${n[0]===act?'on':''}" onclick="go('${n[0]}')"><i>${n[1]}</i>${n[2]}</button>`).join('');
+  applyLang();
+}
+if(S.user)refresh();else render();
+</script>
+</body>
+</html>

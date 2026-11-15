@@ -1,0 +1,46 @@
+version: "3.9"
+
+services:
+  backend:
+    build:
+      context: .
+      dockerfile: backend/Dockerfile
+    container_name: kshetra-backend
+    restart: unless-stopped
+    env_file:
+      - .env
+    environment:
+      - FLASK_ENV=production
+      - DATABASE_URL=sqlite:////data/kshetra.db
+    volumes:
+      - kshetra_db_data:/data
+      - ./backups:/workspace/backups
+    ports:
+      - "5000:5000"
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://127.0.0.1:5000/healthz')"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+
+  worker:
+    build:
+      context: .
+      dockerfile: backend/Dockerfile
+    container_name: kshetra-worker
+    restart: unless-stopped
+    command: ["python", "worker.py"]
+    env_file:
+      - .env
+    environment:
+      - FLASK_ENV=production
+      - DATABASE_URL=sqlite:////data/kshetra.db
+      - WORKER_INTERVAL_SECONDS=3600
+    volumes:
+      - kshetra_db_data:/data
+      - ./backups:/workspace/backups
+    depends_on:
+      - backend
+
+volumes:
+  kshetra_db_data:

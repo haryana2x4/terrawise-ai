@@ -1,82 +1,60 @@
-# Kshetra (क्षेत्र)
+# Kshetra (क्षेत्र) — Agricultural Decision Support Platform
 
-Precision agro-climatic advisor and interactive 3D companion suite built for smallholder farmers in **Ahilya Nagar** and **Nashik**, Maharashtra.
-
-## Overview
-
-- **Kshetra Agro-Advisor (`backend/`, `frontend/`, `data/`, `tests/`)** — Full-stack GIS and meteorological decision-support platform powered by Open-Meteo and NASA POWER telemetry. Supports Marathi, Hindi, and English with interactive parcel boundary validation, multi-factor crop suitability scoring, IPM advisories, and printable farmer credential cards.
-- **SUNDAY v2 (`services/ai-bot/`)** — Local-first Node.js + Three.js 3D voxel companion and sandboxed skill runner.
-- **Beyond Earth — Orien (`modules/orien/`)** — React 19 + TypeScript + Three.js orbital telemetry and mission portal.
+**Kshetra** (formerly TERRAWISE AI) is a zero-demo, production-grade agricultural decision support platform built for smallholder farmers and agricultural extension officers in **Ahilya Nagar** and **Nashik**, Maharashtra.
 
 ---
 
-## Project Structure
+## Core Capabilities
 
-```text
-kshetra/
-├── backend/            # Flask REST API, SQLAlchemy models, Shapely/PyProj GIS validator
-├── frontend/           # React + TypeScript + Vite + Tailwind CSS web client
-├── data/               # District/taluka GeoJSON layers & crop/IPM reference datasets
-├── tests/              # Python unit & integration test suite
-├── services/ai-bot/    # SUNDAY v2 3D Enderman companion studio
-└── modules/orien/      # Beyond Earth orbital portal module
-```
+1. **Zero-Demo Production Integrity**:
+   - Every screen, endpoint, and metric reflects real field telemetry or explicit `"No data"` (`"माहिती नाही"` / `"कोई जानकारी नहीं"`).
+   - Missing values never render as `0`, and every metric displays its upstream source and UTC timestamp.
+   - Enforced by [`scripts/check_no_demo.py`](file:///C:/Users/Rocky/.gemini/antigravity/scratch/terrawise-ai/scripts/check_no_demo.py).
+
+2. **Transactional 20-Farmer Cap & 7/12 Parcel Mapping**:
+   - Hard capacity of **20 active farmer accounts** enforced inside a database transaction (`BEGIN IMMEDIATE` on SQLite / `SELECT ... FOR UPDATE` on PostgreSQL).
+   - Up to **4 parcels per farmer**, validated with RFC 7946 right-hand rule orientation, minimum 0.5m vertex spacing, district containment, dual-CRS geodesic (`WGS84`) vs projected (`UTM Zone 43N / EPSG:32643`) area cross-check (`< 0.5%` divergence), and `<= 2%` cross-parcel overlap guard.
+   - Printable **A6 single** and **A4 batch** PDF credential cards with Devanagari typography (`NotoSansDevanagari`).
+
+3. **Agronomic Suitability Engine & Real-Time Telemetry**:
+   - Integrates **Open-Meteo** (7-day forecast + 30-day history + soil moisture), **ISRIC SoilGrids v2.0**, and **Agmarknet** (`data.gov.in`) behind an SSRF-safe allowlist, retry with backoff, circuit breaker, and database snapshot cache.
+   - Computes **VPD** (Vapor Pressure Deficit), **GDD** (Growing Degree Days), **RSHI** (Regional Soil-Hydration Index 0–100), and **0–100 crop suitability scores** across 5 transparent factors (`water_match`, `soil_match`, `season_temp_match`, `duration_efficiency`, `rotation_health`).
+   - Prioritizes **Integrated Pest Management (IPM)** with mandatory Krishi Vigyan Kendra (KVK) safety disclaimers.
+
+4. **Krishi Mitra AI Assistant (Marathi / Hindi / English + Voice)**:
+   - Grounded in each farmer's real parcel geometry, soil type, irrigation source, live weather, and crop suitability scores.
+   - Pluggable provider adapter (`gemini`, `openai`, or deterministic grounded agronomic engine) with prompt-injection sanitization, per-farmer hourly message limits (`30/hr`), daily token budgets, thumbs up/down feedback, and 90-day retention.
+
+5. **India DPDP Act 2023 Compliance**:
+   - First-login Marathi/Hindi/English privacy consent flow, field-level PII encryption (`mobile_encrypted`, `survey_number_encrypted`), one-click **Export My Data (JSON)**, and self-service **Delete My Data**.
 
 ---
 
-## Quick Start
+## Quick Start (Windows PowerShell)
 
-### 1. Environment Setup
+```powershell
+# 1. Backend setup & admin initialization
+cd backend
+python -m pip install -r requirements.txt
+$env:FLASK_APP = "wsgi.py"
+python -m flask doctor
+python -m flask create-admin --admin-id ADMIN --name "Kshetra Agricultural Officer"
+python wsgi.py
 
-```bash
-cp .env.example .env
-```
-
-### 2. Backend & Frontend (Kshetra)
-
-```bash
-# Install backend dependencies
-python -m venv .venv
-.venv\Scripts\activate      # macOS/Linux: source .venv/bin/activate
-pip install -r backend/requirements.txt
-
-# Generate sample parcel boundaries
-python backend/generate_fields.py
-
-# Build frontend
+# 2. Frontend dev server (in a second terminal)
 cd frontend
-npm install
-npm run build
-cd ..
-
-# Start server on http://127.0.0.1:5000
-python backend/app.py
-```
-
-Run backend tests:
-
-```bash
-python -m unittest discover tests
-```
-
-### 3. SUNDAY v2 Studio (`services/ai-bot`)
-
-```bash
-cd services/ai-bot
-npm install
-node server.js
-```
-
-### 4. Beyond Earth Portal (`modules/orien`)
-
-```bash
-cd modules/orien
 npm install
 npm run dev
 ```
 
+See [`RUN_LOCAL.md`](file:///C:/Users/Rocky/.gemini/antigravity/scratch/terrawise-ai/RUN_LOCAL.md), [`ARCHITECTURE.md`](file:///C:/Users/Rocky/.gemini/antigravity/scratch/terrawise-ai/ARCHITECTURE.md), [`DEPLOY.md`](file:///C:/Users/Rocky/.gemini/antigravity/scratch/terrawise-ai/DEPLOY.md), and [`SECURITY.md`](file:///C:/Users/Rocky/.gemini/antigravity/scratch/terrawise-ai/SECURITY.md) for complete documentation.
+
 ---
+
+## Built with AI Assistance
+
+Developed and upgraded with assistance from **Google Antigravity** (used for layered backend refactoring, security hardening, Krishi Mitra bot integration, automated test authoring, and technical documentation).
 
 ## License
 
-MIT © [Aryan Ramdinesh Kurmi](https://github.com/haryana2x4)
+MIT License — see [`LICENSE`](file:///C:/Users/Rocky/.gemini/antigravity/scratch/terrawise-ai/LICENSE).
