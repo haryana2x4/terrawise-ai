@@ -40,6 +40,7 @@ interface FarmerHomeProps {
   onLogout: () => void;
   onOpenAdmin: () => void;
   onOpenInstallModal?: () => void;
+  onOpenGuideModal?: () => void;
 }
 
 type HomeTab = "today" | "precision" | "dossier";
@@ -53,7 +54,8 @@ export const FarmerHome: React.FC<FarmerHomeProps> = ({
   onLanguageChange,
   onLogout,
   onOpenAdmin,
-  onOpenInstallModal
+  onOpenInstallModal,
+  onOpenGuideModal
 }) => {
   const [dashboardData, setDashboardData] = useState<any>(null);
   const [isLoading, setIsLoading] = useState<boolean>(true);
@@ -344,6 +346,7 @@ export const FarmerHome: React.FC<FarmerHomeProps> = ({
           onOpenAdmin={farmer.role === "admin" ? onOpenAdmin : undefined}
           onOpenAssistant={() => setShowAssistant(true)}
           onOpenInstallModal={onOpenInstallModal}
+          onOpenGuideModal={onOpenGuideModal}
         />
       </div>
 

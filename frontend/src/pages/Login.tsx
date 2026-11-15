@@ -27,6 +27,7 @@ interface LoginProps {
   onLanguageChange: (l: Language) => void;
   onLoginSuccess: (farmerData: any, token: string) => void;
   onOpenInstallModal?: () => void;
+  onOpenGuideModal?: () => void;
   canNativeInstall?: boolean;
 }
 
@@ -46,6 +47,7 @@ export const Login: React.FC<LoginProps> = ({
   onLanguageChange,
   onLoginSuccess,
   onOpenInstallModal,
+  onOpenGuideModal,
   canNativeInstall
 }) => {
   const [farmerId, setFarmerId] = useState(() => {
@@ -240,7 +242,27 @@ export const Login: React.FC<LoginProps> = ({
               >
                 <Download className="w-3 h-3 text-emerald-300" />
                 <span className="hidden sm:inline">
-                  {lang === "mr" ? "अ‍ॅप डाउनलोड" : "Get App"}
+                  {lang === "mr" ? "अ‍ॅप डाउनलोड" : lang === "hi" ? "ऐप डाउनलोड" : "Get App"}
+                </span>
+              </button>
+            )}
+
+            {onOpenGuideModal && (
+              <button
+                type="button"
+                onClick={onOpenGuideModal}
+                title={
+                  lang === "mr"
+                    ? "सुरक्षा, डेटा स्टोरेज, AI आणि फ्लोचार्ट Q&A"
+                    : lang === "hi"
+                      ? "सुरक्षा, डेटा स्टोरेज, AI और फ़्लोचार्ट Q&A"
+                      : "Security, Data Storage, AI & Flowchart Q&A"
+                }
+                className="px-2 py-1 rounded-xl text-[10px] sm:text-xs font-extrabold border transition-colors flex items-center space-x-1 bg-black/45 border-amber-400/35 text-amber-200 hover:text-white"
+              >
+                <ShieldCheck className="w-3 h-3 text-amber-300" />
+                <span className="hidden md:inline">
+                  {lang === "mr" ? "प्रणाली Q&A" : lang === "hi" ? "सिस्टम Q&A" : "Q&A Guide"}
                 </span>
               </button>
             )}
@@ -552,6 +574,24 @@ export const Login: React.FC<LoginProps> = ({
           </div>
 
           <div className="flex flex-wrap items-center justify-center gap-3 text-[11px]">
+            {onOpenGuideModal && (
+              <>
+                <button
+                  onClick={onOpenGuideModal}
+                  className="text-amber-300 hover:text-amber-200 font-bold flex items-center space-x-1"
+                >
+                  <ShieldCheck className="w-3.5 h-3.5" />
+                  <span>
+                    {lang === "mr"
+                      ? "सुरक्षा, फ्लोचार्ट व Q&A"
+                      : lang === "hi"
+                        ? "सुरक्षा, फ़्लोचार्ट व Q&A"
+                        : "Security, Flowchart & Q&A"}
+                  </span>
+                </button>
+                <span className="text-stone-700">•</span>
+              </>
+            )}
             <button
               onClick={() => setInfoModal("status")}
               className="text-emerald-400 hover:text-emerald-300 font-bold flex items-center space-x-1"

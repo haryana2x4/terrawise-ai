@@ -4,6 +4,7 @@ import { Login } from "./pages/Login";
 import { FarmerHome } from "./pages/FarmerHome";
 import { AdminPortal } from "./pages/AdminPortal";
 import { InstallAppModal } from "./components/InstallAppModal";
+import { SystemGuideModal } from "./components/SystemGuideModal";
 
 interface BeforeInstallPromptEvent extends Event {
   prompt: () => Promise<void>;
@@ -45,6 +46,7 @@ export const App: React.FC = () => {
     );
   });
   const [showInstallModal, setShowInstallModal] = useState(false);
+  const [showGuideModal, setShowGuideModal] = useState(false);
 
   useEffect(() => {
     const handleBeforeInstall = (e: Event) => {
@@ -120,6 +122,7 @@ export const App: React.FC = () => {
           onLanguageChange={handleLanguageChange}
           onLoginSuccess={handleLoginSuccess}
           onOpenInstallModal={() => setShowInstallModal(true)}
+          onOpenGuideModal={() => setShowGuideModal(true)}
           canNativeInstall={Boolean(deferredPrompt)}
         />
       ) : view === "admin" ? (
@@ -130,6 +133,7 @@ export const App: React.FC = () => {
           onBack={() => setView("farmer")}
           onLogout={handleLogout}
           onOpenInstallModal={() => setShowInstallModal(true)}
+          onOpenGuideModal={() => setShowGuideModal(true)}
         />
       ) : (
         <FarmerHome
@@ -142,6 +146,7 @@ export const App: React.FC = () => {
           onLogout={handleLogout}
           onOpenAdmin={() => setView("admin")}
           onOpenInstallModal={() => setShowInstallModal(true)}
+          onOpenGuideModal={() => setShowGuideModal(true)}
         />
       )}
 
@@ -151,8 +156,16 @@ export const App: React.FC = () => {
           canNativeInstall={Boolean(deferredPrompt)}
           isInstalled={isInstalled}
           onTriggerNativeInstall={handleTriggerNativeInstall}
+          onOpenGuideModal={() => {
+            setShowInstallModal(false);
+            setShowGuideModal(true);
+          }}
           onClose={() => setShowInstallModal(false)}
         />
+      )}
+
+      {showGuideModal && (
+        <SystemGuideModal lang={lang} onClose={() => setShowGuideModal(false)} />
       )}
     </>
   );

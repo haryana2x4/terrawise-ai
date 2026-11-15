@@ -2,6 +2,14 @@
 
 All notable architectural and API changes to **Kshetra (formerly TERRAWISE AI)** are documented here.
 
+## [2.4.1] — 2026-11-15 — Smart Zero-Friction `.exe` Launcher & In-App Architecture / Q&A Guide
+
+### Added & Fixed
+- **Zero-Friction Smart [`Kshetra-Desktop.exe`](file:///C:/Users/Rocky/.gemini/antigravity/scratch/terrawise-ai/release/Kshetra-Desktop.exe) ([`KshetraDesktop.cs`](file:///C:/Users/Rocky/.gemini/antigravity/scratch/terrawise-ai/packaging/windows/KshetraDesktop.cs), [`api/v1/__init__.py`](file:///C:/Users/Rocky/.gemini/antigravity/scratch/terrawise-ai/backend/app/api/v1/__init__.py))**:
+  - Added single-instance `Mutex` protection (no overlapping duplicate popups), PE-overlay target URL embedding via `GET /api/v1/meta/download/windows-exe?target=...`, automatic depth-2 repo discovery across `Downloads`, `Desktop`, `Documents`, and `.gemini/antigravity/scratch`, silent `start.py` auto-boot splash screen, and an interactive Connect / Browse Folder GUI dialog.
+- **In-App Architecture, Flowchart & Simple Q&A Guide ([`SystemGuideModal.tsx`](file:///C:/Users/Rocky/.gemini/antigravity/scratch/terrawise-ai/frontend/src/components/SystemGuideModal.tsx))**:
+  - Added trilingual (`mr` / `hi` / `en`) modal accessible from [`Login.tsx`](file:///C:/Users/Rocky/.gemini/antigravity/scratch/terrawise-ai/frontend/src/pages/Login.tsx) (header & footer), [`Header.tsx`](file:///C:/Users/Rocky/.gemini/antigravity/scratch/terrawise-ai/frontend/src/components/Header.tsx), [`AdminPortal.tsx`](file:///C:/Users/Rocky/.gemini/antigravity/scratch/terrawise-ai/frontend/src/pages/AdminPortal.tsx), and [`InstallAppModal.tsx`](file:///C:/Users/Rocky/.gemini/antigravity/scratch/terrawise-ai/frontend/src/components/InstallAppModal.tsx).
+
 ## [2.4.0] — 2026-11-15 — Windows Desktop `.exe`, Android `.apk` Packaging Kit & System Q&A Architecture Guide
 
 ### Added

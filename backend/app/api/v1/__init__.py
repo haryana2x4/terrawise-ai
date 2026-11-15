@@ -1746,7 +1746,7 @@ def meta_download_windows_launcher():
 
 @api_v1.route("/meta/download/windows-exe", methods=["GET"])
 def meta_download_windows_exe():
-    """Serve the compiled native Windows desktop executable (Kshetra-Desktop.exe)."""
+    """Serve Kshetra-Desktop.exe, optionally embedding a verified ?target= server URL in its PE overlay."""
     base_dir = Path(current_app.config["BASE_DIR"])
     exe_path = base_dir / "release" / "Kshetra-Desktop.exe"
     if not exe_path.is_file():
@@ -1755,8 +1755,15 @@ def meta_download_windows_exe():
             "Kshetra-Desktop.exe has not been compiled yet. Run python packaging/windows/build_exe.py.",
             404,
         )
+    payload = exe_path.read_bytes()
+    requested_target = request.args.get("target")
+    if requested_target:
+        verified_url = _resolve_verified_access_url(requested_target)
+        cfg_blob = json.dumps({"url": verified_url}, separators=(",", ":")).encode("utf-8")
+        payload = payload + b"\n__KSHETRA_CFG__=" + cfg_blob + b"\n"
+
     return Response(
-        exe_path.read_bytes(),
+        payload,
         mimetype="application/vnd.microsoft.portable-executable",
         headers={
             "Content-Disposition": 'attachment; filename="Kshetra-Desktop.exe"',

@@ -33,6 +33,7 @@ interface AdminPortalProps {
   onBack: () => void;
   onLogout?: () => void;
   onOpenInstallModal?: () => void;
+  onOpenGuideModal?: () => void;
 }
 
 export const AdminPortal: React.FC<AdminPortalProps> = ({
@@ -41,7 +42,8 @@ export const AdminPortal: React.FC<AdminPortalProps> = ({
   tier = "full",
   onBack,
   onLogout,
-  onOpenInstallModal
+  onOpenInstallModal,
+  onOpenGuideModal
 }) => {
   const [overview, setOverview] = useState<any>(null);
   const [talukaOptions, setTalukaOptions] = useState<{ name: string; district: string }[]>([]);
@@ -516,6 +518,17 @@ export const AdminPortal: React.FC<AdminPortalProps> = ({
               >
                 <QrCode className="w-4 h-4 text-emerald-300" />
                 <span className="hidden md:inline">शेअर / QR अ‍ॅप</span>
+              </button>
+            )}
+
+            {onOpenGuideModal && (
+              <button
+                onClick={onOpenGuideModal}
+                className="bg-amber-900/90 hover:bg-amber-800 text-amber-100 px-3 py-1.5 rounded-xl text-xs font-extrabold flex items-center space-x-1 shadow border border-amber-500/40"
+                title="System Architecture, Security, AI Grounding & Q&A"
+              >
+                <FileCheck2 className="w-4 h-4 text-amber-300" />
+                <span className="hidden lg:inline">प्रणाली Q&amp;A</span>
               </button>
             )}
 

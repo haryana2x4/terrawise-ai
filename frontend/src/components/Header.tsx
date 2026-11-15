@@ -1,6 +1,6 @@
 import React from "react";
 import { Language, translations } from "../i18n/translations";
-import { User, LogOut, ShieldAlert, Bot, Zap, Download } from "lucide-react";
+import { User, LogOut, ShieldAlert, Bot, Zap, Download, ShieldCheck } from "lucide-react";
 
 interface HeaderProps {
   farmer: any;
@@ -12,6 +12,7 @@ interface HeaderProps {
   onOpenAdmin?: () => void;
   onOpenAssistant?: () => void;
   onOpenInstallModal?: () => void;
+  onOpenGuideModal?: () => void;
 }
 
 export const Header: React.FC<HeaderProps> = ({
@@ -23,7 +24,8 @@ export const Header: React.FC<HeaderProps> = ({
   onLogout,
   onOpenAdmin,
   onOpenAssistant,
-  onOpenInstallModal
+  onOpenInstallModal,
+  onOpenGuideModal
 }) => {
   const t = translations[lang];
 
@@ -83,6 +85,25 @@ export const Header: React.FC<HeaderProps> = ({
               <Download className="w-3.5 h-3.5 text-emerald-300" />
               <span className="hidden md:inline">
                 {lang === "mr" ? "अ‍ॅप घ्या" : lang === "hi" ? "ऐप पाएं" : "Install"}
+              </span>
+            </button>
+          )}
+
+          {onOpenGuideModal && (
+            <button
+              onClick={onOpenGuideModal}
+              className="bg-emerald-900/90 hover:bg-emerald-800 text-amber-200 px-2.5 py-1.5 rounded-xl text-xs font-bold flex items-center space-x-1 border border-amber-400/35 shadow-xs transition-all"
+              title={
+                lang === "mr"
+                  ? "सुरक्षा, डेटा, API आणि फ्लोचार्ट माहिती"
+                  : lang === "hi"
+                    ? "सुरक्षा, डेटा, API और फ्लोचार्ट गाइड"
+                    : "Security, APIs, Flowchart & Simple Q&A"
+              }
+            >
+              <ShieldCheck className="w-3.5 h-3.5 text-amber-300" />
+              <span className="hidden lg:inline">
+                {lang === "mr" ? "प्रणाली Q&A" : lang === "hi" ? "सिस्टम Q&A" : "Q&A Guide"}
               </span>
             </button>
           )}

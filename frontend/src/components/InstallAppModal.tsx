@@ -11,7 +11,8 @@ import {
   Globe,
   CheckCircle2,
   Terminal,
-  Share2
+  Share2,
+  ShieldCheck
 } from "lucide-react";
 
 interface AccessInfo {
@@ -32,6 +33,7 @@ interface InstallAppModalProps {
   canNativeInstall: boolean;
   isInstalled: boolean;
   onTriggerNativeInstall: () => Promise<void>;
+  onOpenGuideModal?: () => void;
   onClose: () => void;
 }
 
@@ -40,6 +42,7 @@ export const InstallAppModal: React.FC<InstallAppModalProps> = ({
   canNativeInstall,
   isInstalled,
   onTriggerNativeInstall,
+  onOpenGuideModal,
   onClose
 }) => {
   const [accessInfo, setAccessInfo] = useState<AccessInfo | null>(null);
@@ -83,7 +86,7 @@ export const InstallAppModal: React.FC<InstallAppModalProps> = ({
     ? `/api/v1/meta/access-qr?target=${encodeURIComponent(selectedUrl)}`
     : null;
   const winLauncherHref = `/api/v1/meta/download/windows-launcher?target=${encodeURIComponent(activeTarget)}`;
-  const winExeHref = "/api/v1/meta/download/windows-exe";
+  const winExeHref = `/api/v1/meta/download/windows-exe?target=${encodeURIComponent(activeTarget)}`;
 
   const handleCopy = async () => {
     try {
@@ -289,10 +292,10 @@ export const InstallAppModal: React.FC<InstallAppModalProps> = ({
               </h4>
               <p className="text-[11px] text-stone-600 leading-relaxed">
                 {lang === "mr"
-                  ? "Windows साठी थेट Kshetra-Desktop.exe डाउनलोड करा किंवा Android फोनवर APK/WebAPK वापरा."
+                  ? "Windows साठी थेट Kshetra-Desktop.exe डाउनलोड करा — हा अ‍ॅप स्वतः तुमचा निवडलेला सर्व्हर URL किंवा Downloads मधील फोल्डर शोधून सुरू होतो."
                   : lang === "hi"
-                    ? "Windows के लिए सीधा Kshetra-Desktop.exe डाउनलोड करें या Android फ़ोन पर APK/WebAPK उपयोग करें।"
-                    : "Download the compiled Windows .exe (native window + auto-start) or build/install on Android."}
+                    ? "Windows के लिए Kshetra-Desktop.exe डाउनलोड करें — यह अपने आप आपका चुना हुआ सर्वर URL या Downloads में मौजूद प्रोजेक्ट फ़ोल्डर ढूंढकर चालू होता है।"
+                    : "Smart Windows launcher embeds your selected URL automatically and auto-detects extracted Kshetra folders on your PC."}
               </p>
               <div className="space-y-1.5">
                 {accessInfo?.windows_exe_ready !== false && (
@@ -341,6 +344,21 @@ export const InstallAppModal: React.FC<InstallAppModalProps> = ({
                   2. {accessInfo?.tunnel_command_hint || "cloudflared tunnel --url http://127.0.0.1:5000"}
                 </div>
               </div>
+              {onOpenGuideModal && (
+                <button
+                  onClick={onOpenGuideModal}
+                  className="w-full py-1.5 px-3 rounded-xl bg-amber-50 hover:bg-amber-100 border border-amber-300 text-amber-950 text-[11px] font-extrabold flex items-center justify-center space-x-1.5 transition-colors"
+                >
+                  <ShieldCheck className="w-3.5 h-3.5 text-amber-700" />
+                  <span>
+                    {lang === "mr"
+                      ? "सुरक्षा, डेटा, AI व फ्लोचार्ट Q&A पहा"
+                      : lang === "hi"
+                        ? "सुरक्षा, डेटा, AI व फ़्लोचार्ट Q&A देखें"
+                        : "View Security, Storage, AI & Flowchart Q&A"}
+                  </span>
+                </button>
+              )}
             </section>
           </div>
         </div>

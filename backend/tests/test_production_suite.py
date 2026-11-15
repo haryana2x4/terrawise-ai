@@ -746,6 +746,18 @@ def test_windows_exe_and_android_packaging_endpoints(client):
     assert 'filename="Kshetra-Desktop.exe"' in exe_resp.headers.get("Content-Disposition", "")
     assert exe_resp.data[:2] == b"MZ"
 
+    # Verified target URL is embedded cleanly into PE overlay while untrusted external URLs are rejected
+    recommended = info["recommended_share_url"]
+    targeted_resp = client.get(f"/api/v1/meta/download/windows-exe?target={recommended}")
+    assert targeted_resp.status_code == 200
+    assert targeted_resp.data[:2] == b"MZ"
+    assert b"__KSHETRA_CFG__=" in targeted_resp.data
+    assert recommended.encode("utf-8") in targeted_resp.data
+
+    evil_resp = client.get("/api/v1/meta/download/windows-exe?target=https://untrusted.example.com")
+    assert evil_resp.status_code == 400
+    assert evil_resp.get_json()["error"]["code"] == "UNTRUSTED_TARGET_URL"
+
 
 
 
