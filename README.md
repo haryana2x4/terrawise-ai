@@ -11,8 +11,8 @@
    - Missing values never render as `0`, and every metric displays its upstream source and UTC timestamp.
    - Enforced by [`scripts/check_no_demo.py`](file:///C:/Users/Rocky/.gemini/antigravity/scratch/terrawise-ai/scripts/check_no_demo.py).
 
-2. **Transactional 20-Farmer Cap, Satellite GIS & 7/12 Parcel Mapping**:
-   - Hard capacity of **20 active farmer accounts** enforced inside a database transaction (`BEGIN IMMEDIATE` on SQLite / `SELECT ... FOR UPDATE` on PostgreSQL).
+2. **Transactional 40-Farmer Cap, Satellite GIS & 7/12 Parcel Mapping**:
+   - Hard capacity of **40 active farmer accounts** enforced inside a database transaction (`BEGIN IMMEDIATE` on SQLite / `SELECT ... FOR UPDATE` on PostgreSQL).
    - Interactive Leaflet Satellite / Street / Topo boundary mapper (`Esri World Imagery` + `OSM` + `OpenTopoMap`) with draggable vertices, 29-taluka quick jump, 1-acre starter square, inline metadata edit (`PATCH /api/v1/parcels/<id>`), GeoJSON export, and Officer land-mapping mode.
    - Up to **4 parcels per farmer**, validated with RFC 7946 right-hand rule orientation, minimum 0.5m vertex spacing, district containment, dual-CRS geodesic (`WGS84`) vs projected (`UTM Zone 43N / EPSG:32643`) area cross-check (`< 0.5%` divergence), and `<= 2%` cross-parcel overlap guard.
    - Printable **A6 single** and **A4 batch** PDF credential cards with Devanagari typography (`NotoSansDevanagari`), plus printable Field Cadastral Dossier (`Ctrl+P`).

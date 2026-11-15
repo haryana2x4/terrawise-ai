@@ -43,6 +43,7 @@ from app.schemas import (
     validate_create_parcel_payload,
     validate_login_payload,
     validate_password_change_payload,
+    validate_update_farmer_payload,
 )
 from app.security import (
     check_object_ownership,
@@ -492,6 +493,8 @@ def update_parcel(parcel_id: int):
             if irr_val not in ALLOWED_IRRIGATION_SOURCES:
                 raise AppError("INVALID_IRRIGATION_SOURCE", f"Unsupported irrigation_source: {irr_val}", 400)
             parcel.irrigation_source = irr_val
+        if "planting_date" in body:
+            parcel.planting_date = str(body["planting_date"] or "").strip()[:16] or None
         if "geojson" in body and body["geojson"]:
             measured = geo_service.validate_and_measure_polygon(body["geojson"])
             others = [
@@ -1173,14 +1176,14 @@ def download_batch_credential_cards():
 
 
 # ============================================================================
-# ADMIN CONSOLE (PHASE 5.1: 20-FARMER CAP, VERIFY LAND, AUDIT LOG, CSV EXPORT)
+# ADMIN CONSOLE (PHASE 5.1: 40-FARMER CAP, VERIFY LAND, AUDIT LOG, CSV EXPORT)
 # ============================================================================
 
 
 @api_v1.route("/admin/overview", methods=["GET"])
 @require_auth(role="admin")
 def admin_overview():
-    max_farmers = int(current_app.config.get("MAX_FARMERS", 20))
+    max_farmers = int(current_app.config.get("MAX_FARMERS", 40))
     with db_manager.session_scope() as session:
         farmers = FarmerRepository.list_active_farmers(session)
         farmer_list = [_serialize_farmer(f, include_parcels=True) for f in farmers]
@@ -1223,7 +1226,7 @@ def admin_overview():
 @api_v1.route("/admin/farmers", methods=["GET", "POST"])
 @require_auth(role="admin")
 def admin_farmers():
-    max_farmers = int(current_app.config.get("MAX_FARMERS", 20))
+    max_farmers = int(current_app.config.get("MAX_FARMERS", 40))
     if request.method == "GET":
         with db_manager.session_scope() as session:
             farmers = FarmerRepository.list_active_farmers(session)
@@ -1260,6 +1263,11 @@ def admin_farmers():
         village=payload["village"] or "",
         preferred_language=payload["preferred_language"] or "mr",
         mobile_encrypted=mobile_enc,
+        holder_relation=payload.get("holder_relation"),
+        farmer_category=payload.get("farmer_category") or "small",
+        primary_crops=payload.get("primary_crops"),
+        farming_experience_years=payload.get("farming_experience_years"),
+        bio_note=payload.get("bio_note"),
         actor_id=g.current_farmer_id,
         ip_address=request.remote_addr,
         max_farmers=max_farmers,
@@ -1339,6 +1347,47 @@ def admin_lock_farmer(farmer_id: str):
         )
         session.commit()
         return jsonify({"farmer": _serialize_farmer(farmer, include_parcels=True)}), 200
+
+
+@api_v1.route("/admin/farmers/<farmer_id>", methods=["PATCH"])
+@require_auth(role="admin")
+def admin_update_farmer(farmer_id: str):
+    """Update a registered farmer's natural profile attributes from the officer portal."""
+    updates = validate_update_farmer_payload(request.get_json(silent=True))
+    with db_manager.session_scope() as session:
+        farmer = FarmerRepository.get_by_farmer_id(session, farmer_id)
+        if not farmer:
+            raise AppError("FARMER_NOT_FOUND", "Farmer not found.", 404)
+        for field in (
+            "name",
+            "district",
+            "taluka",
+            "village",
+            "preferred_language",
+            "holder_relation",
+            "farmer_category",
+            "primary_crops",
+            "farming_experience_years",
+            "bio_note",
+        ):
+            if field in updates:
+                setattr(farmer, field, updates[field])
+        if "mobile" in updates:
+            mobile_val = updates["mobile"]
+            farmer.mobile_encrypted = (
+                encrypt_field(mobile_val, current_app.config["SECRET_KEY"]) if mobile_val else None
+            )
+        CommunityRepository.log_audit(
+            session,
+            actor_id=g.current_farmer_id,
+            action="ADMIN_UPDATE_FARMER",
+            target_id=farmer_id,
+            ip_address=request.remote_addr,
+        )
+        session.commit()
+        session.refresh(farmer)
+        profile = _serialize_farmer(farmer, include_parcels=True)
+    return jsonify({"farmer": profile}), 200
 
 
 @api_v1.route("/admin/farmers/<farmer_id>", methods=["DELETE"])
@@ -1452,7 +1501,7 @@ def meta_version():
                 "commit": current_app.config.get("GIT_COMMIT_SHA", "HEAD"),
                 "environment": current_app.config.get("APP_ENV", "development"),
                 "supported_districts": ["Ahilya Nagar", "Nashik"],
-                "max_farmers": int(current_app.config.get("MAX_FARMERS", 20)),
+                "max_farmers": int(current_app.config.get("MAX_FARMERS", 40)),
             }
         ),
         200,
@@ -1474,7 +1523,7 @@ def meta_public_status():
                 "database": "connected" if db_ok else "unreachable",
                 "capacity": {
                     "active_farmers": active_farmers,
-                    "max_farmers": int(current_app.config.get("MAX_FARMERS", 20)),
+                    "max_farmers": int(current_app.config.get("MAX_FARMERS", 40)),
                 },
                 "upstream_sources": sources,
             }

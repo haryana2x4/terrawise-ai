@@ -21,7 +21,9 @@ import {
   MapPin,
   LogOut,
   Compass,
-  QrCode
+  QrCode,
+  Search,
+  Edit3
 } from "lucide-react";
 
 interface AdminPortalProps {
@@ -42,13 +44,20 @@ export const AdminPortal: React.FC<AdminPortalProps> = ({
   onOpenInstallModal
 }) => {
   const [overview, setOverview] = useState<any>(null);
+  const [talukaOptions, setTalukaOptions] = useState<{ name: string; district: string }[]>([]);
   const [showAddModal, setShowAddModal] = useState<boolean>(false);
   const [showAnnModal, setShowAnnModal] = useState<boolean>(false);
   const [mappingFarmer, setMappingFarmer] = useState<any | null>(null);
+  const [editingFarmer, setEditingFarmer] = useState<any | null>(null);
   const [sunTheme] = useState(() => computeSunTheme());
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [actionMsg, setActionMsg] = useState<string | null>(null);
   const [issuedPasswords, setIssuedPasswords] = useState<Record<string, string>>({});
+
+  // Roster search & filter state
+  const [searchQuery, setSearchQuery] = useState("");
+  const [districtFilter, setDistrictFilter] = useState<"ALL" | "Ahilya Nagar" | "Nashik">("ALL");
+  const [statusFilter, setStatusFilter] = useState<"ALL" | "LOCKED" | "UNMAPPED">("ALL");
 
   // Create farmer form state
   const [name, setName] = useState("");
@@ -56,6 +65,23 @@ export const AdminPortal: React.FC<AdminPortalProps> = ({
   const [taluka, setTaluka] = useState("Rahuri");
   const [district, setDistrict] = useState("Ahilya Nagar");
   const [mobile, setMobile] = useState("");
+  const [holderRelation, setHolderRelation] = useState("");
+  const [farmerCategory, setFarmerCategory] = useState("small");
+  const [primaryCrops, setPrimaryCrops] = useState("");
+  const [experienceYears, setExperienceYears] = useState("");
+  const [bioNote, setBioNote] = useState("");
+
+  // Edit farmer form state
+  const [editName, setEditName] = useState("");
+  const [editDistrict, setEditDistrict] = useState("Ahilya Nagar");
+  const [editTaluka, setEditTaluka] = useState("Rahuri");
+  const [editVillage, setEditVillage] = useState("");
+  const [editMobile, setEditMobile] = useState("");
+  const [editRelation, setEditRelation] = useState("");
+  const [editCategory, setEditCategory] = useState("small");
+  const [editPrimaryCrops, setEditPrimaryCrops] = useState("");
+  const [editExpYears, setEditExpYears] = useState("");
+  const [editBioNote, setEditBioNote] = useState("");
 
   // Announcement form state
   const [annDistrict, setAnnDistrict] = useState("Ahilya Nagar");
@@ -87,6 +113,70 @@ export const AdminPortal: React.FC<AdminPortalProps> = ({
     loadOverview();
   }, [loadOverview]);
 
+  useEffect(() => {
+    fetch("/api/v1/geo/talukas")
+      .then(r => r.json())
+      .then(data => {
+        if (Array.isArray(data?.talukas)) {
+          setTalukaOptions(data.talukas);
+        }
+      })
+      .catch(() => {});
+  }, []);
+
+  const openEditFarmerModal = (f: any) => {
+    setEditingFarmer(f);
+    setEditName(f.name || "");
+    setEditDistrict(f.district || "Ahilya Nagar");
+    setEditTaluka(f.taluka || "Rahuri");
+    setEditVillage(f.village || "");
+    setEditMobile(f.mobile || "");
+    setEditRelation(f.holder_relation || "");
+    setEditCategory(f.farmer_category || "small");
+    setEditPrimaryCrops(f.primary_crops || "");
+    setEditExpYears(
+      f.farming_experience_years !== null && f.farming_experience_years !== undefined
+        ? String(f.farming_experience_years)
+        : ""
+    );
+    setEditBioNote(f.bio_note || "");
+  };
+
+  const handleUpdateFarmer = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!editingFarmer) return;
+    try {
+      const resp = await fetch(`/api/v1/admin/farmers/${editingFarmer.farmer_id}`, {
+        method: "PATCH",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`
+        },
+        body: JSON.stringify({
+          name: editName,
+          district: editDistrict,
+          taluka: editTaluka,
+          village: editVillage,
+          mobile: editMobile,
+          holder_relation: editRelation,
+          farmer_category: editCategory,
+          primary_crops: editPrimaryCrops,
+          farming_experience_years: editExpYears ? Number(editExpYears) : null,
+          bio_note: editBioNote
+        })
+      });
+      const data = await resp.json();
+      if (!resp.ok) {
+        throw new Error(data?.error?.message || "Update failed");
+      }
+      setActionMsg(`शेतकरी ${editingFarmer.farmer_id} (${editName}) माहिती अद्ययावत झाली!`);
+      setEditingFarmer(null);
+      loadOverview();
+    } catch (err: any) {
+      setActionMsg(`त्रुटी: ${err.message}`);
+    }
+  };
+
   const handleCreateFarmer = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
@@ -102,6 +192,11 @@ export const AdminPortal: React.FC<AdminPortalProps> = ({
           taluka,
           district,
           mobile,
+          holder_relation: holderRelation,
+          farmer_category: farmerCategory,
+          primary_crops: primaryCrops,
+          farming_experience_years: experienceYears ? Number(experienceYears) : null,
+          bio_note: bioNote,
           preferred_language: lang
         })
       });
@@ -122,6 +217,11 @@ export const AdminPortal: React.FC<AdminPortalProps> = ({
       setName("");
       setVillage("");
       setMobile("");
+      setHolderRelation("");
+      setFarmerCategory("small");
+      setPrimaryCrops("");
+      setExperienceYears("");
+      setBioNote("");
       loadOverview();
     } catch (err: any) {
       setActionMsg(`त्रुटी: ${err.message}`);
@@ -176,7 +276,7 @@ export const AdminPortal: React.FC<AdminPortalProps> = ({
         headers: { Authorization: `Bearer ${token}` }
       });
       if (resp.ok) {
-        setActionMsg(`शेतकरी ${farmerId} खाते हटवले (२० शेतकरी मर्यादेत १ जागा मोकळी झाली).`);
+        setActionMsg(`शेतकरी ${farmerId} खाते हटवले (४० शेतकरी मर्यादेत १ जागा मोकळी झाली).`);
         loadOverview();
       }
     } catch {
@@ -291,11 +391,37 @@ export const AdminPortal: React.FC<AdminPortalProps> = ({
     }
   };
 
-  const capacity = overview?.capacity || { active_farmers: 0, max_farmers: 20, remaining_slots: 20 };
+  const capacity = overview?.capacity || { active_farmers: 0, max_farmers: 40, remaining_slots: 40 };
   const farmersList = overview?.farmers || [];
   const sourceHealth = overview?.source_health || [];
   const auditLogs = overview?.audit_logs || [];
   const feedbackList = overview?.feedback || [];
+
+  const filteredFarmers = farmersList.filter((f: any) => {
+    if (districtFilter !== "ALL" && f.district !== districtFilter) return false;
+    if (statusFilter === "LOCKED" && !f.is_locked) return false;
+    if (statusFilter === "UNMAPPED" && (f.parcels || []).length > 0) return false;
+    const q = searchQuery.trim().toLowerCase();
+    if (!q) return true;
+    const hay = [
+      f.farmer_id,
+      f.name,
+      f.village,
+      f.taluka,
+      f.district,
+      f.primary_crops,
+      f.holder_relation
+    ]
+      .filter(Boolean)
+      .join(" ")
+      .toLowerCase();
+    return hay.includes(q);
+  });
+
+  const districtTalukas = (dist: string) => {
+    const filtered = talukaOptions.filter(opt => !dist || dist === "All" || opt.district === dist);
+    return filtered;
+  };
 
   const totalMappedParcels = farmersList.reduce(
     (sum: number, f: any) => sum + ((f.parcels || []).length || 0),
@@ -459,7 +585,7 @@ export const AdminPortal: React.FC<AdminPortalProps> = ({
           </div>
         </section>
 
-        {/* 1. Capacity Meter Bar (N of 20) */}
+        {/* 1. Capacity Meter Bar (N of 40) */}
         <section className="bg-white/90 backdrop-blur-md rounded-3xl p-5 shadow-xs border border-stone-200/80">
           <div className="flex items-center justify-between mb-2">
             <span className="font-black text-sm text-stone-900">
@@ -481,27 +607,61 @@ export const AdminPortal: React.FC<AdminPortalProps> = ({
 
         {/* 2.Registered Farmers & Land Verification Table */}
         <section className="bg-white rounded-3xl p-5 shadow-xs border border-stone-200">
-          <div className="flex items-center justify-between mb-4">
+          <div className="flex flex-wrap items-center justify-between gap-3 mb-4">
             <div>
               <h2 className="text-lg font-black text-stone-900">
                 नोंदणीकृत शेतकरी व ७/१२ शेत पडताळणी (Farmers &amp; Parcel Verification)
               </h2>
               <p className="text-xs text-stone-500">
-                शेतकरी आयडी, पासवर्ड रिसेट, अनलॉक, A6 ओळखपत्र प्रिंट आणि ७/१२ पडताळणी
+                शेतकरी आयडी, पासवर्ड रिसेट, अनलॉक, A6 ओळखपत्र प्रिंट आणि ७/१२ पडताळणी ({filteredFarmers.length} / {farmersList.length})
               </p>
             </div>
-            <button
-              onClick={loadOverview}
-              className="p-2 rounded-xl bg-stone-100 hover:bg-stone-200 text-stone-700"
-              title="Refresh"
-            >
-              <RefreshCw className={`w-4 h-4 ${isLoading ? "animate-spin" : ""}`} />
-            </button>
+            <div className="flex flex-wrap items-center gap-2">
+              <div className="relative">
+                <Search className="w-3.5 h-3.5 text-stone-400 absolute left-2.5 top-2.5" />
+                <input
+                  type="text"
+                  value={searchQuery}
+                  onChange={e => setSearchQuery(e.target.value)}
+                  placeholder="नाव, गाव, ID, पीक शोधा..."
+                  className="pl-8 pr-3 py-1.5 rounded-xl border border-stone-200 bg-stone-50 text-xs font-semibold w-48 focus:outline-none focus:border-emerald-600"
+                />
+              </div>
+              <select
+                value={districtFilter}
+                onChange={e => setDistrictFilter(e.target.value as any)}
+                className="px-2.5 py-1.5 rounded-xl border border-stone-200 bg-stone-50 text-xs font-bold text-stone-700"
+              >
+                <option value="ALL">सर्व जिल्हे (All)</option>
+                <option value="Ahilya Nagar">Ahilya Nagar</option>
+                <option value="Nashik">Nashik</option>
+              </select>
+              <select
+                value={statusFilter}
+                onChange={e => setStatusFilter(e.target.value as any)}
+                className="px-2.5 py-1.5 rounded-xl border border-stone-200 bg-stone-50 text-xs font-bold text-stone-700"
+              >
+                <option value="ALL">सर्व खाती (All Status)</option>
+                <option value="UNMAPPED">नकाशा बाकी (0 Plots)</option>
+                <option value="LOCKED">लॉक केलेली (Locked)</option>
+              </select>
+              <button
+                onClick={loadOverview}
+                className="p-2 rounded-xl bg-stone-100 hover:bg-stone-200 text-stone-700"
+                title="Refresh"
+              >
+                <RefreshCw className={`w-4 h-4 ${isLoading ? "animate-spin" : ""}`} />
+              </button>
+            </div>
           </div>
 
           {farmersList.length === 0 ? (
             <div className="p-6 text-center text-stone-500 text-sm font-semibold">
               अजून कोणताही शेतकरी नोंदणीकृत नाही. वरच्या &apos;{t.add_farmer}&apos; बटणावर क्लिक करून पहिला शेतकरी जोडा.
+            </div>
+          ) : filteredFarmers.length === 0 ? (
+            <div className="p-6 text-center text-stone-500 text-sm font-semibold">
+              शोधलेल्या निकषानुसार कोणताही शेतकरी सापडला नाही.
             </div>
           ) : (
             <div className="overflow-x-auto">
@@ -509,30 +669,53 @@ export const AdminPortal: React.FC<AdminPortalProps> = ({
                 <thead>
                   <tr className="border-b border-stone-200 text-stone-500 font-bold uppercase text-[11px]">
                     <th className="pb-3 px-2">आयडी (ID)</th>
-                    <th className="pb-3 px-2">नाव (Name)</th>
-                    <th className="pb-3 px-2">गाव / तालुका / जिल्हा</th>
+                    <th className="pb-3 px-2">नाव व प्रोफाइल (Farmer)</th>
+                    <th className="pb-3 px-2">गाव / तालुका / पिके</th>
                     <th className="pb-3 px-2">शेत तुकडे (7/12 Verify)</th>
                     <th className="pb-3 px-2 text-right">कृती (Actions)</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-stone-100">
-                  {farmersList.map((f: any) => (
+                  {filteredFarmers.map((f: any) => (
                     <tr key={f.farmer_id} className="hover:bg-stone-50/80 transition-colors">
-                      <td className="py-3 px-2 font-mono font-bold text-emerald-900">
-                        {f.farmer_id}
-                      </td>
-                      <td className="py-3 px-2 font-bold text-stone-800">
-                        {f.name}
-                        {f.is_locked && (
-                          <span className="ml-2 text-rose-600 font-semibold text-xs">
-                            [Locked]
+                      <td className="py-3 px-2 font-mono font-bold text-emerald-900 align-top">
+                        <div>{f.farmer_id}</div>
+                        {typeof f.total_acres === "number" && f.total_acres > 0 && (
+                          <span className="inline-block mt-1 px-1.5 py-0.5 rounded bg-sky-50 border border-sky-200 text-sky-900 text-[10px]">
+                            {f.total_acres.toFixed(2)} ac
                           </span>
                         )}
                       </td>
-                      <td className="py-3 px-2 text-stone-600">
-                        {f.village}, {f.taluka}, {f.district}
+                      <td className="py-3 px-2 align-top">
+                        <div className="font-bold text-stone-800">
+                          {f.name}
+                          {f.is_locked && (
+                            <span className="ml-2 text-rose-600 font-semibold text-xs">
+                              [Locked]
+                            </span>
+                          )}
+                        </div>
+                        {(f.holder_relation || f.farming_experience_years != null) && (
+                          <div className="text-[11px] text-stone-500 mt-0.5">
+                            {f.holder_relation}
+                            {f.holder_relation && f.farming_experience_years != null ? " • " : ""}
+                            {f.farming_experience_years != null
+                              ? `${f.farming_experience_years} yrs exp`
+                              : ""}
+                          </div>
+                        )}
                       </td>
-                      <td className="py-3 px-2">
+                      <td className="py-3 px-2 text-stone-600 align-top">
+                        <div>
+                          {f.village}, {f.taluka}, {f.district}
+                        </div>
+                        {f.primary_crops && (
+                          <span className="inline-block mt-1 px-2 py-0.5 rounded-full bg-emerald-50 border border-emerald-200 text-emerald-900 text-[11px] font-semibold">
+                            {f.primary_crops}
+                          </span>
+                        )}
+                      </td>
+                      <td className="py-3 px-2 align-top">
                         {(f.parcels || []).length === 0 ? (
                           <span className="text-xs text-stone-400">0 parcels</span>
                         ) : (
@@ -566,6 +749,13 @@ export const AdminPortal: React.FC<AdminPortalProps> = ({
                         >
                           <MapPin className="w-3.5 h-3.5" />
                           <span className="hidden lg:inline">नकाशा</span>
+                        </button>
+                        <button
+                          onClick={() => openEditFarmerModal(f)}
+                          className="p-1.5 bg-stone-100 hover:bg-stone-200 text-stone-700 rounded-lg"
+                          title="शेतकरी माहिती बदला (Edit Profile)"
+                        >
+                          <Edit3 className="w-4 h-4" />
                         </button>
                         <button
                           onClick={() => handleToggleLock(f.farmer_id, Boolean(f.is_locked))}
@@ -712,21 +902,33 @@ export const AdminPortal: React.FC<AdminPortalProps> = ({
 
       {/* Add Farmer Modal */}
       {showAddModal && (
-        <div className="fixed inset-0 z-50 bg-black/60 flex items-center justify-center p-4">
-          <div className="bg-white rounded-3xl max-w-md w-full p-6 shadow-2xl">
+        <div className="fixed inset-0 z-50 bg-black/60 flex items-center justify-center p-4 overflow-y-auto">
+          <div className="bg-white rounded-3xl max-w-lg w-full p-6 shadow-2xl my-6">
             <h2 className="text-xl font-black text-stone-900 mb-4">
               नवीन शेतकरी नोंदणी ({capacity.active_farmers + 1} of {capacity.max_farmers})
             </h2>
             <form onSubmit={handleCreateFarmer} className="space-y-3 text-xs sm:text-sm">
-              <div>
-                <label className="block font-bold text-stone-700 mb-1">शेतकऱ्याचे पूर्ण नाव:</label>
-                <input
-                  type="text"
-                  required
-                  value={name}
-                  onChange={e => setName(e.target.value)}
-                  className="w-full px-3 py-2 rounded-xl border border-stone-300 font-semibold"
-                />
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                <div>
+                  <label className="block font-bold text-stone-700 mb-1">शेतकऱ्याचे पूर्ण नाव:</label>
+                  <input
+                    type="text"
+                    required
+                    value={name}
+                    onChange={e => setName(e.target.value)}
+                    className="w-full px-3 py-2 rounded-xl border border-stone-300 font-semibold"
+                  />
+                </div>
+                <div>
+                  <label className="block font-bold text-stone-700 mb-1">पालक / नातेसंबंध (ऐच्छिक):</label>
+                  <input
+                    type="text"
+                    value={holderRelation}
+                    onChange={e => setHolderRelation(e.target.value)}
+                    placeholder="उदा. रा. प्र. देशमुख"
+                    className="w-full px-3 py-2 rounded-xl border border-stone-300 font-semibold"
+                  />
+                </div>
               </div>
 
               <div className="grid grid-cols-2 gap-2">
@@ -735,8 +937,10 @@ export const AdminPortal: React.FC<AdminPortalProps> = ({
                   <select
                     value={district}
                     onChange={e => {
-                      setDistrict(e.target.value);
-                      setTaluka(e.target.value === "Ahilya Nagar" ? "Rahuri" : "Niphad");
+                      const nextDist = e.target.value;
+                      setDistrict(nextDist);
+                      const firstTal = districtTalukas(nextDist)[0]?.name;
+                      setTaluka(firstTal || (nextDist === "Ahilya Nagar" ? "Rahuri" : "Niphad"));
                     }}
                     className="w-full px-3 py-2 rounded-xl border border-stone-300 font-semibold"
                   >
@@ -745,36 +949,101 @@ export const AdminPortal: React.FC<AdminPortalProps> = ({
                   </select>
                 </div>
                 <div>
-                  <label className="block font-bold text-stone-700 mb-1">तालुका:</label>
+                  <label className="block font-bold text-stone-700 mb-1">तालुका (२९ तालुके):</label>
+                  {districtTalukas(district).length > 0 ? (
+                    <select
+                      value={taluka}
+                      onChange={e => setTaluka(e.target.value)}
+                      className="w-full px-3 py-2 rounded-xl border border-stone-300 font-semibold"
+                    >
+                      {districtTalukas(district).map(opt => (
+                        <option key={opt.name} value={opt.name}>
+                          {opt.name}
+                        </option>
+                      ))}
+                    </select>
+                  ) : (
+                    <input
+                      type="text"
+                      required
+                      value={taluka}
+                      onChange={e => setTaluka(e.target.value)}
+                      className="w-full px-3 py-2 rounded-xl border border-stone-300 font-semibold"
+                    />
+                  )}
+                </div>
+              </div>
+
+              <div className="grid grid-cols-2 gap-2">
+                <div>
+                  <label className="block font-bold text-stone-700 mb-1">गाव:</label>
                   <input
                     type="text"
                     required
-                    value={taluka}
-                    onChange={e => setTaluka(e.target.value)}
+                    value={village}
+                    onChange={e => setVillage(e.target.value)}
+                    className="w-full px-3 py-2 rounded-xl border border-stone-300 font-semibold"
+                  />
+                </div>
+                <div>
+                  <label className="block font-bold text-stone-700 mb-1">
+                    मोबाईल क्र. (AES एनक्रिप्टेड):
+                  </label>
+                  <input
+                    type="tel"
+                    value={mobile}
+                    onChange={e => setMobile(e.target.value)}
+                    className="w-full px-3 py-2 rounded-xl border border-stone-300 font-semibold"
+                  />
+                </div>
+              </div>
+
+              <div className="grid grid-cols-2 gap-2">
+                <div>
+                  <label className="block font-bold text-stone-700 mb-1">धारणा प्रकार (Category):</label>
+                  <select
+                    value={farmerCategory}
+                    onChange={e => setFarmerCategory(e.target.value)}
+                    className="w-full px-3 py-2 rounded-xl border border-stone-300 font-semibold"
+                  >
+                    <option value="marginal">अत्यल्पभूधारक (&lt; 2.5 ac)</option>
+                    <option value="small">अल्पभूधारक (2.5 - 5 ac)</option>
+                    <option value="semi_medium">मध्यम अल्प (5 - 10 ac)</option>
+                    <option value="medium">मध्यम शेतकरी (10+ ac)</option>
+                  </select>
+                </div>
+                <div>
+                  <label className="block font-bold text-stone-700 mb-1">शेती अनुभव (वर्षे):</label>
+                  <input
+                    type="number"
+                    min={0}
+                    max={80}
+                    value={experienceYears}
+                    onChange={e => setExperienceYears(e.target.value)}
+                    placeholder="उदा. 14"
                     className="w-full px-3 py-2 rounded-xl border border-stone-300 font-semibold"
                   />
                 </div>
               </div>
 
               <div>
-                <label className="block font-bold text-stone-700 mb-1">गाव:</label>
+                <label className="block font-bold text-stone-700 mb-1">मुख्य पिके (Primary Crops):</label>
                 <input
                   type="text"
-                  required
-                  value={village}
-                  onChange={e => setVillage(e.target.value)}
+                  value={primaryCrops}
+                  onChange={e => setPrimaryCrops(e.target.value)}
+                  placeholder="उदा. कांदा, ऊस, सोयाबीन"
                   className="w-full px-3 py-2 rounded-xl border border-stone-300 font-semibold"
                 />
               </div>
 
               <div>
-                <label className="block font-bold text-stone-700 mb-1">
-                  मोबाईल क्र. (पर्यायी — AES एनक्रिप्टेड):
-                </label>
+                <label className="block font-bold text-stone-700 mb-1">शेती व सिंचन टीप (पर्यायी):</label>
                 <input
-                  type="tel"
-                  value={mobile}
-                  onChange={e => setMobile(e.target.value)}
+                  type="text"
+                  value={bioNote}
+                  onChange={e => setBioNote(e.target.value)}
+                  placeholder="उदा. ठिबक सिंचन + विहीर, गांडूळ खत वापर"
                   className="w-full px-3 py-2 rounded-xl border border-stone-300 font-semibold"
                 />
               </div>
@@ -792,6 +1061,165 @@ export const AdminPortal: React.FC<AdminPortalProps> = ({
                   className="flex-1 py-2.5 rounded-xl bg-emerald-800 hover:bg-emerald-700 font-bold text-white shadow"
                 >
                   नोंदणी करा
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* Edit Farmer Profile Modal */}
+      {editingFarmer && (
+        <div className="fixed inset-0 z-50 bg-black/60 flex items-center justify-center p-4 overflow-y-auto">
+          <div className="bg-white rounded-3xl max-w-lg w-full p-6 shadow-2xl my-6">
+            <h2 className="text-xl font-black text-stone-900 mb-1">
+              शेतकरी माहिती अद्ययावत करा ({editingFarmer.farmer_id})
+            </h2>
+            <p className="text-xs text-stone-500 mb-4">
+              गाव, तालुका, मुख्य पिके, अनुभव व धारणा प्रकार बदला.
+            </p>
+            <form onSubmit={handleUpdateFarmer} className="space-y-3 text-xs sm:text-sm">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                <div>
+                  <label className="block font-bold text-stone-700 mb-1">पूर्ण नाव:</label>
+                  <input
+                    type="text"
+                    required
+                    value={editName}
+                    onChange={e => setEditName(e.target.value)}
+                    className="w-full px-3 py-2 rounded-xl border border-stone-300 font-semibold"
+                  />
+                </div>
+                <div>
+                  <label className="block font-bold text-stone-700 mb-1">नातेसंबंध:</label>
+                  <input
+                    type="text"
+                    value={editRelation}
+                    onChange={e => setEditRelation(e.target.value)}
+                    className="w-full px-3 py-2 rounded-xl border border-stone-300 font-semibold"
+                  />
+                </div>
+              </div>
+              <div className="grid grid-cols-2 gap-2">
+                <div>
+                  <label className="block font-bold text-stone-700 mb-1">जिल्हा:</label>
+                  <select
+                    value={editDistrict}
+                    onChange={e => {
+                      const nextDist = e.target.value;
+                      setEditDistrict(nextDist);
+                      const firstTal = districtTalukas(nextDist)[0]?.name;
+                      if (firstTal) setEditTaluka(firstTal);
+                    }}
+                    className="w-full px-3 py-2 rounded-xl border border-stone-300 font-semibold"
+                  >
+                    <option value="Ahilya Nagar">Ahilya Nagar</option>
+                    <option value="Nashik">Nashik</option>
+                  </select>
+                </div>
+                <div>
+                  <label className="block font-bold text-stone-700 mb-1">तालुका:</label>
+                  {districtTalukas(editDistrict).length > 0 ? (
+                    <select
+                      value={editTaluka}
+                      onChange={e => setEditTaluka(e.target.value)}
+                      className="w-full px-3 py-2 rounded-xl border border-stone-300 font-semibold"
+                    >
+                      {districtTalukas(editDistrict).map(opt => (
+                        <option key={opt.name} value={opt.name}>
+                          {opt.name}
+                        </option>
+                      ))}
+                    </select>
+                  ) : (
+                    <input
+                      type="text"
+                      required
+                      value={editTaluka}
+                      onChange={e => setEditTaluka(e.target.value)}
+                      className="w-full px-3 py-2 rounded-xl border border-stone-300 font-semibold"
+                    />
+                  )}
+                </div>
+              </div>
+              <div className="grid grid-cols-2 gap-2">
+                <div>
+                  <label className="block font-bold text-stone-700 mb-1">गाव:</label>
+                  <input
+                    type="text"
+                    required
+                    value={editVillage}
+                    onChange={e => setEditVillage(e.target.value)}
+                    className="w-full px-3 py-2 rounded-xl border border-stone-300 font-semibold"
+                  />
+                </div>
+                <div>
+                  <label className="block font-bold text-stone-700 mb-1">मोबाईल क्र.:</label>
+                  <input
+                    type="tel"
+                    value={editMobile}
+                    onChange={e => setEditMobile(e.target.value)}
+                    className="w-full px-3 py-2 rounded-xl border border-stone-300 font-semibold"
+                  />
+                </div>
+              </div>
+              <div className="grid grid-cols-2 gap-2">
+                <div>
+                  <label className="block font-bold text-stone-700 mb-1">प्रकार:</label>
+                  <select
+                    value={editCategory}
+                    onChange={e => setEditCategory(e.target.value)}
+                    className="w-full px-3 py-2 rounded-xl border border-stone-300 font-semibold"
+                  >
+                    <option value="marginal">अत्यल्पभूधारक (&lt; 2.5 ac)</option>
+                    <option value="small">अल्पभूधारक (2.5 - 5 ac)</option>
+                    <option value="semi_medium">मध्यम अल्प (5 - 10 ac)</option>
+                    <option value="medium">मध्यम शेतकरी (10+ ac)</option>
+                  </select>
+                </div>
+                <div>
+                  <label className="block font-bold text-stone-700 mb-1">शेती अनुभव (वर्षे):</label>
+                  <input
+                    type="number"
+                    min={0}
+                    max={80}
+                    value={editExpYears}
+                    onChange={e => setEditExpYears(e.target.value)}
+                    className="w-full px-3 py-2 rounded-xl border border-stone-300 font-semibold"
+                  />
+                </div>
+              </div>
+              <div>
+                <label className="block font-bold text-stone-700 mb-1">मुख्य पिके:</label>
+                <input
+                  type="text"
+                  value={editPrimaryCrops}
+                  onChange={e => setEditPrimaryCrops(e.target.value)}
+                  className="w-full px-3 py-2 rounded-xl border border-stone-300 font-semibold"
+                />
+              </div>
+              <div>
+                <label className="block font-bold text-stone-700 mb-1">शेती टीप:</label>
+                <input
+                  type="text"
+                  value={editBioNote}
+                  onChange={e => setEditBioNote(e.target.value)}
+                  className="w-full px-3 py-2 rounded-xl border border-stone-300 font-semibold"
+                />
+              </div>
+              <div className="pt-3 flex space-x-2">
+                <button
+                  type="button"
+                  onClick={() => setEditingFarmer(null)}
+                  className="flex-1 py-2.5 rounded-xl bg-stone-100 hover:bg-stone-200 font-bold text-stone-700"
+                >
+                  रद्द करा
+                </button>
+                <button
+                  type="submit"
+                  className="flex-1 py-2.5 rounded-xl bg-emerald-800 hover:bg-emerald-700 font-bold text-white shadow"
+                >
+                  माहिती जतन करा
                 </button>
               </div>
             </form>
@@ -824,12 +1252,27 @@ export const AdminPortal: React.FC<AdminPortalProps> = ({
                   <label className="block font-bold text-stone-700 mb-1">
                     तालुका (रिकामे = सर्व):
                   </label>
-                  <input
-                    type="text"
-                    value={annTaluka}
-                    onChange={e => setAnnTaluka(e.target.value)}
-                    className="w-full px-3 py-2 rounded-xl border border-stone-300 font-semibold"
-                  />
+                  {districtTalukas(annDistrict).length > 0 ? (
+                    <select
+                      value={annTaluka}
+                      onChange={e => setAnnTaluka(e.target.value)}
+                      className="w-full px-3 py-2 rounded-xl border border-stone-300 font-semibold"
+                    >
+                      <option value="">सर्व तालुके (All)</option>
+                      {districtTalukas(annDistrict).map(opt => (
+                        <option key={opt.name} value={opt.name}>
+                          {opt.name}
+                        </option>
+                      ))}
+                    </select>
+                  ) : (
+                    <input
+                      type="text"
+                      value={annTaluka}
+                      onChange={e => setAnnTaluka(e.target.value)}
+                      className="w-full px-3 py-2 rounded-xl border border-stone-300 font-semibold"
+                    />
+                  )}
                 </div>
               </div>
 

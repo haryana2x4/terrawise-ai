@@ -67,7 +67,7 @@ Open **http://localhost:5173** in your browser and sign in with `ADMIN` and the 
 
 1. Sign in as `ADMIN` to open the **Agricultural Officer Command Center**.
 2. Click **नवीन शेतकरी जोडा (Add Farmer)** and enter the farmer's name, district (`Ahilya Nagar` or `Nashik`), taluka, and village.
-3. Kshetra atomically reserves a slot (`1 of 20`), generates a unique Farmer ID (e.g., `KS-482910`) and a pronounceable natural password (e.g., `Banyan-Godavari-Lotus-42`).
+3. Kshetra atomically reserves a slot (`1 of 40`), generates a unique Farmer ID (e.g., `KS-482910`) and a pronounceable natural password (e.g., `Banyan-Godavari-Lotus-42`).
 4. Click the **Print (A6 PDF)** icon next to the farmer to download their printable Devanagari credential card.
 5. When the farmer signs in for the first time, Kshetra presents the **DPDP Act 2023 Privacy Consent** notice and prompts them to set their own private password.
 

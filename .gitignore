@@ -42,6 +42,7 @@ services/ai-bot/data/memory.json
 uploads/
 credential-cards/
 **/credential*.pdf
+backend/issued_credentials.*
 
 # Editor and OS files
 .vscode/*

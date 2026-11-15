@@ -9,6 +9,7 @@ from typing import Any, Dict, Optional
 
 from flask import Flask, g, jsonify, request, send_from_directory
 from flask_cors import CORS
+from sqlalchemy import inspect as sa_inspect, text
 from werkzeug.exceptions import HTTPException
 
 from app.api.v1 import api_v1
@@ -27,6 +28,30 @@ from app.services import (
 
 # Ensure models are imported before create_all
 import app.models  # noqa: F401
+
+
+def _ensure_farmer_profile_columns(engine) -> None:
+    """Safely add optional natural-profile columns to existing farmer tables without wiping data."""
+    try:
+        inspector = sa_inspect(engine)
+        if not inspector.has_table("farmers"):
+            return
+        existing_cols = {col["name"] for col in inspector.get_columns("farmers")}
+        column_ddl = [
+            ("holder_relation", "VARCHAR(100)"),
+            ("farmer_category", "VARCHAR(32) NOT NULL DEFAULT 'small'"),
+            ("primary_crops", "VARCHAR(160)"),
+            ("farming_experience_years", "INTEGER"),
+            ("bio_note", "VARCHAR(300)"),
+        ]
+        missing = [(col_name, ddl) for col_name, ddl in column_ddl if col_name not in existing_cols]
+        if not missing:
+            return
+        with engine.begin() as conn:
+            for col_name, ddl in missing:
+                conn.execute(text(f"ALTER TABLE farmers ADD COLUMN {col_name} {ddl}"))
+    except Exception as exc:
+        logging.getLogger(__name__).warning("Schema column verification skipped: %s", exc)
 
 
 def create_app(
@@ -50,6 +75,7 @@ def create_app(
     db_manager.init_app(app)
     if db_manager.engine is not None:
         Base.metadata.create_all(bind=db_manager.engine)
+        _ensure_farmer_profile_columns(db_manager.engine)
 
     # Initialize domain services once per app instance
     data_dir = app.config["DATA_DIR"]

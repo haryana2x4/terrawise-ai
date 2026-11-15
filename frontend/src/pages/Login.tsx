@@ -590,7 +590,7 @@ export const Login: React.FC<LoginProps> = ({
                   <span className="font-mono font-bold text-stone-900">
                     {statusPayload?.capacity
                       ? `${statusPayload.capacity.active_farmers} / ${statusPayload.capacity.max_farmers}`
-                      : "0 / 20"}
+                      : "0 / 40"}
                   </span>
                 </div>
                 <div className="space-y-2">

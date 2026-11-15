@@ -212,7 +212,7 @@
     },
     "/admin/overview": {
       "get": {
-        "summary": "Get 20-farmer capacity meter, farmers list, source health, feedback, and audit logs",
+        "summary": "Get 40-farmer capacity meter, farmers list, source health, feedback, and audit logs",
         "tags": ["admin"]
       }
     },
@@ -222,7 +222,17 @@
         "tags": ["admin"]
       },
       "post": {
-        "summary": "Atomically create farmer account enforcing MAX_FARMERS=20 hard cap",
+        "summary": "Atomically create farmer account enforcing MAX_FARMERS=40 hard cap",
+        "tags": ["admin"]
+      }
+    },
+    "/admin/farmers/{farmer_id}": {
+      "patch": {
+        "summary": "Update human farmer profile attributes (Admin only)",
+        "tags": ["admin"]
+      },
+      "delete": {
+        "summary": "Permanently delete a non-admin farmer account (Admin only)",
         "tags": ["admin"]
       }
     },

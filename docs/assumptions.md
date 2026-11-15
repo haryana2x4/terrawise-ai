@@ -10,7 +10,7 @@
 2. **Zero-Demo Production Posture**:
    - All seeded demo accounts (`AHN-001`, `NSK-001`, `ADM-001`) have been removed from automatic startup seeding.
    - A fresh database starts with **0 farmers** and **0 admins**. The initial administrator is provisioned explicitly via `flask --app backend/wsgi.py create-admin` (reading from interactive prompt or `INITIAL_ADMIN_PASSWORD` env var).
-   - Farmers are registered exclusively by authenticated admins or field officers up to the hard cap of `MAX_FARMERS=20` enforced inside a locked transaction (`BEGIN IMMEDIATE` on SQLite, `SELECT ... FOR UPDATE` / advisory lock on PostgreSQL).
+   - Farmers are registered exclusively by authenticated admins or field officers up to the hard cap of `MAX_FARMERS=40` enforced inside a locked transaction (`BEGIN IMMEDIATE` on SQLite, `SELECT ... FOR UPDATE` / advisory lock on PostgreSQL).
 
 3. **API Versioning & Backward Compatibility**:
    - All endpoints are served under `/api/v1/*` with consistent JSON envelopes and `X-Request-ID` tracing headers.

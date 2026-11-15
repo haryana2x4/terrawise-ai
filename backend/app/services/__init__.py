@@ -1176,9 +1176,26 @@ class AssistantService:
         parcel_desc = (
             f"Parcel '{active_parcel.name}': {active_parcel.area_acres} acres ({active_parcel.area_gunthas} gunthas), "
             f"soil={active_parcel.soil_type}, irrigation={active_parcel.irrigation_source}"
+            + (f", planting_date={active_parcel.planting_date}" if active_parcel.planting_date else "")
             if active_parcel
             else "No parcel mapped yet (advise the farmer to draw their field polygon on the map)."
         )
+        crop_hist = (
+            ", ".join(
+                f"{ch.crop_name} ({ch.season} {ch.year})"
+                for ch in (active_parcel.crop_history or [])[:3]
+            )
+            if active_parcel
+            else ""
+        )
+        profile_bits = [f"{farmer.name} ({farmer.village}, {farmer.taluka}, {farmer.district})"]
+        if getattr(farmer, "primary_crops", None):
+            profile_bits.append(f"Primary crops: {farmer.primary_crops}")
+        if getattr(farmer, "farming_experience_years", None):
+            profile_bits.append(f"Experience: {farmer.farming_experience_years} yrs")
+        if crop_hist:
+            profile_bits.append(f"Recent crop rotation: {crop_hist}")
+        farmer_context_line = " • ".join(profile_bits)
         cur = weather.get("current", {})
         temp_disp = (cur.get("temperature_c") or {}).get("display", "No data")
         rain_7d = weather.get("summary", {}).get("rain_7d_forecast_mm")
@@ -1196,7 +1213,7 @@ class AssistantService:
             f"1. Never invent weather, soil, or market numbers. If a value is 'No data', say so clearly.\n"
             f"2. Cite data provenance: {prov}.\n"
             f"3. For pest/disease queries, recommend Integrated Pest Management (IPM) first and advise consulting KVK before chemical sprays.\n"
-            f"Farmer Context: {farmer.name} ({farmer.taluka}, {farmer.district}). {parcel_desc}.\n"
+            f"Farmer Context: {farmer_context_line}. {parcel_desc}.\n"
             f"Current Temp: {temp_disp}, 7-day Forecast Rain: {rain_7d if rain_7d is not None else 'No data'} mm, "
             f"30-day Past Rain: {rain_30d if rain_30d is not None else 'No data'} mm.\n"
             f"Top Crop Suitability Scores: {top_crops or 'No data'}."

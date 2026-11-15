@@ -64,7 +64,7 @@ class BaseConfig:
     SQLALCHEMY_DATABASE_URI: str = _resolve_database_uri()
 
     # Operational limits
-    MAX_FARMERS: int = int(os.environ.get("MAX_FARMERS", "20"))
+    MAX_FARMERS: int = int(os.environ.get("MAX_FARMERS", "40"))
     MAX_PARCELS_PER_FARMER: int = int(os.environ.get("MAX_PARCELS_PER_FARMER", "4"))
     LOGIN_LOCKOUT_ATTEMPTS: int = int(os.environ.get("LOGIN_LOCKOUT_ATTEMPTS", "5"))
     LOGIN_LOCKOUT_MINUTES: int = int(os.environ.get("LOGIN_LOCKOUT_MINUTES", "15"))

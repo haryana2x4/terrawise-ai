@@ -23,7 +23,7 @@ def app():
         test_config={
             "TESTING": True,
             "SQLALCHEMY_DATABASE_URI": "sqlite:///:memory:",
-            "MAX_FARMERS": 20,
+            "MAX_FARMERS": 40,
             "ASSISTANT_HOURLY_MSG_LIMIT": 5,
         },
     )

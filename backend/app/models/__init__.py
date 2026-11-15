@@ -26,7 +26,7 @@ def _utcnow() -> datetime:
 
 
 class Farmer(Base):
-    """Registered farmer or administrator account (hard cap of 20 active farmers enforced in repository)."""
+    """Registered farmer or administrator account (hard cap of 40 active farmers enforced in repository)."""
 
     __tablename__ = "farmers"
     __table_args__ = (
@@ -47,6 +47,13 @@ class Farmer(Base):
     village: Mapped[str] = mapped_column(String(100), nullable=False, default="")
     preferred_language: Mapped[str] = mapped_column(String(8), nullable=False, default="mr")
     mobile_encrypted: Mapped[Optional[str]] = mapped_column(String(512), nullable=True)
+
+    # Human & agronomic profile metadata
+    holder_relation: Mapped[Optional[str]] = mapped_column(String(100), nullable=True)
+    farmer_category: Mapped[str] = mapped_column(String(32), nullable=False, default="small")
+    primary_crops: Mapped[Optional[str]] = mapped_column(String(160), nullable=True)
+    farming_experience_years: Mapped[Optional[int]] = mapped_column(Integer, nullable=True)
+    bio_note: Mapped[Optional[str]] = mapped_column(String(300), nullable=True)
 
     failed_attempts: Mapped[int] = mapped_column(Integer, nullable=False, default=0)
     locked_until: Mapped[Optional[datetime]] = mapped_column(DateTime, nullable=True)
@@ -80,6 +87,11 @@ class Farmer(Base):
             "taluka": self.taluka,
             "village": self.village,
             "preferred_language": self.preferred_language,
+            "holder_relation": self.holder_relation,
+            "farmer_category": self.farmer_category or "small",
+            "primary_crops": self.primary_crops,
+            "farming_experience_years": self.farming_experience_years,
+            "bio_note": self.bio_note,
             "must_change_password": self.must_change_password,
             "is_locked": self.is_locked(),
             "failed_attempts": self.failed_attempts,
@@ -90,6 +102,10 @@ class Farmer(Base):
             "created_at": self.created_at.isoformat() + "Z" if self.created_at else None,
             "last_login": self.last_login.isoformat() + "Z" if self.last_login else None,
             "parcel_count": len(self.parcels) if self.parcels is not None else 0,
+            "total_acres": round(
+                sum(float(p.area_acres or 0.0) for p in (self.parcels or [])),
+                2,
+            ),
         }
         if include_sensitive:
             data["mobile"] = decrypted_mobile

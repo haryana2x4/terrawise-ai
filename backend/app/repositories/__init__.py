@@ -31,7 +31,7 @@ def _utcnow_naive() -> datetime:
 
 
 class FarmerRepository:
-    """Repository for Farmer identity, 20-farmer cap enforcement, and refresh tokens."""
+    """Repository for Farmer identity, 40-farmer cap enforcement, and refresh tokens."""
 
     @staticmethod
     def count_active_farmers(session: Session) -> int:
@@ -70,11 +70,16 @@ class FarmerRepository:
         village: str = "",
         preferred_language: str = "mr",
         mobile_encrypted: Optional[str] = None,
+        holder_relation: Optional[str] = None,
+        farmer_category: str = "small",
+        primary_crops: Optional[str] = None,
+        farming_experience_years: Optional[int] = None,
+        bio_note: Optional[str] = None,
         actor_id: str = "ADMIN",
         ip_address: Optional[str] = None,
-        max_farmers: int = 20,
+        max_farmers: int = 40,
     ) -> Dict[str, Any]:
-        """Atomically enforce the 20-farmer hard limit inside a locked transaction."""
+        """Atomically enforce the 40-farmer hard limit inside a locked transaction."""
         session = db_manager.get_session()
         try:
             dialect = session.bind.dialect.name if session.bind else "sqlite"
@@ -109,6 +114,11 @@ class FarmerRepository:
                 village=village.strip(),
                 preferred_language=preferred_language,
                 mobile_encrypted=mobile_encrypted,
+                holder_relation=holder_relation,
+                farmer_category=farmer_category or "small",
+                primary_crops=primary_crops,
+                farming_experience_years=farming_experience_years,
+                bio_note=bio_note,
             )
             session.add(farmer)
             session.add(

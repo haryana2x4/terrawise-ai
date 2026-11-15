@@ -7,13 +7,16 @@ import {
   Sparkles,
   ThumbsUp,
   ThumbsDown,
-  ShieldCheck
+  ShieldCheck,
+  CheckCircle2
 } from "lucide-react";
 
 interface WhatToPlantModalProps {
   suitability: any;
   token?: string;
   lang: Language;
+  activeParcelId?: number | null;
+  onCropRecorded?: () => void;
   onClose: () => void;
 }
 
@@ -21,12 +24,43 @@ export const WhatToPlantModal: React.FC<WhatToPlantModalProps> = ({
   suitability,
   token,
   lang,
+  activeParcelId,
+  onCropRecorded,
   onClose
 }) => {
   const t = translations[lang];
   const recommendations = suitability?.recommendations || [];
   const season = suitability?.season || "auto";
   const [ratedCrops, setRatedCrops] = useState<Record<string, number>>({});
+  const [loggedCropId, setLoggedCropId] = useState<string | null>(null);
+  const [logError, setLogError] = useState<string | null>(null);
+
+  const handleLogPlantedCrop = async (cropId: string, cropName: string) => {
+    if (!token || !activeParcelId) return;
+    setLogError(null);
+    try {
+      const resp = await fetch(`/api/v1/parcels/${activeParcelId}/history`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`
+        },
+        body: JSON.stringify({
+          crop_id: cropId,
+          crop_name: cropName,
+          season: season === "auto" ? "kharif" : season
+        })
+      });
+      if (!resp.ok) {
+        const d = await resp.json().catch(() => ({}));
+        throw new Error(d?.error?.message || "Failed to log crop");
+      }
+      setLoggedCropId(cropId);
+      if (onCropRecorded) onCropRecorded();
+    } catch (err: any) {
+      setLogError(err.message);
+    }
+  };
 
   const submitCropFeedback = async (cropId: string, rating: 1 | -1) => {
     setRatedCrops(prev => ({ ...prev, [cropId]: rating }));
@@ -194,6 +228,29 @@ export const WhatToPlantModal: React.FC<WhatToPlantModalProps> = ({
                   </div>
 
                   <div className="flex items-center space-x-1 shrink-0">
+                    {activeParcelId && token && (
+                      <button
+                        onClick={() => handleLogPlantedCrop(crop.crop_id, crop.name)}
+                        disabled={loggedCropId === crop.crop_id}
+                        className={`px-2 py-1 rounded-lg border text-[11px] font-bold flex items-center space-x-1 ${
+                          loggedCropId === crop.crop_id
+                            ? "bg-emerald-100 border-emerald-400 text-emerald-900"
+                            : "bg-stone-50 hover:bg-emerald-50 border-stone-300 text-stone-800"
+                        }`}
+                        title="Record this crop in your parcel's crop rotation ledger"
+                      >
+                        <CheckCircle2 className="w-3.5 h-3.5 text-emerald-700" />
+                        <span>
+                          {loggedCropId === crop.crop_id
+                            ? lang === "mr"
+                              ? "नोंदवले"
+                              : "Logged"
+                            : lang === "mr"
+                            ? "पेरणी नोंदवा"
+                            : "Log Sown"}
+                        </span>
+                      </button>
+                    )}
                     <button
                       onClick={() => submitCropFeedback(crop.crop_id, 1)}
                       className={`p-1.5 rounded-lg border ${
@@ -225,6 +282,7 @@ export const WhatToPlantModal: React.FC<WhatToPlantModalProps> = ({
 
         {/* Footer Disclaimer */}
         <div className="p-4 border-t border-stone-200 bg-stone-50 rounded-b-3xl text-center">
+          {logError && <p className="text-xs text-rose-700 font-bold mb-1">{logError}</p>}
           <p className="text-xs text-stone-600 font-medium">
             {suitability?.ipm_disclaimer || "Consult your local Krishi Vigyan Kendra (KVK) before applying chemical pesticides."}
           </p>

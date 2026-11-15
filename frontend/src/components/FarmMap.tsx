@@ -175,6 +175,7 @@ export const FarmMap: React.FC<FarmMapProps> = ({
   const [surveyNum, setSurveyNum] = useState("");
   const [soilType, setSoilType] = useState("medium_black");
   const [irrigationSource, setIrrigationSource] = useState("drip");
+  const [plantingDate, setPlantingDate] = useState("");
   const [statusBanner, setStatusBanner] = useState<{ type: "error" | "ok" | "info"; text: string } | null>(null);
   const [validationResult, setValidationResult] = useState<any>(null);
   const [isSaving, setIsSaving] = useState(false);
@@ -185,6 +186,7 @@ export const FarmMap: React.FC<FarmMapProps> = ({
   const [editSurvey, setEditSurvey] = useState("");
   const [editSoil, setEditSoil] = useState("medium_black");
   const [editIrrigation, setEditIrrigation] = useState("drip");
+  const [editPlantingDate, setEditPlantingDate] = useState("");
 
   const t = translations[lang];
   const liveMetrics = useMemo(() => computePolygonMetrics(drawVertices), [drawVertices]);
@@ -556,6 +558,7 @@ export const FarmMap: React.FC<FarmMapProps> = ({
       survey_number: surveyNum.trim(),
       soil_type: soilType,
       irrigation_source: irrigationSource,
+      planting_date: plantingDate || null,
       geojson: { type: "Polygon", coordinates: [ring] }
     };
     if (targetFarmerId) {
@@ -608,7 +611,8 @@ export const FarmMap: React.FC<FarmMapProps> = ({
           name: editName,
           survey_number: editSurvey,
           soil_type: editSoil,
-          irrigation_source: editIrrigation
+          irrigation_source: editIrrigation,
+          planting_date: editPlantingDate || null
         })
       });
       const data = await resp.json();
@@ -976,6 +980,17 @@ export const FarmMap: React.FC<FarmMapProps> = ({
               <option value="borewell">बोअरवेल (Borewell)</option>
               <option value="rainfed">कोरडवाहू (Rainfed)</option>
             </select>
+            <div className="col-span-2 flex items-center gap-2">
+              <label className="text-[11px] font-bold text-stone-600 shrink-0">
+                पेरणी दिनांक (पर्यायी):
+              </label>
+              <input
+                type="date"
+                value={plantingDate}
+                onChange={e => setPlantingDate(e.target.value)}
+                className="flex-1 px-2.5 py-1.5 rounded-xl border border-stone-300 font-semibold"
+              />
+            </div>
           </div>
 
           <div className="flex items-center gap-2">
@@ -1066,6 +1081,17 @@ export const FarmMap: React.FC<FarmMapProps> = ({
                   <option value="borewell">बोअरवेल (Borewell)</option>
                   <option value="rainfed">कोरडवाहू (Rainfed)</option>
                 </select>
+                <div className="col-span-2 flex items-center gap-2">
+                  <label className="text-[11px] font-bold text-stone-600 shrink-0">
+                    पेरणी दिनांक (Sowing Date):
+                  </label>
+                  <input
+                    type="date"
+                    value={editPlantingDate}
+                    onChange={e => setEditPlantingDate(e.target.value)}
+                    className="flex-1 px-2.5 py-1.5 rounded-xl border border-stone-300 font-semibold"
+                  />
+                </div>
               </div>
               <button
                 type="submit"
@@ -1101,6 +1127,7 @@ export const FarmMap: React.FC<FarmMapProps> = ({
                   </div>
                   <p className="text-xs text-stone-500 font-medium mt-0.5">
                     माती: {selectedParcel.soil_type} • सिंचन: {selectedParcel.irrigation_source}
+                    {selectedParcel.planting_date ? ` • पेरणी: ${selectedParcel.planting_date}` : ""}
                   </p>
                 </div>
 
@@ -1136,6 +1163,7 @@ export const FarmMap: React.FC<FarmMapProps> = ({
                       setEditSurvey(selectedParcel.survey_number || "");
                       setEditSoil(selectedParcel.soil_type || "medium_black");
                       setEditIrrigation(selectedParcel.irrigation_source || "drip");
+                      setEditPlantingDate(selectedParcel.planting_date || "");
                       setIsEditingMeta(true);
                     }}
                     className="px-2.5 py-1.5 rounded-xl bg-stone-100 hover:bg-stone-200 text-stone-800 text-xs font-bold flex items-center space-x-1"

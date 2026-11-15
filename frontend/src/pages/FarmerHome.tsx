@@ -376,6 +376,19 @@ export const FarmerHome: React.FC<FarmerHomeProps> = ({
                   <span>7/12 Verified</span>
                 </span>
               )}
+              {farmerProfile?.village && (
+                <span className="inline-flex items-center space-x-1 text-[10px] font-extrabold bg-stone-100 text-stone-800 px-2 py-0.5 rounded-full border border-stone-200">
+                  <MapPin className="w-3 h-3 text-emerald-700" />
+                  <span>
+                    {farmerProfile.village}, {farmerProfile.taluka}
+                  </span>
+                </span>
+              )}
+              {farmerProfile?.farming_experience_years != null && (
+                <span className="inline-flex items-center text-[10px] font-extrabold bg-amber-50 text-amber-900 px-2 py-0.5 rounded-full border border-amber-200">
+                  {farmerProfile.farming_experience_years} {lang === "mr" ? "वर्षे अनुभव" : "yrs exp"}
+                </span>
+              )}
             </div>
 
             <h1 className="text-lg sm:text-xl font-black text-stone-900 leading-tight">
@@ -392,6 +405,12 @@ export const FarmerHome: React.FC<FarmerHomeProps> = ({
                     : "No parcel mapped yet"}
                 </strong>
               </span>
+              {farmerProfile?.primary_crops && (
+                <span className="text-emerald-800">
+                  • {lang === "mr" ? "मुख्य पिके:" : "Crops:"}{" "}
+                  <strong>{farmerProfile.primary_crops}</strong>
+                </span>
+              )}
             </p>
           </div>
 
@@ -703,10 +722,24 @@ export const FarmerHome: React.FC<FarmerHomeProps> = ({
                         <p className="text-stone-600">
                           Soil: <strong>{p.soil_type}</strong> • Irrigation:{" "}
                           <strong>{p.irrigation_source}</strong>
+                          {p.survey_number ? ` • गट क्र. ${p.survey_number}` : ""}
+                          {p.planting_date ? ` • पेरणी: ${p.planting_date}` : ""}
                         </p>
                         <p className="text-[11px] font-mono text-stone-500">
                           Lat {p.centroid_lat?.toFixed(5)}°, Lon {p.centroid_lon?.toFixed(5)}°
                         </p>
+                        {Array.isArray(p.crop_history) && p.crop_history.length > 0 && (
+                          <div className="pt-1 flex flex-wrap gap-1">
+                            {p.crop_history.slice(0, 4).map((ch: any) => (
+                              <span
+                                key={ch.id}
+                                className="px-2 py-0.5 rounded-full bg-emerald-50 border border-emerald-200 text-emerald-900 text-[10px] font-bold"
+                              >
+                                {ch.crop_name} ({ch.season} {ch.year})
+                              </span>
+                            ))}
+                          </div>
+                        )}
                       </div>
                     ))}
                   </div>
@@ -754,6 +787,8 @@ export const FarmerHome: React.FC<FarmerHomeProps> = ({
           suitability={suitability}
           token={token}
           lang={lang}
+          activeParcelId={activeParcel?.id}
+          onCropRecorded={loadDashboard}
           onClose={() => setShowWhatToPlant(false)}
         />
       )}

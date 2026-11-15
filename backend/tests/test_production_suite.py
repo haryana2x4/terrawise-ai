@@ -73,7 +73,7 @@ def test_zero_demo_routes_and_empty_initial_db(client):
     assert status_resp.status_code == 200
     data = status_resp.get_json()
     assert data["capacity"]["active_farmers"] == 0
-    assert data["capacity"]["max_farmers"] == 20
+    assert data["capacity"]["max_farmers"] == 40
 
 
 def test_check_no_demo_guard_script():
@@ -172,10 +172,10 @@ def test_auth_lockout_and_refresh_token_reuse_detection(client, admin_token):
     assert relogin.status_code == 200
 
 
-def test_hard_20_farmer_cap_enforcement(client, admin_token):
-    """Verify exactly 20 farmers can be created and the 21st is rejected with 409 FARMER_CAP_REACHED."""
+def test_hard_40_farmer_cap_enforcement(client, admin_token):
+    """Verify exactly 40 farmers can be created and the 41st is rejected with 409 FARMER_CAP_REACHED."""
     created_ids = []
-    for i in range(20):
+    for i in range(40):
         resp = client.post(
             "/api/v1/admin/farmers",
             headers={"Authorization": f"Bearer {admin_token}"},
@@ -189,12 +189,12 @@ def test_hard_20_farmer_cap_enforcement(client, admin_token):
         assert resp.status_code == 201, f"Failed on slot {i+1}: {resp.get_json()}"
         created_ids.append(resp.get_json()["farmer"]["farmer_id"])
 
-    # 21st farmer must be rejected
+    # 41st farmer must be rejected
     overflow = client.post(
         "/api/v1/admin/farmers",
         headers={"Authorization": f"Bearer {admin_token}"},
         json={
-            "name": "Farmer Twenty One",
+            "name": "Farmer Forty One",
             "district": "Ahilya Nagar",
             "taluka": "Rahuri",
             "village": "Overflow",
@@ -584,5 +584,83 @@ def test_pwa_reachability_qr_and_launcher_security(client):
 
     bat_blocked = client.get("/api/v1/meta/download/windows-launcher?target=https://untrusted.invalid")
     assert bat_blocked.status_code == 400
+
+
+def test_human_profile_update_planting_date_and_crop_history(client, admin_token):
+    """Verify enriched human farmer profile creation/update, planting_date, and crop history logging."""
+    created = client.post(
+        "/api/v1/admin/farmers",
+        headers={"Authorization": f"Bearer {admin_token}"},
+        json={
+            "name": "Tukaram Babanrao Patil",
+            "district": "Nashik",
+            "taluka": "Niphad",
+            "village": "Pimpalgaon Baswant",
+            "holder_relation": "S/o Babanrao Patil",
+            "farmer_category": "semi_medium",
+            "primary_crops": "Grapes, Red Onion",
+            "farming_experience_years": 18,
+            "bio_note": "Drip line + private percolation tank",
+        },
+    )
+    assert created.status_code == 201
+    created_data = created.get_json()
+    farmer_obj = created_data["farmer"]
+    assert farmer_obj["holder_relation"] == "S/o Babanrao Patil"
+    assert farmer_obj["farmer_category"] == "semi_medium"
+    assert farmer_obj["primary_crops"] == "Grapes, Red Onion"
+    assert farmer_obj["farming_experience_years"] == 18
+
+    fid = farmer_obj["farmer_id"]
+    patched = client.patch(
+        f"/api/v1/admin/farmers/{fid}",
+        headers={"Authorization": f"Bearer {admin_token}"},
+        json={"primary_crops": "Grapes, Onion, Soybeans", "farming_experience_years": 19},
+    )
+    assert patched.status_code == 200
+    assert patched.get_json()["farmer"]["primary_crops"] == "Grapes, Onion, Soybeans"
+    assert patched.get_json()["farmer"]["farming_experience_years"] == 19
+
+    login_resp = client.post(
+        "/api/v1/auth/login",
+        json={"farmer_id": fid, "password": created_data["temporary_password"]},
+    ).get_json()
+    ftoken = login_resp["access_token"]
+
+    parcel_resp = client.post(
+        "/api/v1/parcels",
+        headers={"Authorization": f"Bearer {ftoken}"},
+        json={
+            "name": "Malran Gat 142",
+            "survey_number": "142/2",
+            "soil_type": "medium_black",
+            "irrigation_source": "drip",
+            "planting_date": "2026-07-04",
+            "geojson": VALID_PARCEL_1,
+        },
+    )
+    assert parcel_resp.status_code == 201
+    parcel_id = parcel_resp.get_json()["parcel"]["id"]
+
+    upd_parcel = client.patch(
+        f"/api/v1/parcels/{parcel_id}",
+        headers={"Authorization": f"Bearer {ftoken}"},
+        json={"planting_date": "2026-07-10"},
+    )
+    assert upd_parcel.status_code == 200
+    assert upd_parcel.get_json()["parcel"]["planting_date"] == "2026-07-10"
+
+    hist_resp = client.post(
+        f"/api/v1/parcels/{parcel_id}/history",
+        headers={"Authorization": f"Bearer {ftoken}"},
+        json={"crop_id": "onion", "crop_name": "Kharif Red Onion", "season": "kharif", "year": 2026},
+    )
+    assert hist_resp.status_code == 201
+
+    dash = client.get("/api/v1/farmer/dashboard?lang=en", headers={"Authorization": f"Bearer {ftoken}"}).get_json()
+    assert dash["farmer"]["primary_crops"] == "Grapes, Onion, Soybeans"
+    assert dash["today_card"]["active_parcel"]["planting_date"] == "2026-07-10"
+    assert dash["today_card"]["active_parcel"]["crop_history"][0]["crop_id"] == "onion"
+
 
 

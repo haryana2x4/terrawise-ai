@@ -28,7 +28,7 @@ Transform **Kshetra (TERRAWISE AI)** from a pilot prototype with seeded demo acc
    - `app/core/` (`errors.py`, `logging.py`, `request_id.py`, `pagination.py`, `units.py`, `values.py` for "No data" vs `0`)
    - `app/security/` (Argon2id/scrypt hashing, short-lived access + hashed rotating refresh tokens with reuse detection, RBAC decorators with object-level IDOR checks, lockout, security headers, field encryption for survey number & mobile, append-only audit log)
    - `app/models/` (Users/Farmers, Farms, Parcels, CropHistory, WeatherSnapshots, SoilProfiles, Announcements, Feedback, AssistantMessages, RefreshTokens, SourceHealth, AuditLogs)
-   - `app/repositories/` (all SQL/ORM queries isolated here; atomic `BEGIN IMMEDIATE` / row-locked 20-farmer cap + non-overlapping parcel transaction)
+   - `app/repositories/` (all SQL/ORM queries isolated here; atomic `BEGIN IMMEDIATE` / row-locked 40-farmer cap + non-overlapping parcel transaction)
    - `app/integrations/` (Open-Meteo, NASA POWER, ISRIC SoilGrids, Agmarknet, NASA GIBS, Sentinel, Google Maps/Geocoding, Web Push — with timeouts, retries, circuit breaker, SSRF allowlist, and source-health recording)
    - `app/services/` (AdviceEngine, RiskEngine, GeoValidationService, CredentialCardService, IngestionService, NotificationService, AssistantService)
    - `app/schemas/` (strict request/response validation)
@@ -46,7 +46,7 @@ Transform **Kshetra (TERRAWISE AI)** from a pilot prototype with seeded demo acc
 5. Build React `AssistantChat.tsx` component with Marathi/Hindi/English support, voice input & read-aloud, quick-question & field-specific chips, sanitized Markdown rendering, and thumbs up/down feedback.
 
 ### Phase 5: Real-Site Production Extras
-1. **Admin Console**: `N of 20` registration meter, create farmer, reset password, lock/unlock, verify land, A6/A4 PDF credential cards, source health table, audit log viewer, notification log, CSV export.
+1. **Admin Console**: `N of 40` registration meter, create/edit farmer, reset password, lock/unlock, verify land, A6/A4 PDF credential cards, source health table, audit log viewer, notification log, CSV export.
 2. **Officer Announcements**: Taluka-targeted weather/pest alerts pushed to farmers' in-app inbox.
 3. **Feedback System**: Thumbs up/down on advice cards & assistant replies + "Report a problem" modal.
 4. **Public `/status` Page**: Live data-source health and freshness without exposing personal data.
@@ -54,5 +54,5 @@ Transform **Kshetra (TERRAWISE AI)** from a pilot prototype with seeded demo acc
 6. **Production Polish & Docs**: 404/500/Offline boundaries, versioned `sw.js`, `robots.txt`, Open Graph tags, `/api/v1/meta/version`, `ARCHITECTURE.md`, `RUN_LOCAL.md`, `DEPLOY.md`, `SECURITY.md`, `CHANGELOG.md`, and `docs/openapi.json`.
 
 ### Phase 6: End-to-End Verification
-1. Run `scripts/check_no_demo.py`, `pytest` (unit, integration, API, IDOR security, 20-farmer concurrency, assistant guardrails), frontend TypeScript check & Vite production build, and bundle secret scan.
+1. Run `scripts/check_no_demo.py`, `pytest` (unit, integration, API, IDOR security, 40-farmer concurrency, assistant guardrails), frontend TypeScript check & Vite production build, and bundle secret scan.
 2. Verify live stack and write `/docs/qa-report.md`.
