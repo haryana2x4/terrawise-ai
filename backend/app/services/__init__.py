@@ -1500,7 +1500,46 @@ class AssistantService:
 
         pairs.sort(key=lambda item: len(item[0]), reverse=True)
         out = text
-        # Protect ASCII words only when source is ASCII to prevent partial substring collisions
+
+        # 1. Dynamic numeric weather alert clauses before static phrase replacements
+        dry_pat = re.compile(
+            r"\((?:७ दिवसांत फक्त|7 दिनों में केवल)\s*([\d.]+)\s*मिमी (?:पाऊस|बारिश)\)|"
+            r"\(([\d.]+)\s*mm expected over 7 days\)"
+        )
+        out = dry_pat.sub(
+            lambda m: {
+                "mr": f"(७ दिवसांत फक्त {m.group(1) or m.group(2)} मिमी पाऊस)",
+                "hi": f"(7 दिनों में केवल {m.group(1) or m.group(2)} मिमी बारिश)",
+                "en": f"({m.group(1) or m.group(2)} mm expected over 7 days)",
+            }[target_lang],
+            out,
+        )
+        rain_pat = re.compile(
+            r"\((?:पुढील ७ दिवसांत|अगले 7 दिनों में)\s*([\d.]+)\s*मिमी\)|"
+            r"\(([\d.]+)\s*mm in next 7 days\)"
+        )
+        out = rain_pat.sub(
+            lambda m: {
+                "mr": f"(पुढील ७ दिवसांत {m.group(1) or m.group(2)} मिमी)",
+                "hi": f"(अगले 7 दिनों में {m.group(1) or m.group(2)} मिमी)",
+                "en": f"({m.group(1) or m.group(2)} mm in next 7 days)",
+            }[target_lang],
+            out,
+        )
+        heat_pat = re.compile(
+            r"\((?:कमाल तापमान|अधिकतम तापमान)\s*([\d.]+)\s*°C\)|"
+            r"\(([\d.]+)\s*°C peak\)"
+        )
+        out = heat_pat.sub(
+            lambda m: {
+                "mr": f"(कमाल तापमान {m.group(1) or m.group(2)} °C)",
+                "hi": f"(अधिकतम तापमान {m.group(1) or m.group(2)} °C)",
+                "en": f"({m.group(1) or m.group(2)} °C peak)",
+            }[target_lang],
+            out,
+        )
+
+        # 2. Longest-first static agronomic phrase & crop replacements
         for src, tgt in pairs:
             if src in out:
                 if src.isascii() and src.replace("_", "").isalnum():
@@ -1508,9 +1547,45 @@ class AssistantService:
                 else:
                     out = out.replace(src, tgt)
 
-        # Clean up duplicate English/Marathi artifacts like "(उत्तम, ..." when target is mr
+        # 3. Clean up water-need level descriptors & quick-answer headers across all 3 languages
+        need_map = {
+            "mr": {"low": "कमी", "moderate": "मध्यम", "high": "जास्त"},
+            "hi": {"low": "कम", "moderate": "मध्यम", "high": "अधिक"},
+            "en": {"low": "low", "moderate": "moderate", "high": "high"},
+        }[target_lang]
+        out = re.sub(
+            r"(पाणी गरज|पानी की आवश्यकता|water need):\s*(low|moderate|high|कमी|कम|मध्यम|जास्त|अधिक)\b",
+            lambda m: f"{m.group(1)}: {need_map.get({'कमी':'low','कम':'low','मध्यम':'moderate','जास्त':'high','अधिक':'high'}.get(m.group(2).lower(), m.group(2).lower()), m.group(2))}",
+            out,
+            flags=re.IGNORECASE,
+        )
         if target_lang == "mr":
-            out = out.replace("(High,", "(उत्तम,").replace("(Moderate,", "(मध्यम,").replace("(Low,", "(कमी,")
+            out = (
+                out.replace("(High,", "(उत्तम,")
+                .replace("(Moderate,", "(मध्यम,")
+                .replace("(Low,", "(कमी,")
+                .replace("(कम,", "(कमी,")
+                .replace("त्वरित उत्तर", "झटपट उत्तर")
+                .replace("Quick Answer", "झटपट उत्तर")
+            )
+        elif target_lang == "hi":
+            out = (
+                out.replace("(High,", "(उत्तम,")
+                .replace("(Moderate,", "(मध्यम,")
+                .replace("(Low,", "(कम,")
+                .replace("(कमी,", "(कम,")
+                .replace("झटपट उत्तर", "त्वरित उत्तर")
+                .replace("Quick Answer", "त्वरित उत्तर")
+            )
+        else:
+            out = (
+                out.replace("(उत्तम,", "(High,")
+                .replace("(मध्यम,", "(Moderate,")
+                .replace("(कमी,", "(Low,")
+                .replace("(कम,", "(Low,")
+                .replace("झटपट उत्तर", "Quick Answer")
+                .replace("त्वरित उत्तर", "Quick Answer")
+            )
         return out
 
     def _deterministic_agronomic_reply(
