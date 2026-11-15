@@ -1,5 +1,5 @@
 /**
- * TERRAWISE AI - Astronomical Sun Engine
+ * Kshetra - Astronomical Sun Engine
  * Calculates solar position (altitude & azimuth) and time-of-day phases for Nashik / Ahilya Nagar
  * Coordinates: 19.9975° N, 73.7898° E (UTC+5:30)
  */

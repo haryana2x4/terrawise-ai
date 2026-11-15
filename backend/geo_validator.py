@@ -1,5 +1,5 @@
 """
-TERRAWISE AI - Geospatial Validation Engine
+Kshetra - Geospatial Validation Engine
 Complies with RFC 7946 GeoJSON, Shapely geometry validation, and PyProj geodesic calculations.
 """
 

@@ -2,7 +2,7 @@ export type Language = "mr" | "hi" | "en";
 
 export const translations = {
   mr: {
-    app_title: "TERRAWISE AI • शेतकरी सल्ला",
+    app_title: "Kshetra • शेतकरी सल्ला",
     login_title: "शेतकरी लॉगिन",
     login_sub: "आपला आयडी व पासवर्ड टाका",
     farmer_id: "शेतकरी आयडी",
@@ -54,7 +54,7 @@ export const translations = {
     sowing_time: "पेरणी वेळ:"
   },
   hi: {
-    app_title: "TERRAWISE AI • किसान सलाह",
+    app_title: "Kshetra • किसान सलाह",
     login_title: "किसान लॉगिन",
     login_sub: "अपना आईडी और पासवर्ड दर्ज करें",
     farmer_id: "किसान आईडी",
@@ -106,7 +106,7 @@ export const translations = {
     sowing_time: "बुवाई का समय:"
   },
   en: {
-    app_title: "TERRAWISE AI • Farmer Advisor",
+    app_title: "Kshetra • Farmer Advisor",
     login_title: "Farmer Login",
     login_sub: "Enter your Farmer ID and Password",
     farmer_id: "Farmer ID",

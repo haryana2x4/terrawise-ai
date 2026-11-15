@@ -1,5 +1,5 @@
 """
-TERRAWISE AI - Bilingual Credential Card PDF Generator
+Kshetra - Bilingual Credential Card PDF Generator
 Generates A6 single cards and A4 batch cards (4 per page) with embedded Noto Sans Devanagari,
 QR codes, and natural one-time passwords.
 """
@@ -121,7 +121,7 @@ def build_single_card_a6(farmer_data: dict, output_path: str, login_url: str = "
     elements = []
 
     # Title
-    elements.append(Paragraph("TERRAWISE AI • शेतकरी ओळखपत्र", header_style))
+    elements.append(Paragraph("Kshetra • शेतकरी ओळखपत्र", header_style))
     elements.append(Paragraph("Pilot Farmer Credential Card", subhead_style))
     elements.append(Spacer(1, 6))
 
@@ -204,7 +204,7 @@ def build_batch_cards_a4(farmers_list: list, output_path: str, login_url: str = 
         qr_img = RLImage(qr_buf, width=50, height=50)
 
         card_content = [
-            Paragraph("<b>TERRAWISE AI • शेतकरी ओळखपत्र</b>", header_style),
+            Paragraph("<b>Kshetra • शेतकरी ओळखपत्र</b>", header_style),
             Paragraph(f"<b>नाव:</b> {f.get('full_name')} | <b>गाव:</b> {f.get('village')}, {f.get('taluka')}", val_style),
             Spacer(1, 3),
             Table([

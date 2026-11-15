@@ -30,7 +30,7 @@ export const Header: React.FC<HeaderProps> = ({
           <div>
             <div className="flex items-center space-x-2">
               <span className="font-bold text-lg text-emerald-100 tracking-wide">
-                TERRAWISE AI
+                Kshetra
               </span>
               {farmer?.is_demo && (
                 <span className="bg-amber-600/90 text-white text-xs font-semibold px-2 py-0.5 rounded-full border border-amber-400">

@@ -1,5 +1,5 @@
 """
-TERRAWISE AI - SQLAlchemy Database Models
+Kshetra - SQLAlchemy Database Models
 Includes Farmer (max 20 hard cap), Parcel (max 4 per farmer), WeatherSnapshot, AuditLog
 """
 

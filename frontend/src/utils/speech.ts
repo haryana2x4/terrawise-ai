@@ -1,5 +1,5 @@
 /**
- * TERRAWISE AI - Voice Read-Aloud Utility (Web Speech API)
+ * Kshetra - Voice Read-Aloud Utility (Web Speech API)
  * Enables farmers and children to listen to daily agricultural guidance in Marathi or Hindi.
  */
 

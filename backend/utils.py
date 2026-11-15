@@ -1,5 +1,5 @@
 """
-TERRAWISE AI - Utilities: Credential Generation, Secure Password Hashing, and Safe Null-vs-Zero Formatting
+Kshetra - Utilities: Credential Generation, Secure Password Hashing, and Safe Null-vs-Zero Formatting
 Supports Argon2id with automatic secure fallback to built-in memory-hard scrypt (RFC 7914)
 when system Application Control policies restrict external C-FFI binaries.
 """

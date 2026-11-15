@@ -1,5 +1,5 @@
 """
-TERRAWISE AI - Database Engine and Atomic Limit Locking
+Kshetra - Database Engine and Atomic Limit Locking
 Enforces MAX_FARMERS=20 strictly via SQLite BEGIN IMMEDIATE transaction lock.
 """
 

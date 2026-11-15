@@ -52,7 +52,7 @@ export const Login: React.FC<LoginProps> = ({
 
   // Render Tier: "full" (rich glass, canvas particles) vs "lite" (low-resource solid card, crisp static bg)
   const [tier, setTier] = useState<"full" | "lite">(() => {
-    const saved = localStorage.getItem("terrawise_tier");
+    const saved = localStorage.getItem("kshetra_tier");
     if (saved === "lite" || saved === "full") return saved;
     // Auto-detect: if hardwareConcurrency is low, suggest lite
     if (typeof navigator !== "undefined" && navigator.hardwareConcurrency && navigator.hardwareConcurrency < 4) {
@@ -126,7 +126,7 @@ export const Login: React.FC<LoginProps> = ({
   const handleTierToggle = () => {
     const nextTier = tier === "full" ? "lite" : "full";
     setTier(nextTier);
-    localStorage.setItem("terrawise_tier", nextTier);
+    localStorage.setItem("kshetra_tier", nextTier);
   };
 
   // Auto-uppercase and auto-insert hyphen (e.g. AHN-001, NSK-001, ADM-001)
@@ -247,7 +247,7 @@ export const Login: React.FC<LoginProps> = ({
             <div className="min-w-0">
               <div className="flex items-center space-x-1 sm:space-x-1.5">
                 <span className="font-extrabold text-xs sm:text-lg tracking-tight text-white drop-shadow-sm truncate">
-                  TERRAWISE AI
+                  Kshetra
                 </span>
                 <span className="hidden sm:inline-block text-[10px] font-semibold bg-emerald-600/80 text-emerald-100 px-2 py-0.5 rounded-full border border-emerald-400/40">
                   महाराष्ट्र पायलट
@@ -597,7 +597,7 @@ export const Login: React.FC<LoginProps> = ({
                 : "Helpline: 1800-123-4567 (Toll-Free) • Krishi Vigyan Kendra Ahilya Nagar & Nashik"}
             </p>
             <p className="text-[11px] text-stone-500 mt-0.5">
-              TERRAWISE AI पायलट • भारतीय हवामान विभाग (IMD) व इस्रो सहकार्य
+              Kshetra • भारतीय हवामान विभाग (IMD) व इस्रो सहकार्य
             </p>
           </div>
 

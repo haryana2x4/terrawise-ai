@@ -1,5 +1,5 @@
 """
-TERRAWISE AI - Agronomic Advice & Multi-Factor Crop Recommendation Engine
+Kshetra - Agronomic Advice & Multi-Factor Crop Recommendation Engine
 Deterministic, explainable scoring algorithm mapping crop physiological demands to real environmental telemetry.
 """
 

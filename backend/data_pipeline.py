@@ -1,5 +1,5 @@
 """
-TERRAWISE AI - Live Agro-Meteorological & NASA Data Pipeline
+Kshetra - Live Agro-Meteorological & NASA Data Pipeline
 Integrates Open-Meteo & NASA POWER APIs with caching, exponential backoff, and provenance tracking.
 """
 

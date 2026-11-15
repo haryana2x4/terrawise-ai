@@ -1,5 +1,5 @@
 """
-TERRAWISE AI - Main Flask REST API Backend
+Kshetra - Main Flask REST API Backend
 Fully integrated with SQLite DB, GIS Validator, Data Pipeline, Advice Engine, and Credential Cards.
 """
 
@@ -85,7 +85,7 @@ def health_check():
     db.close()
     return jsonify({
         "status": "healthy",
-        "service": "TERRAWISE AI Pilot Backend",
+        "service": "Kshetra Backend",
         "timestamp": datetime.now(timezone.utc).isoformat(),
         "pilot_districts": ["Ahilya Nagar (Ahmednagar)", "Nashik"],
         "max_farmers_cap": MAX_FARMERS_CAP,
@@ -561,7 +561,7 @@ def serve_frontend(path):
     if os.path.exists(index_file):
         return send_file(index_file)
     return jsonify({
-        "message": "TERRAWISE AI Backend API is active. Build frontend or run Vite dev server at port 5173.",
+        "message": "Kshetra Backend API is active. Build frontend or run Vite dev server at port 5173.",
         "api_health": "/api/health"
     })
 

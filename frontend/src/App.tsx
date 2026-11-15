@@ -6,27 +6,27 @@ import { AdminPortal } from "./pages/AdminPortal";
 
 export const App: React.FC = () => {
   const [lang, setLang] = useState<Language>(() => {
-    return (localStorage.getItem("terrawise_lang") as Language) || "mr";
+    return (localStorage.getItem("kshetra_lang") as Language) || "mr";
   });
   const [farmer, setFarmer] = useState<any>(() => {
-    const saved = localStorage.getItem("terrawise_farmer");
+    const saved = localStorage.getItem("kshetra_farmer");
     return saved ? JSON.parse(saved) : null;
   });
   const [token, setToken] = useState<string>(() => {
-    return localStorage.getItem("terrawise_token") || "";
+    return localStorage.getItem("kshetra_token") || "";
   });
   const [view, setView] = useState<"farmer" | "admin">("farmer");
 
   const handleLanguageChange = (newLang: Language) => {
     setLang(newLang);
-    localStorage.setItem("terrawise_lang", newLang);
+    localStorage.setItem("kshetra_lang", newLang);
   };
 
   const handleLoginSuccess = (farmerData: any, authToken: string) => {
     setFarmer(farmerData);
     setToken(authToken);
-    localStorage.setItem("terrawise_farmer", JSON.stringify(farmerData));
-    localStorage.setItem("terrawise_token", authToken);
+    localStorage.setItem("kshetra_farmer", JSON.stringify(farmerData));
+    localStorage.setItem("kshetra_token", authToken);
     if (farmerData.role === "admin") {
       setView("admin");
     } else {
@@ -38,8 +38,8 @@ export const App: React.FC = () => {
     fetch("/api/auth/logout", { method: "POST" }).catch(() => {});
     setFarmer(null);
     setToken("");
-    localStorage.removeItem("terrawise_farmer");
-    localStorage.removeItem("terrawise_token");
+    localStorage.removeItem("kshetra_farmer");
+    localStorage.removeItem("kshetra_token");
     setView("farmer");
   };
 
