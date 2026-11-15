@@ -1531,7 +1531,13 @@ def _collect_access_metadata() -> Dict[str, Any]:
     public_url = str(current_app.config.get("PUBLIC_URL") or "").strip().rstrip("/")
     recommended_url = public_url or (lan_urls[0] if lan_urls else current_origin)
 
-    allowed_urls = [u for u in [public_url, *lan_urls, current_origin] if u]
+    # Also allow matching Vite dev origins on loopback/LAN when in non-production
+    dev_origins: List[str] = []
+    if current_app.config.get("ALLOW_LAN_ORIGINS"):
+        dev_origins.extend(["http://127.0.0.1:5173", "http://localhost:5173"])
+        dev_origins.extend(f"http://{ip}:5173" for ip in lan_ips)
+
+    allowed_urls = list(dict.fromkeys(u for u in [public_url, *lan_urls, current_origin, *dev_origins] if u))
 
     manifest_ready = (dist_dir / "manifest.webmanifest").is_file() or (
         public_dir / "manifest.webmanifest"

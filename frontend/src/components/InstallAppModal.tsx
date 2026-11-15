@@ -76,7 +76,9 @@ export const InstallAppModal: React.FC<InstallAppModalProps> = ({
   }
 
   const activeTarget = selectedUrl || window.location.origin;
-  const qrSrc = `/api/v1/meta/access-qr?target=${encodeURIComponent(activeTarget)}`;
+  const qrSrc = selectedUrl
+    ? `/api/v1/meta/access-qr?target=${encodeURIComponent(selectedUrl)}`
+    : null;
   const winLauncherHref = `/api/v1/meta/download/windows-launcher?target=${encodeURIComponent(activeTarget)}`;
 
   const handleCopy = async () => {
@@ -201,11 +203,17 @@ export const InstallAppModal: React.FC<InstallAppModalProps> = ({
 
             <div className="flex flex-col sm:flex-row items-center gap-4">
               <div className="bg-white p-2.5 rounded-2xl border border-stone-200 shadow-xs shrink-0">
-                <img
-                  src={qrSrc}
-                  alt="Kshetra Access QR Code"
-                  className="w-36 h-36 object-contain"
-                />
+                {qrSrc ? (
+                  <img
+                    src={qrSrc}
+                    alt="Kshetra Access QR Code"
+                    className="w-36 h-36 object-contain"
+                  />
+                ) : (
+                  <div className="w-36 h-36 rounded-xl bg-stone-100 animate-pulse flex items-center justify-center text-[11px] font-bold text-stone-400">
+                    Generating QR...
+                  </div>
+                )}
               </div>
 
               <div className="flex-1 w-full space-y-2.5">
