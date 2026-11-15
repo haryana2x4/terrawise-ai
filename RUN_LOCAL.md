@@ -1,17 +1,29 @@
-# Running Kshetra Locally (VS Code, Antigravity IDE & Windows PowerShell)
+# Running Kshetra Locally (Git, VS Code, Antigravity IDE & Windows PowerShell)
 
-All scripts and IDE launch configurations are Windows-safe and require zero manual setup beyond Python and Node.js.
+All scripts and IDE launch configurations are Windows-safe and require zero manual setup beyond Python, Node.js, and Git.
 
 ---
 
-## Quick Start: VS Code & Antigravity IDE (One-Click F5)
+## Quick Start: Git + VS Code (One-Click F5)
 
-1. Open the repository folder `terrawise-ai` (or open `kshetra.code-workspace`) in **VS Code** or **Antigravity IDE**.
+### A. Fresh Machine (`git clone` -> Open in VS Code)
+
+```powershell
+git clone https://github.com/haryana2x4/terrawise-ai.git
+cd terrawise-ai
+code kshetra.code-workspace
+```
+
+*(If you already have the folder, pull the latest commits first: `git pull origin main`.)*
+
+### B. Run Immediately in VS Code (`F5`)
+
+1. Open `terrawise-ai` (or `kshetra.code-workspace`) in **VS Code** or **Antigravity IDE**.
 2. Press **F5** (or open the **Run and Debug** sidebar and select **Kshetra: Run Full Stack (One-Click F5)**).
    - `start.py` automatically creates `.env` with freshly generated local keys (never hardcoded), installs missing backend/frontend dependencies, initializes the database, starts both the Flask backend (`http://127.0.0.1:5000`) and Vite frontend (`http://127.0.0.1:5173`), and opens Kshetra in your browser.
    - To debug Python routes with breakpoints alongside Vite, select **Kshetra: Debug Backend + Frontend (Full Stack)**.
-   - Use **Terminal -> Run Task...** for built-in shortcuts (`Setup & Bootstrap Check`, `Create Initial Admin (CLI)`, `System Doctor Check`, `Verify All`).
-3. To create your first administrator account, run from the integrated terminal (or the **Create Initial Admin (CLI)** task):
+   - Use **Terminal -> Run Task...** for built-in shortcuts (`Setup & Bootstrap Check`, `Create Initial Admin (CLI)`, `System Doctor Check`, `Build Windows EXE (Kshetra-Desktop.exe)`, `Build Android APK (Capacitor + Gradle)`, `Verify All`).
+3. To create your first administrator account, run from the VS Code integrated terminal (or run the **Create Initial Admin (CLI)** task):
 
 ```powershell
 cd backend
@@ -102,4 +114,5 @@ npm run build
    - Click **अ‍ॅप डाउनलोड (Get App)** on Login, **अ‍ॅप घ्या (Install)** in the top bar, or **शेअर / QR अ‍ॅप** in the Admin Header to:
      - Install natively as a standalone **PWA** on Android Chrome/Edge or Windows/macOS Desktop (`manifest.webmanifest` + Service Worker offline shell).
      - Scan the live SVG **QR Code** (`/api/v1/meta/access-qr`) to open Kshetra directly on nearby mobile phones.
-     - Download **`Kshetra-App.bat`** (`/api/v1/meta/download/windows-launcher`) for a standalone desktop window on Windows PCs.
+     - Download **`Kshetra-Desktop.exe`** (`/api/v1/meta/download/windows-exe`) — or rebuild it via `python packaging/windows/build_exe.py` — plus **`Kshetra-App.bat`** (`/api/v1/meta/download/windows-launcher`) for Windows PCs.
+     - Compile a standalone Android **`.apk`** on a machine with Android Studio SDK using `.\mobile\build_apk.ps1` (see [`mobile/BUILD_APK.md`](mobile/BUILD_APK.md)).

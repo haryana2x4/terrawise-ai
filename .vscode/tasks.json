@@ -105,12 +105,32 @@
       "problemMatcher": []
     },
     {
-      "label": "Kshetra: Verify All (Guard + Pytest + Typecheck + Build)",
+      "label": "Kshetra: Build Windows EXE (Kshetra-Desktop.exe)",
+      "type": "shell",
+      "command": "python",
+      "args": ["packaging/windows/build_exe.py"],
+      "options": {
+        "cwd": "${workspaceFolder}"
+      },
+      "problemMatcher": []
+    },
+    {
+      "label": "Kshetra: Build Android APK (Capacitor + Gradle)",
+      "type": "shell",
+      "command": "powershell",
+      "args": ["-ExecutionPolicy", "Bypass", "-File", "mobile/build_apk.ps1"],
+      "options": {
+        "cwd": "${workspaceFolder}"
+      },
+      "problemMatcher": []
+    },
+    {
+      "label": "Kshetra: Verify All (Guard + Doctor + Pytest + Typecheck + Build)",
       "type": "shell",
       "command": "python",
       "args": [
         "-c",
-        "import shutil, subprocess, sys; npm = shutil.which('npm.cmd') or shutil.which('npm'); npx = shutil.which('npx.cmd') or shutil.which('npx'); cmds = [([sys.executable, 'scripts/check_no_demo.py'], '.'), ([sys.executable, '-m', 'pytest', '-v'], '.'), ([npx, 'tsc', '--noEmit'], 'frontend'), ([npm, 'run', 'build'], 'frontend')]; [subprocess.run(c, cwd=d, check=True) for c, d in cmds]"
+        "import shutil, subprocess, sys; npm = shutil.which('npm.cmd') or shutil.which('npm'); npx = shutil.which('npx.cmd') or shutil.which('npx'); cmds = [([sys.executable, 'scripts/check_no_demo.py'], '.'), ([sys.executable, '-m', 'flask', '--app', 'wsgi', 'doctor'], 'backend'), ([sys.executable, '-m', 'pytest', '-v'], 'backend'), ([npx, 'tsc', '--noEmit'], 'frontend'), ([npm, 'run', 'build'], 'frontend')]; [subprocess.run(c, cwd=d, check=True) for c, d in cmds]"
       ],
       "options": {
         "cwd": "${workspaceFolder}"
