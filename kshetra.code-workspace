@@ -1,0 +1,22 @@
+{
+  "folders": [
+    {
+      "name": "Kshetra (Smart Farming AI)",
+      "path": "."
+    }
+  ],
+  "settings": {
+    "python.testing.pytestEnabled": true,
+    "python.testing.unittestEnabled": false,
+    "python.analysis.extraPaths": [
+      "${workspaceFolder}/backend"
+    ],
+    "typescript.tsdk": "frontend/node_modules/typescript/lib"
+  },
+  "extensions": {
+    "recommendations": [
+      "ms-python.python",
+      "ms-python.debugpy"
+    ]
+  }
+}

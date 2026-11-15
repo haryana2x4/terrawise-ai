@@ -3,8 +3,13 @@ from __future__ import annotations
 
 import logging
 import os
+import sys
 import time
 from pathlib import Path
+
+BACKEND_DIR = Path(__file__).resolve().parent
+if str(BACKEND_DIR) not in sys.path:
+    sys.path.insert(0, str(BACKEND_DIR))
 
 from app import create_app
 from app.extensions import db_manager

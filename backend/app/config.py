@@ -6,12 +6,50 @@ from pathlib import Path
 from typing import List
 
 
+_ROOT_DIR = Path(__file__).resolve().parent.parent.parent
+_BACKEND_DIR = Path(__file__).resolve().parent.parent
+
+
+def _load_env_file(env_path: Path) -> None:
+    """Load KEY=VALUE pairs from .env without overriding already-set process env vars."""
+    if not env_path.exists():
+        return
+    try:
+        for raw_line in env_path.read_text(encoding="utf-8").splitlines():
+            line = raw_line.strip()
+            if not line or line.startswith("#") or "=" not in line:
+                continue
+            key, val = line.split("=", 1)
+            key = key.strip()
+            val = val.strip().strip('"').strip("'")
+            if key:
+                os.environ.setdefault(key, val)
+    except OSError:
+        pass
+
+
+def _resolve_database_uri() -> str:
+    raw = os.environ.get("DATABASE_URL", "").strip()
+    if not raw:
+        return f"sqlite:///{(_BACKEND_DIR / 'kshetra.db').as_posix()}"
+    if raw.startswith("sqlite:///") and raw != "sqlite:///:memory:":
+        rel_part = raw[len("sqlite:///"):]
+        p = Path(rel_part)
+        if not p.is_absolute():
+            return f"sqlite:///{(_BACKEND_DIR / p).resolve().as_posix()}"
+    return raw
+
+
+_load_env_file(_ROOT_DIR / ".env")
+_load_env_file(_BACKEND_DIR / ".env")
+
+
 class BaseConfig:
     """Shared base configuration across all environments."""
 
-    BASE_DIR: Path = Path(__file__).resolve().parent.parent.parent
-    BACKEND_DIR: Path = Path(__file__).resolve().parent.parent
-    DATA_DIR: Path = BASE_DIR / "data"
+    BASE_DIR: Path = _ROOT_DIR
+    BACKEND_DIR: Path = _BACKEND_DIR
+    DATA_DIR: Path = _ROOT_DIR / "data"
 
     APP_NAME: str = "Kshetra"
     APP_VERSION: str = os.environ.get("APP_VERSION", "2.0.0")
@@ -22,11 +60,8 @@ class BaseConfig:
     JWT_ACCESS_TOKEN_EXPIRES_MIN: int = int(os.environ.get("JWT_ACCESS_TOKEN_EXPIRES_MIN", "30"))
     JWT_REFRESH_TOKEN_EXPIRES_DAYS: int = int(os.environ.get("JWT_REFRESH_TOKEN_EXPIRES_DAYS", "7"))
 
-    # Database
-    SQLALCHEMY_DATABASE_URI: str = os.environ.get(
-        "DATABASE_URL",
-        f"sqlite:///{(BACKEND_DIR / 'kshetra.db').as_posix()}",
-    )
+    # Database (relative SQLite paths resolve consistently inside backend/)
+    SQLALCHEMY_DATABASE_URI: str = _resolve_database_uri()
 
     # Operational limits
     MAX_FARMERS: int = int(os.environ.get("MAX_FARMERS", "20"))

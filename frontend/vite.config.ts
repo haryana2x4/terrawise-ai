@@ -11,6 +11,14 @@ export default defineConfig({
       '/api': {
         target: 'http://127.0.0.1:5000',
         changeOrigin: true
+      },
+      '/healthz': {
+        target: 'http://127.0.0.1:5000',
+        changeOrigin: true
+      },
+      '/readyz': {
+        target: 'http://127.0.0.1:5000',
+        changeOrigin: true
       }
     }
   }

@@ -1,0 +1,26 @@
+{
+  "python.testing.pytestEnabled": true,
+  "python.testing.unittestEnabled": false,
+  "python.testing.pytestArgs": [
+    "-v"
+  ],
+  "python.analysis.extraPaths": [
+    "${workspaceFolder}/backend"
+  ],
+  "python.autoComplete.extraPaths": [
+    "${workspaceFolder}/backend"
+  ],
+  "python.terminal.activateEnvironment": true,
+  "typescript.tsdk": "frontend/node_modules/typescript/lib",
+  "files.eol": "\n",
+  "files.exclude": {
+    "**/__pycache__": true,
+    "**/.pytest_cache": true
+  },
+  "search.exclude": {
+    "**/node_modules": true,
+    "**/frontend/dist": true,
+    "**/__pycache__": true,
+    "**/.pytest_cache": true
+  }
+}

@@ -1,0 +1,85 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "Kshetra: Run Full Stack (One-Click F5)",
+      "type": "python",
+      "request": "launch",
+      "program": "${workspaceFolder}/start.py",
+      "cwd": "${workspaceFolder}",
+      "args": ["--no-browser"],
+      "env": {
+        "KSHETRA_NO_BROWSER": "1"
+      },
+      "console": "integratedTerminal",
+      "justMyCode": true,
+      "serverReadyAction": {
+        "pattern": "Kshetra App\\s+:\\s+(https?://[^\\s]+)",
+        "uriFormat": "%s",
+        "action": "openExternally"
+      }
+    },
+    {
+      "name": "Kshetra: Debug Backend + Frontend (Full Stack)",
+      "type": "python",
+      "request": "launch",
+      "program": "${workspaceFolder}/backend/wsgi.py",
+      "cwd": "${workspaceFolder}/backend",
+      "preLaunchTask": "Kshetra: Frontend Dev Server (Vite :5173)",
+      "env": {
+        "FLASK_ENV": "development",
+        "HOST": "127.0.0.1",
+        "PORT": "5000",
+        "PYTHONUNBUFFERED": "1"
+      },
+      "console": "integratedTerminal",
+      "justMyCode": true,
+      "serverReadyAction": {
+        "pattern": "Running on (http://127\\.0\\.0\\.1:5000)",
+        "uriFormat": "http://127.0.0.1:5173",
+        "action": "openExternally"
+      }
+    },
+    {
+      "name": "Kshetra: Backend API Only (Flask :5000)",
+      "type": "python",
+      "request": "launch",
+      "program": "${workspaceFolder}/backend/wsgi.py",
+      "cwd": "${workspaceFolder}/backend",
+      "env": {
+        "FLASK_ENV": "development",
+        "HOST": "127.0.0.1",
+        "PORT": "5000",
+        "PYTHONUNBUFFERED": "1"
+      },
+      "console": "integratedTerminal",
+      "justMyCode": true
+    },
+    {
+      "name": "Kshetra: Background Telemetry Worker",
+      "type": "python",
+      "request": "launch",
+      "program": "${workspaceFolder}/backend/worker.py",
+      "cwd": "${workspaceFolder}/backend",
+      "env": {
+        "PYTHONPATH": "${workspaceFolder}/backend",
+        "PYTHONUNBUFFERED": "1"
+      },
+      "console": "integratedTerminal",
+      "justMyCode": true
+    },
+    {
+      "name": "Kshetra: Run Pytest Suite",
+      "type": "python",
+      "request": "launch",
+      "module": "pytest",
+      "args": ["-v"],
+      "cwd": "${workspaceFolder}",
+      "env": {
+        "PYTHONPATH": "${workspaceFolder}/backend"
+      },
+      "console": "integratedTerminal",
+      "justMyCode": false
+    }
+  ]
+}

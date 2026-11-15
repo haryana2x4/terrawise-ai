@@ -1,6 +1,22 @@
-# Running Kshetra Locally (Windows PowerShell)
+# Running Kshetra Locally (VS Code, Antigravity IDE & Windows PowerShell)
 
-All commands below are native Windows PowerShell commands. No bash-only scripts are required.
+All scripts and IDE launch configurations are Windows-safe and require zero manual setup beyond Python and Node.js.
+
+---
+
+## Quick Start: VS Code & Antigravity IDE (One-Click F5)
+
+1. Open the repository folder `terrawise-ai` (or open `kshetra.code-workspace`) in **VS Code** or **Antigravity IDE**.
+2. Press **F5** (or open the **Run and Debug** sidebar and select **Kshetra: Run Full Stack (One-Click F5)**).
+   - `start.py` automatically creates `.env` with freshly generated local keys (never hardcoded), installs missing backend/frontend dependencies, initializes the database, starts both the Flask backend (`http://127.0.0.1:5000`) and Vite frontend (`http://127.0.0.1:5173`), and opens Kshetra in your browser.
+   - To debug Python routes with breakpoints alongside Vite, select **Kshetra: Debug Backend + Frontend (Full Stack)**.
+   - Use **Terminal -> Run Task...** for built-in shortcuts (`Setup & Bootstrap Check`, `Create Initial Admin (CLI)`, `System Doctor Check`, `Verify All`).
+3. To create your first administrator account, run from the integrated terminal (or the **Create Initial Admin (CLI)** task):
+
+```powershell
+cd backend
+python -m flask --app wsgi create-admin --admin-id ADMIN --name "Kshetra Agricultural Officer"
+```
 
 ---
 
