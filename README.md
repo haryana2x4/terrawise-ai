@@ -30,9 +30,10 @@
 5. **India DPDP Act 2023 Compliance**:
    - First-login Marathi/Hindi/English privacy consent flow, field-level PII encryption (`mobile_encrypted`, `survey_number_encrypted`), one-click **Export My Data (JSON)**, and self-service **Delete My Data**.
 
-6. **Installable PWA & Multi-Device Sharing**:
-   - Full Progressive Web App (`manifest.webmanifest`, `192/512` icons, Service Worker `sw.js`) installable on Android, iOS, Windows, and macOS.
-   - Built-in **Install & Share Modal** with live Wi-Fi/LAN SVG QR code, one-click PWA install, Windows Standalone App (`Kshetra-App.bat`), and 1-click [`share_app.bat`](file:///C:/Users/Rocky/.gemini/antigravity/scratch/terrawise-ai/share_app.bat) Waitress host mode (`start.py --share --prod`).
+6. **Installable PWA, Windows `.exe`, Android `.apk` Kit & Multi-Device Sharing**:
+   - Full Progressive Web App (`manifest.webmanifest`, `192/512` icons, Service Worker `sw.js`) installable on Android WebAPK, iOS, Windows, and macOS.
+   - Built-in **Install & Share Modal** with live Wi-Fi/LAN SVG QR code, downloadable compiled [`Kshetra-Desktop.exe`](file:///C:/Users/Rocky/.gemini/antigravity/scratch/terrawise-ai/release/Kshetra-Desktop.exe), `Kshetra-App.bat`, Capacitor/TWA [`mobile/`](file:///C:/Users/Rocky/.gemini/antigravity/scratch/terrawise-ai/mobile/BUILD_APK.md) `.apk` build kit, and [`share_app.bat`](file:///C:/Users/Rocky/.gemini/antigravity/scratch/terrawise-ai/share_app.bat) Waitress host mode.
+   - Detailed plain-language technical FAQ, flowchart, security, and AI grounding reference in [`docs/system-qa-guide.md`](file:///C:/Users/Rocky/.gemini/antigravity/scratch/terrawise-ai/docs/system-qa-guide.md).
 
 ---
 

@@ -1,0 +1,15 @@
+{
+  "appId": "in.kshetra.agri",
+  "appName": "Kshetra",
+  "webDir": "../frontend/dist",
+  "bundledWebRuntime": false,
+  "android": {
+    "allowMixedContent": true,
+    "captureInput": true,
+    "webContentsDebuggingEnabled": false
+  },
+  "server": {
+    "androidScheme": "https",
+    "cleartext": true
+  }
+}

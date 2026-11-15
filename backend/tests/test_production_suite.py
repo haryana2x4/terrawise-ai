@@ -732,5 +732,21 @@ def test_assistant_translation_and_trilingual_today_card(client, admin_token):
     assert bad_lang.get_json()["error"]["code"] == "INVALID_LANGUAGE"
 
 
+def test_windows_exe_and_android_packaging_endpoints(client):
+    """Verify /meta/access-info packaging flags and Kshetra-Desktop.exe PE binary download."""
+    info_resp = client.get("/api/v1/meta/access-info")
+    assert info_resp.status_code == 200
+    info = info_resp.get_json()
+    assert info["windows_exe_ready"] is True
+    assert info["android_project_ready"] is True
+    assert info["android_package_id"] == "in.kshetra.agri"
+
+    exe_resp = client.get("/api/v1/meta/download/windows-exe")
+    assert exe_resp.status_code == 200
+    assert 'filename="Kshetra-Desktop.exe"' in exe_resp.headers.get("Content-Disposition", "")
+    assert exe_resp.data[:2] == b"MZ"
+
+
+
 
 

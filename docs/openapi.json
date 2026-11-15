@@ -265,6 +265,30 @@
         "summary": "Public health status of database and upstream telemetry sources",
         "tags": ["meta"]
       }
+    },
+    "/meta/access-info": {
+      "get": {
+        "summary": "Return local/LAN/public URLs plus PWA, Windows .exe, and Android packaging readiness",
+        "tags": ["meta"]
+      }
+    },
+    "/meta/access-qr": {
+      "get": {
+        "summary": "Generate allowlisted SVG QR code for phone/tablet access",
+        "tags": ["meta"]
+      }
+    },
+    "/meta/download/windows-launcher": {
+      "get": {
+        "summary": "Download Kshetra-App.bat desktop app shortcut",
+        "tags": ["meta"]
+      }
+    },
+    "/meta/download/windows-exe": {
+      "get": {
+        "summary": "Download compiled native Windows executable Kshetra-Desktop.exe",
+        "tags": ["meta"]
+      }
     }
   }
 }

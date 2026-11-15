@@ -1647,6 +1647,10 @@ def _collect_access_metadata() -> Dict[str, Any]:
         public_dir / "manifest.webmanifest"
     ).is_file()
     dist_ready = (dist_dir / "index.html").is_file()
+    windows_exe_ready = (base_dir / "release" / "Kshetra-Desktop.exe").is_file()
+    android_project_ready = (base_dir / "mobile" / "capacitor.config.json").is_file() and (
+        base_dir / "mobile" / "build_apk.ps1"
+    ).is_file()
 
     return {
         "current_origin": current_origin,
@@ -1657,6 +1661,8 @@ def _collect_access_metadata() -> Dict[str, Any]:
         "allowed_urls": allowed_urls,
         "pwa_manifest_ready": manifest_ready,
         "production_bundle_built": dist_ready,
+        "windows_exe_ready": windows_exe_ready,
+        "android_project_ready": android_project_ready,
     }
 
 
@@ -1677,7 +1683,7 @@ def _resolve_verified_access_url(requested_url: Optional[str]) -> str:
 
 @api_v1.route("/meta/access-info", methods=["GET"])
 def meta_access_info():
-    """Return local/LAN/public URLs and PWA installability status for sharing and onboarding."""
+    """Return local/LAN/public URLs and PWA/Desktop/Mobile packaging readiness metadata."""
     meta = _collect_access_metadata()
     return jsonify(
         {
@@ -1687,6 +1693,9 @@ def meta_access_info():
             "recommended_share_url": meta["recommended_share_url"],
             "pwa_manifest_ready": meta["pwa_manifest_ready"],
             "production_bundle_built": meta["production_bundle_built"],
+            "windows_exe_ready": meta["windows_exe_ready"],
+            "android_project_ready": meta["android_project_ready"],
+            "android_package_id": "in.kshetra.agri",
             "tunnel_command_hint": "cloudflared tunnel --url http://127.0.0.1:5000",
         }
     ), 200
@@ -1730,6 +1739,27 @@ def meta_download_windows_launcher():
         mimetype="text/plain; charset=utf-8",
         headers={
             "Content-Disposition": 'attachment; filename="Kshetra-App.bat"',
+            "Cache-Control": "no-store",
+        },
+    )
+
+
+@api_v1.route("/meta/download/windows-exe", methods=["GET"])
+def meta_download_windows_exe():
+    """Serve the compiled native Windows desktop executable (Kshetra-Desktop.exe)."""
+    base_dir = Path(current_app.config["BASE_DIR"])
+    exe_path = base_dir / "release" / "Kshetra-Desktop.exe"
+    if not exe_path.is_file():
+        raise AppError(
+            "EXE_NOT_BUILT",
+            "Kshetra-Desktop.exe has not been compiled yet. Run python packaging/windows/build_exe.py.",
+            404,
+        )
+    return Response(
+        exe_path.read_bytes(),
+        mimetype="application/vnd.microsoft.portable-executable",
+        headers={
+            "Content-Disposition": 'attachment; filename="Kshetra-Desktop.exe"',
             "Cache-Control": "no-store",
         },
     )

@@ -53,3 +53,11 @@ backend/issued_credentials.*
 .idea/
 .DS_Store
 Thumbs.db
+
+# Android / Capacitor intermediate build artifacts (keep release/Kshetra-Desktop.exe tracked)
+mobile/node_modules/
+mobile/android/build/
+mobile/android/.gradle/
+mobile/android/app/build/
+release/*.apk
+release/Kshetra-Standalone.exe

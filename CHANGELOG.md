@@ -2,6 +2,17 @@
 
 All notable architectural and API changes to **Kshetra (formerly TERRAWISE AI)** are documented here.
 
+## [2.4.0] — 2026-11-15 — Windows Desktop `.exe`, Android `.apk` Packaging Kit & System Q&A Architecture Guide
+
+### Added
+- **Compiled Windows Desktop Executable (`release/Kshetra-Desktop.exe`)**:
+  - Added [`KshetraDesktop.cs`](file:///C:/Users/Rocky/.gemini/antigravity/scratch/terrawise-ai/packaging/windows/KshetraDesktop.cs) + [`build_exe.py`](file:///C:/Users/Rocky/.gemini/antigravity/scratch/terrawise-ai/packaging/windows/build_exe.py) compiling a native WinForms desktop binary with custom Kshetra app icon (`kshetra.ico`) via Microsoft `.NET csc.exe`, plus optional all-in-one PyInstaller bundler [`build_full_standalone_exe.py`](file:///C:/Users/Rocky/.gemini/antigravity/scratch/terrawise-ai/packaging/windows/build_full_standalone_exe.py).
+  - Exposed `GET /api/v1/meta/download/windows-exe` and `windows_exe_ready` / `android_project_ready` flags in `/api/v1/meta/access-info` and [`InstallAppModal.tsx`](file:///C:/Users/Rocky/.gemini/antigravity/scratch/terrawise-ai/frontend/src/components/InstallAppModal.tsx).
+- **Android `.apk` Packaging Kit (`mobile/`)**:
+  - Added Capacitor (`in.kshetra.agri`) & TWA configs (`capacitor.config.json`, `package.json`, `twa-manifest.json`), automated PowerShell APK compiler [`build_apk.ps1`](file:///C:/Users/Rocky/.gemini/antigravity/scratch/terrawise-ai/mobile/build_apk.ps1) with GPS/Microphone permissions, and [`BUILD_APK.md`](file:///C:/Users/Rocky/.gemini/antigravity/scratch/terrawise-ai/mobile/BUILD_APK.md).
+- **System Security, Storage, API, AI Training/Grounding, Flowchart & Simple Q&A Guide**:
+  - Added [`docs/system-qa-guide.md`](file:///C:/Users/Rocky/.gemini/antigravity/scratch/terrawise-ai/docs/system-qa-guide.md) documenting encryption, SQLite/PostgreSQL storage, upstream scientific APIs, real-time grounded agronomy RAG, Mermaid architecture flowchart, and plain-language Q&A.
+
 ## [2.3.0] — 2026-11-15 — Upgraded Natural AI Voice v2 & Trilingual Marathi/Hindi/English Translation Everywhere
 
 ### Added & Upgraded

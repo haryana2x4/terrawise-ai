@@ -1,0 +1,22 @@
+{
+  "packageId": "in.kshetra.agri",
+  "host": "kshetra.local",
+  "name": "Kshetra",
+  "launcherName": "Kshetra",
+  "display": "standalone",
+  "themeColor": "#0c1411",
+  "navigationColor": "#0c1411",
+  "backgroundColor": "#0c1411",
+  "enableNotifications": true,
+  "startUrl": "/",
+  "iconUrl": "/icons/icon-512.png",
+  "maskableIconUrl": "/icons/icon-512-maskable.png",
+  "shortcuts": [],
+  "signingKey": {
+    "path": "./android.keystore",
+    "alias": "kshetra"
+  },
+  "appVersionName": "1.0.0",
+  "appVersionCode": 1,
+  "orientation": "portrait"
+}
