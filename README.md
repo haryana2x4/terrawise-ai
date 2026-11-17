@@ -1,6 +1,9 @@
 # Kshetra (क्षेत्र) — Agricultural Decision Support Platform
 
-**Kshetra** (formerly TERRAWISE AI) is a zero-demo, production-grade agricultural decision support platform built for smallholder farmers and agricultural extension officers in **Ahilya Nagar** and **Nashik**, Maharashtra.
+> 🏆 **NASA Space Apps Challenge 2026 — Team Infinity • Provisional Rank #8 (`73 / 100`)**
+> Ranked **#8** out of **73 scored teams** (**83 total teams**) on the *Provisional Marking List* — earning **`20 / 20` (Full Marks) in Validity** and **`19 / 20` in Creativity** (`Impact: 13/20`, `Creativity: 19/20`, `Validity: 20/20`, `Relevance: 9/20`, `Presentation: 12/20`).
+
+**Kshetra** (formerly TERRAWISE AI) is a zero-demo, production-grade agricultural decision support platform built by **Team Infinity** for smallholder farmers and agricultural extension officers in **Ahilya Nagar** and **Nashik**, Maharashtra.
 
 ---
 
@@ -55,6 +58,21 @@ npm run dev
 ```
 
 See [`RUN_LOCAL.md`](file:///C:/Users/Rocky/.gemini/antigravity/scratch/terrawise-ai/RUN_LOCAL.md), [`ARCHITECTURE.md`](file:///C:/Users/Rocky/.gemini/antigravity/scratch/terrawise-ai/ARCHITECTURE.md), [`DEPLOY.md`](file:///C:/Users/Rocky/.gemini/antigravity/scratch/terrawise-ai/DEPLOY.md), and [`SECURITY.md`](file:///C:/Users/Rocky/.gemini/antigravity/scratch/terrawise-ai/SECURITY.md) for complete documentation.
+
+---
+
+## Competition Result — Team Infinity (NASA Space Apps Challenge 2026)
+
+| Criterion | Provisional Score | Notes |
+| :--- | :---: | :--- |
+| **Impact** | `13 / 20` | Real-world Maharashtra smallholder workflows (Marathi / Hindi / English) |
+| **Creativity** | `19 / 20` | Zero-demo field truthfulness, Krishi Mitra grounded AI + Voice v2, offline PWA |
+| **Validity** | **`20 / 20`** | Dual-CRS geodesy (`WGS84` + `UTM 43N`), FAO-56 math, 15/15 passing test suite |
+| **Relevance** | `9 / 20` | Agro-climate & soil telemetry integration (`Open-Meteo`, `ISRIC SoilGrids`, `MPKV`) |
+| **Presentation** | `12 / 20` | Live full-stack platform, A6 PDF cards & slide showcase |
+| **TOTAL (Rank #8)** | **`73 / 100`** | **Rank #8 out of 73 scored teams** (`83` teams listed on the provisional marking list) |
+
+Built by **Team Infinity** ([GitHub @haryana2x4](https://github.com/haryana2x4) • [LinkedIn](https://www.linkedin.com/in/aryan-kurmi-147a67431/)).
 
 ---
 
